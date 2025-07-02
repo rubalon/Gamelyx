@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "🎮 MyGamingVault (Root)",
+      "path": "."
+    },
+    {
+      "name": "🌐 Frontend (Angular)",
+      "path": "./frontend"
+    },
+    {
+      "name": "⚙️ Backend (Spring Boot)",
+      "path": "./backend"
+    }
+  ]
+}
