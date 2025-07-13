@@ -1,4 +1,4 @@
-# MyGamingVault - Git Ignore
+# Gamelyx - Git Ignore
 
 #################################################
 # IDEs y Editores
@@ -88,4 +88,4 @@ backend/.idea/
 #################################################
 # Mantener el workspace pero ignorar configs personales
 .vscode/settings.json
-!MyGamingVault.code-workspace
+!Gamelyx.code-workspace

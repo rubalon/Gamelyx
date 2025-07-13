@@ -1,4 +1,4 @@
-package com.mygamingvault.backend.controller;
+package com.gamelyx.backend.controller;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +12,7 @@ public class TestController {
 
     @GetMapping("/hello")
     public String hello() {
-        return "¡Hola desde MyGamingVault Backend! 🎮";
+        return "¡Hola desde Gamelyx Backend! 🎮";
     }
 
     @GetMapping("/status")

@@ -1,10 +1,10 @@
-package com.mygamingvault.backend;
+package com.gamelyx.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MyGamingVaultBackendApplicationTests {
+class GamelyxBackendApplicationTests {
 
     @Test
     void contextLoads() {

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "my-gaming-vault": {
+    "gamelyx": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "my-gaming-vault:build:production"
+              "buildTarget": "gamelyx:build:production"
             },
             "development": {
-              "buildTarget": "my-gaming-vault:build:development"
+              "buildTarget": "gamelyx:build:development"
             }
           },
           "defaultConfiguration": "development"

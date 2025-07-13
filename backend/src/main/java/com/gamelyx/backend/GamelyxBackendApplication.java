@@ -1,13 +1,13 @@
-package com.mygamingvault.backend;
+package com.gamelyx.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MyGamingVaultBackendApplication {
+public class GamelyxBackendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MyGamingVaultBackendApplication.class, args);
+        SpringApplication.run(GamelyxBackendApplication.class, args);
     }
 
 }

@@ -1,11 +1,11 @@
-# MyGamingVault 🎮
+# Gamelyx 🎮
 
 Aplicación web para amantes de los videojuegos desarrollada como Trabajo Fin de Grado.
 
 ## 📁 Estructura del Proyecto
 
 ```
-MyGamingVault/
+Gamelyx/
 ├── frontend/          # Aplicación Angular
 ├── backend/           # API Spring Boot  
 ├── docs/              # Documentación
@@ -39,8 +39,8 @@ MyGamingVault/
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/MyGamingVault.git
-   cd MyGamingVault
+   git clone https://github.com/tu-usuario/Gamelyx.git
+   cd Gamelyx
    ```
 
 2. **Configurar Frontend**

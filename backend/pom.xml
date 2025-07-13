@@ -8,11 +8,11 @@
         <version>3.5.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.mygamingvault</groupId>
+    <groupId>com.gamelyx</groupId>
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MyGamingVault-Backend</name>
-    <description>MyGamingVault-Backend</description>
+    <name>Gamelyx-Backend</name>
+    <description>Gamelyx-Backend</description>
     <url/>
     <licenses>
         <license/>
