@@ -1,0 +1,43 @@
+// Variables SCSS para la sección de features
+$card-hover-scale: 1.02;
+$transition-duration: 0.3s;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+// Mixins para efectos reutilizables
+@mixin card-hover-effect {
+  transform: translateY(-0.5rem) scale($card-hover-scale);
+  box-shadow: 0 20px 25px -5px $shadow-color, 0 10px 10px -5px $shadow-color;
+}
+
+@mixin gradient-icon($from, $to) {
+  background: linear-gradient(135deg, $from, $to);
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// Estilos específicos si necesitamos customización más allá de Tailwind
+.feature-card {
+  transition: all $transition-duration ease-in-out;
+  
+  &:hover {
+    @include card-hover-effect;
+  }
+  
+  .icon-container {
+    transition: transform $transition-duration ease-in-out;
+    
+    &.green {
+      @include gradient-icon(#4ade80, #059669);
+    }
+    
+    &.blue {
+      @include gradient-icon(#60a5fa, #0891b2);
+    }
+    
+    &.purple {
+      @include gradient-icon(#a78bfa, #db2777);
+    }
+  }
+}

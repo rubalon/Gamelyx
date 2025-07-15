@@ -1,0 +1,25 @@
+// Variables SCSS para la landing page
+$page-min-height: 100vh;
+
+// Estructura principal de la landing page
+.landing-container {
+  min-height: $page-min-height;
+  
+  // Podemos usar anidación SCSS para organizar mejor
+  app-header {
+    // Estilos específicos del header en esta página
+  }
+  
+  app-hero-section {
+    // Estilos específicos del hero en esta página
+  }
+  
+  app-features-section {
+    // Estilos específicos de las features en esta página
+  }
+}
+
+// Mixins para efectos de scroll suave si los necesitamos
+@mixin smooth-scroll {
+  scroll-behavior: smooth;
+}
