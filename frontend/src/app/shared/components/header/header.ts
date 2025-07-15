@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -8,8 +9,10 @@ import { Component } from '@angular/core';
 })
 export class Header {
   
+  constructor(private router: Router) {}
+
   onLoginClick(): void {
-    // TODO: Implementar lógica de login más adelante
-    console.log('Login clicked');
+    // Navegar a la página de home (temporalmente)
+    this.router.navigate(['/home']);
   }
 }

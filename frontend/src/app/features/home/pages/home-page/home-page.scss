@@ -1,0 +1,25 @@
+// Estilos específicos para la página Home
+// Variables para la home page
+$home-min-height: 100vh;
+$gradient-animation-duration: 3s;
+
+// Contenedor principal
+.home-container {
+  min-height: $home-min-height;
+  
+  // Si queremos añadir animaciones más adelante
+  .title-gradient {
+    // Futuras animaciones para el gradiente del título
+  }
+  
+  .construction-card {
+    // Estilos adicionales para el mensaje de construcción
+  }
+}
+
+// Animación opcional para el título (por si la queremos más adelante)
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
