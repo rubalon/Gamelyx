@@ -1,6 +1,6 @@
 // Variables SCSS para el hero section
 $animation-delay-base: 2s;
-$blur-size: 3rem;
+
 
 // Animaciones personalizadas usando SCSS
 .animation-delay-2000 {
@@ -11,14 +11,3 @@ $blur-size: 3rem;
   animation-delay: $animation-delay-base * 2;
 }
 
-// Podemos crear mixins SCSS para efectos reutilizables (no se esta usando revisar si es necesario)
-@mixin blur-effect($size: $blur-size) {
-  filter: blur($size);
-}
-
-// Aplicar el mixin si necesitamos customización adicional
-.hero-background {
-  .blur-effect {
-    @include blur-effect();
-  }
-}
