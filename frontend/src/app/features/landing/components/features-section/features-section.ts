@@ -19,7 +19,7 @@ interface Feature {
   templateUrl: './features-section.html',
   styleUrl: './features-section.scss'
 })
-export class FeaturesSectionComponent {
+export class FeaturesSection {
   
   features: Feature[] = [
     {

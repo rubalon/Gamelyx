@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
-export class HeaderComponent {
+export class Header {
   
   onLoginClick(): void {
     // TODO: Implementar lógica de login más adelante
