@@ -65,12 +65,21 @@
             },
             "development": {
               "buildTarget": "gamelyx:build:development"
+            },
+            "en": {
+              "buildTarget": "gamelyx:build:en"
+            },
+            "es": {
+              "buildTarget": "gamelyx:build:es"
             }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular/build:extract-i18n"
+          "builder": "@angular/build:extract-i18n",
+          "options": {
+            "buildTarget": "gamelyx:build:development"
+          }
         },
         "test": {
           "builder": "@angular/build:karma",

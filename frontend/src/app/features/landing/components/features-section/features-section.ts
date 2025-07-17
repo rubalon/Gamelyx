@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 
 interface Feature {
-  id: string; 
-  title: string;
-  description: string;
+  id: string;
+  titleKey: string; 
+  descriptionKey: string;
   icon: string;
   comingSoon: boolean;
   gradientBg: string;
@@ -15,7 +16,7 @@ interface Feature {
 @Component({
   selector: 'app-features-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './features-section.html',
   styleUrl: './features-section.scss'
 })
@@ -23,9 +24,9 @@ export class FeaturesSection {
   
   features: Feature[] = [
     {
-      id: 'game-reviews',  // ← ID único que nunca cambia
-      title: 'Game Reviews & Tracking',
-      description: 'Mantén un registro completo de todos los juegos que has completado, los que estás jugando y tu lista de deseos. Comparte reseñas y descubre nuevos títulos.',
+      id: 'game-reviews',
+      titleKey: 'features.gameReviews.title',
+      descriptionKey: 'features.gameReviews.description',
       icon: 'game-controller',
       gradientBg: 'bg-gradient-to-br from-green-400 to-emerald-600',
       gradientHover: 'bg-gradient-to-br from-green-400/10 to-emerald-600/10',
@@ -33,9 +34,9 @@ export class FeaturesSection {
       comingSoon: false
     },
     {
-      id: 'team-finding',  // ← ID único que nunca cambia
-      title: 'Team Finding',
-      description: 'Encuentra compañeros de equipo perfectos para rankear competitivamente o simplemente amigos para disfrutar de tus juegos favoritos en modo casual.',
+      id: 'team-finding',
+      titleKey: 'features.teamFinding.title',
+      descriptionKey: 'features.teamFinding.description',
       icon: 'users',
       gradientBg: 'bg-gradient-to-br from-blue-400 to-cyan-600',
       gradientHover: 'bg-gradient-to-br from-blue-400/10 to-cyan-600/10',
@@ -43,9 +44,9 @@ export class FeaturesSection {
       comingSoon: false
     },
     {
-      id: 'ai-matchmaking',  // ← ID único que nunca cambia
-      title: 'AI Matchmaking',
-      description: 'Nuestro sistema de inteligencia artificial analiza tu estilo de juego, personalidad y preferencias para encontrarte los compañeros más compatibles.',
+      id: 'ai-matchmaking',
+      titleKey: 'features.aiMatchmaking.title',
+      descriptionKey: 'features.aiMatchmaking.description',
       icon: 'ai-chip',
       gradientBg: 'bg-gradient-to-br from-purple-400 to-pink-600',
       gradientHover: 'bg-gradient-to-br from-purple-400/10 to-pink-600/10',

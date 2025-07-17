@@ -12,17 +12,32 @@
         </h1>
       </div>
       
-      <!-- Botón de login a la derecha -->
-      <button 
-        (click)="onLoginClick()"
-        class="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
-      >
-        <!-- Icono de persona -->
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-        </svg>
-        <span>Iniciar Sesión</span>
-      </button>
+      <!-- Selector de idioma y botón de login -->
+      <div class="flex items-center space-x-4">
+        
+        <!-- Selector de idioma -->
+        <div class="relative">
+          <select 
+            [value]="getCurrentLanguage()"
+            (change)="changeLanguage($event)"
+            class="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+          >
+            <option value="es">🇪🇸 Español</option>
+            <option value="en">🇺🇸 English</option>
+          </select>
+        </div>
+        
+        <!-- Botón de login -->
+        <button 
+          (click)="onLoginClick()"
+          class="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+        >
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+          </svg>
+          <span>{{ 'header.login' | translate }}</span>
+        </button>
+      </div>
     </div>
   </div>
 </header>

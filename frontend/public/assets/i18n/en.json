@@ -1,0 +1,43 @@
+{
+  "header": {
+    "login": "log In"
+  },
+  "hero": {
+    "subtitle": "Your gaming experience elevated to the next level",
+    "description": "Discover, connect and dominate. The ultimate platform for gamers who seek more than just playing.",
+    "cta": {
+      "start": "Get Started",
+      "learn": "Learn More"
+    }
+  },
+  "features": {
+    "title": {
+      "part1": "Features that",
+      "part2": "transform",
+      "part3": "your gaming"
+    },
+    "subtitle": "Discover the tools that will take your gaming experience to the next level",
+    "gameReviews": {
+      "title": "Game Reviews & Tracking",
+      "description": "Keep a complete record of all the games you've completed, the ones you're playing and your wishlist. Share reviews and discover new titles."
+    },
+    "teamFinding": {
+      "title": "Team Finding",
+      "description": "Find perfect teammates to rank competitively or just friends to enjoy your favorite games in casual mode."
+    },
+    "aiMatchmaking": {
+      "title": "AI Matchmaking",
+      "description": "Our artificial intelligence system analyzes your gameplay style, personality and preferences to find you the most compatible teammates."
+    },
+    "badge": {
+      "available": "✨ Available",
+      "comingSoon": "🚀 Coming Soon"
+    }
+  },
+  "home": {
+    "title": "HOME",
+    "welcome": "Welcome to your gaming dashboard",
+    "construction": "🚧 Page under construction",
+    "constructionDetails": "Here will be the main dashboard content"
+  }
+}

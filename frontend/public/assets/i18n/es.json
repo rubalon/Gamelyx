@@ -1,0 +1,43 @@
+{
+  "header": {
+    "login": "Iniciar Sesión"
+  },
+  "hero": {
+    "subtitle": "Tu experiencia gaming elevada al siguiente nivel",
+    "description": "Descubre, conecta y domina. La plataforma definitiva para gamers que buscan más que solo jugar.",
+    "cta": {
+      "start": "Comenzar Ahora",
+      "learn": "Saber Más"
+    }
+  },
+  "features": {
+    "title": {
+      "part1": "Funcionalidades que",
+      "part2": "transforman",
+      "part3": "tu gaming"
+    },
+    "subtitle": "Descubre las herramientas que llevarán tu experiencia de juego al siguiente nivel",
+    "gameReviews": {
+      "title": "Game Reviews & Tracking",
+      "description": "Mantén un registro completo de todos los juegos que has completado, los que estás jugando y tu lista de deseos. Comparte reseñas y descubre nuevos títulos."
+    },
+    "teamFinding": {
+      "title": "Team Finding", 
+      "description": "Encuentra compañeros de equipo perfectos para rankear competitivamente o simplemente amigos para disfrutar de tus juegos favoritos en modo casual."
+    },
+    "aiMatchmaking": {
+      "title": "AI Matchmaking",
+      "description": "Nuestro sistema de inteligencia artificial analiza tu estilo de juego, personalidad y preferencias para encontrarte los compañeros más compatibles."
+    },
+    "badge": {
+      "available": "✨ Disponible",
+      "comingSoon": "🚀 Próximamente"
+    }
+  },
+  "home": {
+    "title": "INICIO",
+    "welcome": "Bienvenido a tu dashboard de gaming",
+    "construction": "🚧 Página en construcción",
+    "constructionDetails": "Aquí irá el contenido principal del dashboard"
+  }
+}

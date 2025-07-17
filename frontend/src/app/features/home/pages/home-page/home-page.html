@@ -10,23 +10,23 @@
       
       <!-- Título principal -->
       <h1 class="text-6xl sm:text-7xl lg:text-8xl font-bold mb-8">
-        <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-          HOME
+        <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent" >
+          {{ 'home.title' | translate }}
         </span>
       </h1>
       
       <!-- Subtítulo temporal -->
-      <p class="text-xl text-gray-400 mb-8">
-        Bienvenido a tu dashboard de gaming
+      <p class="text-xl text-gray-400 mb-8" >
+        {{ 'home.welcome' | translate }}
       </p>
       
       <!-- Mensaje temporal -->
       <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-md mx-auto">
-        <p class="text-gray-300 text-sm">
-          🚧 Página en construcción
+        <p class="text-gray-300 text-sm" >
+          {{ 'home.construction' | translate }}
         </p>
-        <p class="text-gray-400 text-xs mt-2">
-          Aquí irá el contenido principal del dashboard
+        <p class="text-gray-400 text-xs mt-2" >
+          {{ 'home.construction.details' | translate }}
         </p>
       </div>
     </div>
