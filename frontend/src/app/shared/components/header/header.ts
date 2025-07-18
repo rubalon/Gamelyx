@@ -2,6 +2,7 @@ import { Component ,inject  } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TranslationService } from '@core/services/translations';
+import { ModalService } from '@shared/services/modal';
 
 @Component({
   selector: 'app-header',
@@ -14,9 +15,10 @@ export class Header {
   
   private router = inject(Router);
   private translationService = inject(TranslationService);
+  private modalService = inject(ModalService);
 
   onLoginClick(): void {
-    this.router.navigate(['/home']);
+    this.modalService.openAuthModal('login');
   }
 
   changeLanguage(event: any): void {

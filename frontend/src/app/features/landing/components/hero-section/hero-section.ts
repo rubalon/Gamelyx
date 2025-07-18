@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { ModalService } from '@shared/services/modal';
 
 @Component({
   selector: 'app-hero-section',
@@ -9,5 +10,11 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './hero-section.scss'
 })
 export class HeroSection {
+
+  protected modalService = inject(ModalService);
+
+  onStartClick(): void {
+  this.modalService.openAuthModal('register'); // Abre en registro
+}
 
 }

@@ -9,3 +9,8 @@
   <!-- Sección de funcionalidades -->
   <app-features-section></app-features-section>
 </div>
+
+<!-- Modal condicional -->
+@if (modalService.authModalVisible$ | async) {
+  <app-auth-modal></app-auth-modal>
+}

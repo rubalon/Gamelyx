@@ -39,5 +39,33 @@
     "welcome": "Bienvenido a tu dashboard de gaming",
     "construction": "🚧 Página en construcción",
     "constructionDetails": "Aquí irá el contenido principal del dashboard"
+  },
+  "auth": {
+    "welcome": "¡Bienvenido a Gamelyx!",
+    "subtitle": "Únete a la comunidad gaming más grande",
+    "login": {
+      "tab": "Entrar",
+      "title": "Iniciar Sesión",
+      "subtitle": "Accede a tu cuenta de gaming",
+      "submit": "Iniciar Sesión"
+    },
+    "register": {
+      "tab": "Registrarse", 
+      "title": "Crear Cuenta",
+      "subtitle": "Únete a miles de gamers",
+      "submit": "Crear Cuenta"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Contraseña",
+      "username": "Nombre de usuario",
+      "confirmPassword": "Confirmar Contraseña"
+    },
+    "placeholders": {
+      "email": "tu@email.com",
+      "password": "••••••••",
+      "username": "Tu nombre de usuario",
+      "confirmPassword": "Repite tu contraseña"
+    }
   }
 }
