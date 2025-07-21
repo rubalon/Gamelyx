@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica tu cuenta - Gamelyx</title>
+    <style>
+        /* Reset básico para compatibilidad con clientes de email */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        /* Container principal */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header con branding */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Contenido principal */
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Botón principal */
+        .cta-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Información adicional */
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 25px 20px;
+            font-size: 14px;
+        }
+
+        .footer-links {
+            margin-top: 15px;
+        }
+
+        .footer-link {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive para móviles */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .cta-button {
+                padding: 12px 25px;
+                font-size: 14px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header con branding -->
+    <div class="header">
+        <div class="logo">🎮 GAMELYX</div>
+        <div class="header-subtitle">Tu plataforma gaming definitiva</div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="greeting">
+            ¡Hola <span th:text="${username}">Usuario</span>! 👋
+        </div>
+
+        <div class="message">
+            ¡Bienvenido a <strong>Gamelyx</strong>! Estamos emocionados de tenerte en nuestra comunidad gaming.
+            <br><br>
+            Para completar tu registro y comenzar a disfrutar de todas nuestras funcionalidades,
+            necesitas verificar tu dirección de email haciendo clic en el botón de abajo:
+        </div>
+
+        <!-- Botón principal de verificación -->
+        <div class="cta-container">
+            <a th:href="${verificationUrl}" class="cta-button">
+                ✨ Verificar mi cuenta
+            </a>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="info-box">
+            <div class="info-title">🛡️ Información de seguridad:</div>
+            <div class="info-text">
+                • Este enlace expirará en 24 horas por motivos de seguridad<br>
+                • Si no solicitaste esta cuenta, puedes ignorar este email<br>
+                • Una vez verificada, podrás acceder a todas las funcionalidades de Gamelyx
+            </div>
+        </div>
+
+        <div class="message">
+            Si el botón no funciona, también puedes copiar y pegar este enlace en tu navegador:
+            <br>
+            <a th:href="${verificationUrl}" th:text="${verificationUrl}" style="color: #667eea; word-break: break-all;">
+                Enlace de verificación
+            </a>
+        </div>
+
+        <div class="message">
+            ¡Gracias por unirte a Gamelyx!<br>
+            <strong>El equipo de Gamelyx</strong> 🚀
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div>© 2025 Gamelyx. Todos los derechos reservados.</div>
+        <div class="footer-links">
+            <a th:href="${frontendUrl}" class="footer-link">Ir a Gamelyx</a>
+            <a href="#" class="footer-link">Soporte</a>
+            <a href="#" class="footer-link">Términos</a>
+            <a href="#" class="footer-link">Privacidad</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

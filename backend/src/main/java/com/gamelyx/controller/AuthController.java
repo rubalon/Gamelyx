@@ -4,6 +4,7 @@ import com.gamelyx.service.AuthService;
 import com.gamelyx.service.AuthService.AuthResponse;
 import com.gamelyx.service.AuthService.LoginRequest;
 import com.gamelyx.service.AuthService.RegisterRequest;
+import com.gamelyx.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private EmailService emailService;
 
     /**
      * Endpoint para registrar nuevos usuarios
@@ -137,6 +141,8 @@ public class AuthController {
         return ResponseEntity.ok(createSuccessResponse("Logout exitoso"));
     }
 
+
+
     /**
      * Endpoint de salud para verificar que el servicio de auth funciona
      * GET /api/auth/health
@@ -148,6 +154,40 @@ public class AuthController {
         health.put("service", "Authentication Service");
         health.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(health);
+    }
+
+    /**
+     * Endpoint de testing para verificar el sistema de email
+     * GET /api/auth/test-email?email=tu@email.com
+     */
+    @GetMapping("/test-email")
+    public ResponseEntity<?> testEmail(@RequestParam String email) {
+        try {
+            // Validación básica del email
+            if (email == null || !email.contains("@")) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("Email inválido"));
+            }
+
+            emailService.sendTestEmail(email);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Email de prueba enviado correctamente");
+            response.put("email", email);
+            response.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Error enviando email de prueba: " + e.getMessage());
+            errorResponse.put("email", email);
+            errorResponse.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     // Métodos de utilidad para crear respuestas consistentes

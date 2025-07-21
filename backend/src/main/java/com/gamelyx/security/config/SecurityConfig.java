@@ -67,6 +67,9 @@ public class SecurityConfig {
                         // Endpoints públicos de autenticación
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
 
+                        // Endpoints de testing y salud (públicos para desarrollo)
+                        .requestMatchers("/api/auth/health", "/api/auth/test-email").permitAll()
+
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 

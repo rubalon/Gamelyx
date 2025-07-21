@@ -32,6 +32,9 @@ public class AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private EmailService emailService;
+
     /**
      * Registra un nuevo usuario en el sistema
      */
@@ -62,8 +65,14 @@ public class AuthService {
         // Guardar usuario
         User savedUser = userRepository.save(user);
 
-        // TODO: Enviar email de verificación (Fase 4)
-        // emailService.sendVerificationEmail(savedUser);
+        // Enviar email de verificación
+        try {
+            emailService.sendVerificationEmail(savedUser, savedUser.getEmailVerificationToken());
+            System.out.println("Email de verificación enviado a: " + savedUser.getEmail());
+        } catch (Exception e) {
+            System.err.println("Error enviando email de verificación: " + e.getMessage());
+            // El registro continúa aunque falle el email
+        }
 
         // Generar tokens JWT
         String accessToken = jwtUtil.generateToken(savedUser.getUsername());
