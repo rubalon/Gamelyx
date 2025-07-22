@@ -1,12 +1,11 @@
-
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ModalService } from '../../services/modal';
-
+import { ModalService } from '@shared/services/modal';
+import { AuthStore, LoginRequest, RegisterRequest } from '@core/stores/auth-store';
 
 @Component({
   selector: 'app-auth-modal',
@@ -15,12 +14,12 @@ import { ModalService } from '../../services/modal';
   templateUrl: './auth-modal.html',
   styleUrl: './auth-modal.scss'
 })
-export class AuthModal implements OnInit , OnDestroy {
+export class AuthModal implements OnInit, OnDestroy {
 
   private modalService = inject(ModalService);
+  private authStore = inject(AuthStore); 
   private destroy$ = new Subject<void>();
   private formBuilder = inject(FormBuilder);
-
 
   // Control de pestañas
   activeTab: 'login' | 'register' = 'login';
@@ -28,7 +27,6 @@ export class AuthModal implements OnInit , OnDestroy {
   // Formularios reactivos
   loginForm!: FormGroup;
   registerForm!: FormGroup;
-
 
   constructor() {
     this.initializeForms();
@@ -49,55 +47,120 @@ export class AuthModal implements OnInit , OnDestroy {
 
   onClose(): void {
     this.modalService.closeAuthModal();
+    this.authStore.clearError();
   }
 
   switchTab(tab: 'login' | 'register'): void {
     this.modalService.setAuthModalTab(tab);
+    this.authStore.clearError();
   }
 
   private initializeForms(): void {
-    // Formulario de login
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
+      emailOrUsername: ['', [Validators.required]], 
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
-    // Formulario de registro
-    this.registerForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(2)]],
+    // Formulario de registro - CORREGIDO: Sintaxis Angular 20
+    this.registerForm = this.formBuilder.nonNullable.group({
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]], 
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
+    }, {
+      validators: [this.passwordMatchValidator] 
     });
+  }
+
+  private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const form = control as FormGroup;
+    const password = form.get('password');
+    const confirmPassword = form.get('confirmPassword');
+    
+    // Si las contraseñas no coinciden
+    if (password?.value !== confirmPassword?.value) {
+      return { passwordMismatch: true }; 
+    }
+    
+    return null; // ✅ Todo bien
   }
 
   onLogin(): void {
     if (this.loginForm.valid) {
-      console.log('Login datos:', this.loginForm.value);
-      // TODO: Implementar lógica de login
+      const loginData = {
+        emailOrUsername: this.loginForm.value.emailOrUsername,
+        password: this.loginForm.value.password
+      };
+
+      console.log('Iniciando login:', loginData);
+
+
+      this.authStore.login(loginData).subscribe({
+        next: (response) => {
+          console.log('Login exitoso:', response);
+          this.modalService.closeAuthModal();
+        },
+        error: (error) => {
+          console.error('Error en login:', error);
+        }
+      });
     } else {
       console.log('Formulario de login inválido');
+      this.markFormGroupTouched(this.loginForm);
     }
   }
 
   onRegister(): void {
     if (this.registerForm.valid) {
-      console.log('Registro datos:', this.registerForm.value);
-      // TODO: Implementar lógica de registro
+      const registerData = {
+        username: this.registerForm.value.username,
+        email: this.registerForm.value.email,
+        password: this.registerForm.value.password
+      };
+
+      console.log('Iniciando registro:', registerData);
+
+      this.authStore.register(registerData).subscribe({
+        next: (response) => {
+          console.log('Registro exitoso:', response);
+          this.modalService.closeAuthModal();
+        },
+        error: (error) => {
+          console.error('Error en registro:', error);
+        }
+      });
     } else {
       console.log('Formulario de registro inválido');
+      this.markFormGroupTouched(this.registerForm);
     }
   }
-
-  // Helper para mostrar errores
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      control?.markAsTouched({ onlySelf: true });
+    });
+  }
   getFieldError(form: FormGroup, fieldName: string): string | null {
     const field = form.get(fieldName);
     if (field && field.invalid && field.touched) {
       if (field.errors?.['required']) return 'Este campo es obligatorio';
       if (field.errors?.['email']) return 'Email inválido';
       if (field.errors?.['minlength']) return `Mínimo ${field.errors?.['minlength'].requiredLength} caracteres`;
+      if (field.errors?.['maxlength']) return `Máximo ${field.errors?.['maxlength'].requiredLength} caracteres`;
+      if (field.errors?.['passwordMismatch']) return 'Las contraseñas no coinciden'; 
     }
     return null;
   }
 
+  get isLoading() {
+    return this.authStore.isLoading();
+  }
+
+  get authError() {
+    return this.authStore.error();
+  }
+
+  get isAuthenticated() {
+    return this.authStore.isAuthenticated();
+  }
 }

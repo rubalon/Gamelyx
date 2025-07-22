@@ -56,16 +56,20 @@
       "submit": "Crear Cuenta"
     },
     "fields": {
+      "emailOrUsername": "Email o Nombre de Usuario",
       "email": "Email",
       "password": "Contraseña",
       "username": "Nombre de usuario",
       "confirmPassword": "Confirmar Contraseña"
     },
     "placeholders": {
+      "emailOrUsername": "tu Email o tu nombre de Usuario",
       "email": "tu@email.com",
       "password": "••••••••",
       "username": "Tu nombre de usuario",
       "confirmPassword": "Repite tu contraseña"
-    }
+    },
+    "loading": "Cargando..."
+    
   }
 }
