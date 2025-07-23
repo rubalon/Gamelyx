@@ -109,7 +109,7 @@ export class AuthStore {
    */
   private storeAuthData(response: AuthResponse): void {
     localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+    localStorage.setItem('refreshToken', response.refreshToken); // TODO : almacenar refresh token de forma segura
     localStorage.setItem('userData', JSON.stringify({
       id: response.userId,
       username: response.username,

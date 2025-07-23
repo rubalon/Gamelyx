@@ -7,6 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ModalService } from '@shared/services/modal';
 import { AuthStore, LoginRequest, RegisterRequest } from '@core/stores/auth-store';
 import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-modal',
@@ -21,7 +22,8 @@ export class AuthModal implements OnInit, OnDestroy {
   private authStore = inject(AuthStore); 
   private destroy$ = new Subject<void>();
   private formBuilder = inject(FormBuilder);
-   private translateService = inject(TranslateService); 
+  private translateService = inject(TranslateService);
+  private router = inject(Router); 
 
 
   // Control de pestañas
@@ -102,6 +104,7 @@ export class AuthModal implements OnInit, OnDestroy {
         next: (response) => {
           console.log('Login exitoso:', response);
           this.modalService.closeAuthModal();
+          this.router.navigate(['/home']);
         },
         error: (error) => {
           console.error('Error en login:', error);

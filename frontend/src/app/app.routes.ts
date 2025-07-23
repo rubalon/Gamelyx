@@ -1,26 +1,24 @@
 import { Routes } from '@angular/router';
+import { canActivateAuth, canActivateGuest } from '@core/guards/auth-guard';
 
 export const routes: Routes = [
-  // Ruta por defecto - redirige a landing
-  {
-    path: '',
-    redirectTo: '/landing',
-    pathMatch: 'full'
+  { 
+    path: '', 
+    redirectTo: '/landing', 
+    pathMatch: 'full' 
   },
-  
-  // Ruta de landing page
   {
     path: 'landing',
-    loadComponent: () => import('./features/landing/pages/landing-page/landing-page').then(m => m.LandingPage)
+    loadComponent: () => import('./features/landing/pages/landing-page/landing-page')
+      .then(m => m.LandingPage),
+    canActivate: [canActivateGuest] // 👈 Solo si NO está logueado
   },
-  
-  // Ruta de home page  
   {
     path: 'home',
-    loadComponent: () => import('./features/home/pages/home-page/home-page').then(m => m.HomePage)
+    loadComponent: () => import('./features/home/pages/home-page/home-page')
+      .then(m => m.HomePage),
+    canActivate: [canActivateAuth] // 👈 Solo si está logueado
   },
-  
-  // Ruta wildcard - página no encontrada (redirige a landing)
   {
     path: '**',
     redirectTo: '/landing'

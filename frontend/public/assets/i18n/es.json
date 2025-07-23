@@ -1,6 +1,7 @@
 {
   "header": {
-    "login": "Iniciar Sesión"
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión"
   },
   "hero": {
     "subtitle": "Tu experiencia gaming elevada al siguiente nivel",

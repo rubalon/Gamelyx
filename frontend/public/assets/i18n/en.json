@@ -1,6 +1,7 @@
 {
   "header": {
-    "login": "log In"
+    "login": "log In",
+    "logout": "log Out"
   },
   "hero": {
     "subtitle": "Your gaming experience elevated to the next level",
