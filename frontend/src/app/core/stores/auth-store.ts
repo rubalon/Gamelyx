@@ -6,7 +6,7 @@ import { catchError, tap } from 'rxjs/operators';
 
 // Interfaces para tipado
 export interface LoginRequest {
-  emailOrUsername: string;
+  usernameOrEmail: string;
   password: string;
 }
 

@@ -69,6 +69,13 @@
       "username": "Your username",
       "confirmPassword": "Repeat your password"
     },
+    "errors": {
+      "required": "This field is required",
+      "email": "Invalid email",
+      "minlength": "Minimum {{length}} characters", 
+      "maxlength": "Maximum {{length}} characters",
+      "passwordMismatch": "Passwords do not match"
+    },
     "loading": "Loading..."
   }
 }

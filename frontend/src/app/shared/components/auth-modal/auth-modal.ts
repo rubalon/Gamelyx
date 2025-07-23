@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ModalService } from '@shared/services/modal';
 import { AuthStore, LoginRequest, RegisterRequest } from '@core/stores/auth-store';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-auth-modal',
@@ -20,6 +21,8 @@ export class AuthModal implements OnInit, OnDestroy {
   private authStore = inject(AuthStore); 
   private destroy$ = new Subject<void>();
   private formBuilder = inject(FormBuilder);
+   private translateService = inject(TranslateService); 
+
 
   // Control de pestañas
   activeTab: 'login' | 'register' = 'login';
@@ -66,7 +69,7 @@ export class AuthModal implements OnInit, OnDestroy {
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]], 
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required,]]
     }, {
       validators: [this.passwordMatchValidator] 
     });
@@ -88,7 +91,7 @@ export class AuthModal implements OnInit, OnDestroy {
   onLogin(): void {
     if (this.loginForm.valid) {
       const loginData = {
-        emailOrUsername: this.loginForm.value.emailOrUsername,
+        usernameOrEmail: this.loginForm.value.emailOrUsername,
         password: this.loginForm.value.password
       };
 
@@ -115,7 +118,8 @@ export class AuthModal implements OnInit, OnDestroy {
       const registerData = {
         username: this.registerForm.value.username,
         email: this.registerForm.value.email,
-        password: this.registerForm.value.password
+        password: this.registerForm.value.password,
+        confirmPassword: this.registerForm.value.confirmPassword //faltaba este campo por lo que el backend no lo aceptaba
       };
 
       console.log('Iniciando registro:', registerData);
@@ -140,17 +144,31 @@ export class AuthModal implements OnInit, OnDestroy {
       control?.markAsTouched({ onlySelf: true });
     });
   }
+
   getFieldError(form: FormGroup, fieldName: string): string | null {
     const field = form.get(fieldName);
-    if (field && field.invalid && field.touched) {
-      if (field.errors?.['required']) return 'Este campo es obligatorio';
-      if (field.errors?.['email']) return 'Email inválido';
-      if (field.errors?.['minlength']) return `Mínimo ${field.errors?.['minlength'].requiredLength} caracteres`;
-      if (field.errors?.['maxlength']) return `Máximo ${field.errors?.['maxlength'].requiredLength} caracteres`;
-      if (field.errors?.['passwordMismatch']) return 'Las contraseñas no coinciden'; 
+    if (field && field.touched) {
+      if (field.errors?.['required']) {
+        return this.translateService.instant('auth.errors.required');
+      }
+      if (field.errors?.['email']) {
+        return this.translateService.instant('auth.errors.email');
+      }
+      if (field.errors?.['minlength']) {
+        const requiredLength = field.errors?.['minlength'].requiredLength;
+        return this.translateService.instant('auth.errors.minlength', { length: requiredLength });
+      }
+      if (field.errors?.['maxlength']) {
+        const requiredLength = field.errors?.['maxlength'].requiredLength;
+        return this.translateService.instant('auth.errors.maxlength', { length: requiredLength });
+      }
+      if (fieldName === 'confirmPassword' && form.errors?.['passwordMismatch']) {
+        return this.translateService.instant('auth.errors.passwordMismatch');
+      }
     }
     return null;
   }
+
 
   get isLoading() {
     return this.authStore.isLoading();

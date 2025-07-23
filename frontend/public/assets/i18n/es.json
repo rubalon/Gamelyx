@@ -69,6 +69,13 @@
       "username": "Tu nombre de usuario",
       "confirmPassword": "Repite tu contraseña"
     },
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "email": "Email inválido", 
+      "minlength": "Mínimo {{length}} caracteres",
+      "maxlength": "Máximo {{length}} caracteres",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    },
     "loading": "Cargando..."
     
   }
