@@ -2,16 +2,15 @@ package com.gamelyx.config;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Configuración centralizada para las API de juegos (RAWG y Steam)
- * <p>
+ * Configuración centralizada para las APIs de juegos (RAWG y Steam)
+ *
  * Esta clase mapea automáticamente las propiedades del application.properties
- * y proporciona validación de configuración al arranque de la aplicación.
+ * usando @ConfigurationProperties con el prefijo "game".
  */
 @Configuration
 @ConfigurationProperties(prefix = "game")
@@ -29,7 +28,6 @@ public class GameApiConfig {
 
     /**
      * Configuración para RAWG API (servicio principal)
-     * Valores obtenidos desde application.properties
      */
     public static class RawgApi {
         @NotBlank(message = "RAWG API base URL es requerida")
@@ -58,7 +56,6 @@ public class GameApiConfig {
 
     /**
      * Configuración para Steam API (servicio de respaldo)
-     * Valores obtenidos desde application.properties
      */
     public static class SteamApi {
         @NotBlank(message = "Steam API base URL es requerida")
