@@ -70,6 +70,9 @@ public class SecurityConfig {
                         // Endpoints de testing y salud (públicos para desarrollo)
                         .requestMatchers("/api/auth/health", "/api/auth/test-email").permitAll()
 
+                        // ✅ NUEVOS: Endpoints de prueba de juegos (temporales para desarrollo)
+                        .requestMatchers("/api/test/games/**").permitAll()
+
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 

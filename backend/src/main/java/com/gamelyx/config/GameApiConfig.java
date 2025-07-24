@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Configuración centralizada para las APIs de juegos (RAWG y Steam)
- *
+ * Configuración centralizada para las API de juegos (RAWG y Steam)
+ * <p>
  * Esta clase mapea automáticamente las propiedades del application.properties
  * y proporciona validación de configuración al arranque de la aplicación.
  */
@@ -33,7 +33,7 @@ public class GameApiConfig {
      */
     public static class RawgApi {
         @NotBlank(message = "RAWG API base URL es requerida")
-        private String baseurl;
+        private String baseUrl;
 
         @NotBlank(message = "RAWG API key es requerida")
         private String key;
@@ -44,8 +44,8 @@ public class GameApiConfig {
         private final Retry retry = new Retry();
 
         // Getters y Setters
-        public String getBaseurl() { return baseurl; }
-        public void setBaseurl(String baseurl) { this.baseurl = baseurl; }
+        public String getBaseUrl() { return baseUrl; }
+        public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
 
         public String getKey() { return key; }
         public void setKey(String key) { this.key = key; }
@@ -62,7 +62,7 @@ public class GameApiConfig {
      */
     public static class SteamApi {
         @NotBlank(message = "Steam API base URL es requerida")
-        private String baseurl;
+        private String baseUrl;
 
         @NotBlank(message = "Steam API key es requerida")
         private String key;
@@ -73,8 +73,8 @@ public class GameApiConfig {
         private final Retry retry = new Retry();
 
         // Getters y Setters
-        public String getBaseurl() { return baseurl; }
-        public void setBaseurl(String baseurl) { this.baseurl = baseurl; }
+        public String getBaseUrl() { return baseUrl; }
+        public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
 
         public String getKey() { return key; }
         public void setKey(String key) { this.key = key; }
@@ -144,8 +144,8 @@ public class GameApiConfig {
     public String toString() {
         return String.format(
                 "GameApiConfig{rawg={url='%s', timeout=%d}, steam={url='%s', timeout=%d}, search={pageSize=%d, maxPageSize=%d}}",
-                rawg.baseurl, rawg.timeout,
-                steam.baseurl, steam.timeout,
+                rawg.baseUrl, rawg.timeout,
+                steam.baseUrl, steam.timeout,
                 search.defaultPageSize, search.maxPageSize
         );
     }
