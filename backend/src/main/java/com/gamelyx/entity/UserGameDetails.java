@@ -88,14 +88,6 @@ public class UserGameDetails {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    /**
-     * Horas jugadas reportadas por el usuario
-     * NULLABLE - No todos los usuarios trackean tiempo
-     */
-    @Column(name = "hours_played")
-    @Min(value = 0, message = "Las horas jugadas no pueden ser negativas")
-    @Max(value = 10000, message = "Las horas jugadas parecen excesivas")
-    private Integer hoursPlayed;
 
     // ===== SECCIÓN: RATING Y REVIEW =====
 
@@ -135,18 +127,6 @@ public class UserGameDetails {
     @UpdateTimestamp
     @Column(name = "last_updated_at", nullable = false)
     private LocalDateTime lastUpdatedAt;
-
-    /**
-     * Si esta entrada está activa (soft delete)
-     */
-    @Column(name = "is_active")
-    private Boolean isActive = true;
-
-    /**
-     * Visibilidad de la review (pública/privada)
-     */
-    @Column(name = "review_is_public")
-    private Boolean reviewIsPublic = true;
 
     // ===== CONSTRUCTORES =====
 
@@ -195,8 +175,6 @@ public class UserGameDetails {
     public LocalDateTime getCompletedAt() { return completedAt; }
     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
 
-    public Integer getHoursPlayed() { return hoursPlayed; }
-    public void setHoursPlayed(Integer hoursPlayed) { this.hoursPlayed = hoursPlayed; }
 
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) {
@@ -233,11 +211,6 @@ public class UserGameDetails {
     public LocalDateTime getLastUpdatedAt() { return lastUpdatedAt; }
     public void setLastUpdatedAt(LocalDateTime lastUpdatedAt) { this.lastUpdatedAt = lastUpdatedAt; }
 
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-
-    public Boolean getReviewIsPublic() { return reviewIsPublic; }
-    public void setReviewIsPublic(Boolean reviewIsPublic) { this.reviewIsPublic = reviewIsPublic; }
 
     // ===== MÉTODOS DE UTILIDAD =====
 
@@ -286,9 +259,6 @@ public class UserGameDetails {
 
         StringBuilder summary = new StringBuilder(status.name());
 
-        if (hoursPlayed != null && hoursPlayed > 0) {
-            summary.append(" • ").append(hoursPlayed).append("h jugadas");
-        }
 
         if (rating != null) {
             summary.append(" • ").append("★").append(rating).append("/10");

@@ -101,9 +101,6 @@ public class Game {
     @Column(name = "last_external_update")
     private LocalDateTime lastExternalUpdate; // Última actualización desde API externa
 
-    @Column(name = "is_active")
-    private Boolean isActive = true; // Para soft delete
-
     // Timestamps automáticos
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -192,9 +189,6 @@ public class Game {
 
     public LocalDateTime getLastExternalUpdate() { return lastExternalUpdate; }
     public void setLastExternalUpdate(LocalDateTime lastExternalUpdate) { this.lastExternalUpdate = lastExternalUpdate; }
-
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
