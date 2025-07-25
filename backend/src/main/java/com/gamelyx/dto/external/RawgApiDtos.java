@@ -115,7 +115,34 @@ public class RawgApiDtos {
 
         private List<Developer> developers;
         private List<Publisher> publishers;
-        private List<String> tags;
+        private List<Tag> tags; // Changed from List<String> to List<Tag>
+
+        // Nuevos campos basados en la respuesta real
+        @JsonProperty("tba")
+        private Boolean tba;
+
+        private String updated;
+
+        @JsonProperty("background_image_additional")
+        private String backgroundImageAdditional;
+
+        @JsonProperty("rating_top")
+        private Integer ratingTop;
+
+        private List<Rating> ratings;
+        private Object reactions; // JSON object complejo
+
+        @JsonProperty("added")
+        private Integer added;
+
+        @JsonProperty("added_by_status")
+        private Object addedByStatus; // JSON object complejo
+
+        @JsonProperty("screenshots_count")
+        private Integer screenshotsCount;
+
+        @JsonProperty("movies_count")
+        private Integer moviesCount;
 
         // Getters y Setters adicionales
         public String getDescription() { return description; }
@@ -139,8 +166,36 @@ public class RawgApiDtos {
         public List<Publisher> getPublishers() { return publishers; }
         public void setPublishers(List<Publisher> publishers) { this.publishers = publishers; }
 
-        public List<String> getTags() { return tags; }
-        public void setTags(List<String> tags) { this.tags = tags; }
+        public List<Tag> getTags() { return tags; }
+        public void setTags(List<Tag> tags) { this.tags = tags; }
+
+        // Nuevos getters y setters
+        public Boolean getTba() { return tba; }
+        public void setTba(Boolean tba) { this.tba = tba; }
+
+        public String getUpdated() { return updated; }
+        public void setUpdated(String updated) { this.updated = updated; }
+
+        public String getBackgroundImageAdditional() { return backgroundImageAdditional; }
+        public void setBackgroundImageAdditional(String backgroundImageAdditional) { this.backgroundImageAdditional = backgroundImageAdditional; }
+
+        public List<Rating> getRatings() { return ratings; }
+        public void setRatings(List<Rating> ratings) { this.ratings = ratings; }
+
+        public Object getReactions() { return reactions; }
+        public void setReactions(Object reactions) { this.reactions = reactions; }
+
+        public Integer getAdded() { return added; }
+        public void setAdded(Integer added) { this.added = added; }
+
+        public Object getAddedByStatus() { return addedByStatus; }
+        public void setAddedByStatus(Object addedByStatus) { this.addedByStatus = addedByStatus; }
+
+        public Integer getScreenshotsCount() { return screenshotsCount; }
+        public void setScreenshotsCount(Integer screenshotsCount) { this.screenshotsCount = screenshotsCount; }
+
+        public Integer getMoviesCount() { return moviesCount; }
+        public void setMoviesCount(Integer moviesCount) { this.moviesCount = moviesCount; }
     }
 
     /**
@@ -150,14 +205,37 @@ public class RawgApiDtos {
     public static class Platform {
         private PlatformInfo platform;
 
+        @JsonProperty("released_at")
+        private String releasedAt;
+
+        private Object requirements; // Puede ser Object complejo o null
+
         public PlatformInfo getPlatform() { return platform; }
         public void setPlatform(PlatformInfo platform) { this.platform = platform; }
+
+        public String getReleasedAt() { return releasedAt; }
+        public void setReleasedAt(String releasedAt) { this.releasedAt = releasedAt; }
+
+        public Object getRequirements() { return requirements; }
+        public void setRequirements(Object requirements) { this.requirements = requirements; }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class PlatformInfo {
             private Integer id;
             private String name;
             private String slug;
+
+            @JsonProperty("year_start")
+            private Integer yearStart;
+
+            @JsonProperty("year_end")
+            private Integer yearEnd;
+
+            @JsonProperty("games_count")
+            private Integer gamesCount;
+
+            @JsonProperty("image_background")
+            private String imageBackground;
 
             public Integer getId() { return id; }
             public void setId(Integer id) { this.id = id; }
@@ -167,6 +245,18 @@ public class RawgApiDtos {
 
             public String getSlug() { return slug; }
             public void setSlug(String slug) { this.slug = slug; }
+
+            public Integer getYearStart() { return yearStart; }
+            public void setYearStart(Integer yearStart) { this.yearStart = yearStart; }
+
+            public Integer getYearEnd() { return yearEnd; }
+            public void setYearEnd(Integer yearEnd) { this.yearEnd = yearEnd; }
+
+            public Integer getGamesCount() { return gamesCount; }
+            public void setGamesCount(Integer gamesCount) { this.gamesCount = gamesCount; }
+
+            public String getImageBackground() { return imageBackground; }
+            public void setImageBackground(String imageBackground) { this.imageBackground = imageBackground; }
         }
     }
 
@@ -225,6 +315,64 @@ public class RawgApiDtos {
 
         public String getSlug() { return slug; }
         public void setSlug(String slug) { this.slug = slug; }
+    }
+
+    /**
+     * Información de tag
+     */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Tag {
+        private Integer id;
+        private String name;
+        private String slug;
+        private String language;
+
+        @JsonProperty("games_count")
+        private Integer gamesCount;
+
+        @JsonProperty("image_background")
+        private String imageBackground;
+
+        public Integer getId() { return id; }
+        public void setId(Integer id) { this.id = id; }
+
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+
+        public String getSlug() { return slug; }
+        public void setSlug(String slug) { this.slug = slug; }
+
+        public String getLanguage() { return language; }
+        public void setLanguage(String language) { this.language = language; }
+
+        public Integer getGamesCount() { return gamesCount; }
+        public void setGamesCount(Integer gamesCount) { this.gamesCount = gamesCount; }
+
+        public String getImageBackground() { return imageBackground; }
+        public void setImageBackground(String imageBackground) { this.imageBackground = imageBackground; }
+    }
+
+    /**
+     * Información de rating
+     */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Rating {
+        private Integer id;
+        private String title;
+        private Integer count;
+        private Double percent;
+
+        public Integer getId() { return id; }
+        public void setId(Integer id) { this.id = id; }
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+
+        public Integer getCount() { return count; }
+        public void setCount(Integer count) { this.count = count; }
+
+        public Double getPercent() { return percent; }
+        public void setPercent(Double percent) { this.percent = percent; }
     }
 
     /**

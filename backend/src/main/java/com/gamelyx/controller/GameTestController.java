@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -27,6 +28,76 @@ public class GameTestController {
 
     public GameTestController(RawgApiService rawgApiService) {
         this.rawgApiService = rawgApiService;
+    }
+
+    /**
+     * Test usando RestTemplate en lugar de WebClient para comparar
+     *
+     * GET /api/test/games/rest-template-test
+     */
+    @GetMapping("/rest-template-test")
+    public ResponseEntity<Map<String, Object>> restTemplateTest() {
+        logger.info("Testing with RestTemplate instead of WebClient");
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://api.rawg.io/api/games/3498?key=aadc3214c79b4f32a1ba6a61c5d2ff95";
+
+            logger.info("Calling URL with RestTemplate: {}", url);
+
+            // Llamada síncrona con RestTemplate
+            String response = restTemplate.getForObject(url, String.class);
+
+            logger.info("RestTemplate call successful, response length: {}",
+                    response != null ? response.length() : 0);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "message", "RestTemplate call worked",
+                    "responseLength", response != null ? response.length() : 0,
+                    "firstChars", response != null ? response.substring(0, Math.min(100, response.length())) : "null",
+                    "timestamp", System.currentTimeMillis()
+            ));
+
+        } catch (Exception e) {
+            logger.error("RestTemplate test failed: {}", e.getMessage(), e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage(),
+                    "errorClass", e.getClass().getSimpleName(),
+                    "timestamp", System.currentTimeMillis()
+            ));
+        }
+    }
+
+    /**
+     * Endpoint simple para verificar si el problema es con WebClient
+     *
+     * GET /api/test/games/simple-test
+     */
+    @GetMapping("/simple-test")
+    public ResponseEntity<Map<String, Object>> simpleTest() {
+        logger.info("Simple test without WebClient");
+
+        try {
+            // Test básico sin WebClient
+            Map<String, Object> result = Map.of(
+                    "status", "OK",
+                    "message", "This endpoint works without calling RAWG",
+                    "configTest", rawgApiService.getServiceInfo(),
+                    "timestamp", System.currentTimeMillis()
+            );
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            logger.error("Simple test failed: {}", e.getMessage(), e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage(),
+                    "timestamp", System.currentTimeMillis()
+            ));
+        }
     }
 
     /**

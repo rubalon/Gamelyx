@@ -2,12 +2,15 @@ package com.gamelyx.service.external;
 
 import com.gamelyx.config.GameApiConfig;
 import com.gamelyx.dto.external.RawgApiDtos;
+import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
@@ -29,13 +32,19 @@ public class RawgApiService {
     public RawgApiService(WebClient.Builder webClientBuilder, GameApiConfig gameApiConfig) {
         this.gameApiConfig = gameApiConfig;
 
-        // Configuramos el WebClient específico para RAWG
+        // Configuramos el WebClient específico para RAWG con timeout más generoso
         this.webClient = webClientBuilder
                 .baseUrl(gameApiConfig.getRawg().getBaseUrl())
                 .defaultHeader("User-Agent", "Gamelyx/1.0")
+                .defaultHeader("Accept", "application/json")
                 .codecs(configurer -> configurer
                         .defaultCodecs()
-                        .maxInMemorySize(1024 * 1024)) // 1MB buffer
+                        .maxInMemorySize(2 * 1024 * 1024)) // 2MB buffer
+                .clientConnector(new ReactorClientHttpConnector(
+                        HttpClient.create()
+                                .responseTimeout(Duration.ofMillis(gameApiConfig.getRawg().getTimeout()))
+                                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                ))
                 .build();
 
         logger.info("RawgApiService initialized with base URL: {}",
