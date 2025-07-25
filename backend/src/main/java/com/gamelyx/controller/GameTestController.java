@@ -30,6 +30,37 @@ public class GameTestController {
     }
 
     /**
+     * Endpoint para probar la URL directa de RAWG sin procesamiento
+     *
+     * GET /api/test/games/debug
+     */
+    @GetMapping("/debug")
+    public ResponseEntity<Map<String, Object>> debugRawgConnection() {
+        logger.info("Debug: Testing direct RAWG connection");
+
+        try {
+            // Información de configuración
+            String baseUrl = rawgApiService.getServiceInfo();
+
+            Map<String, Object> debugInfo = Map.of(
+                    "serviceInfo", baseUrl,
+                    "testUrl", "https://api.rawg.io/api/games/3498?key=aadc3214c79b4f32a1ba6a61c5d2ff95",
+                    "timestamp", System.currentTimeMillis(),
+                    "message", "Try this URL in your browser to test RAWG API directly"
+            );
+
+            return ResponseEntity.ok(debugInfo);
+
+        } catch (Exception e) {
+            logger.error("Debug failed: {}", e.getMessage());
+            return ResponseEntity.ok(Map.of(
+                    "error", e.getMessage(),
+                    "timestamp", System.currentTimeMillis()
+            ));
+        }
+    }
+
+    /**
      * Endpoint de salud para verificar que el servicio está funcionando
      *
      * GET /api/test/games/health
