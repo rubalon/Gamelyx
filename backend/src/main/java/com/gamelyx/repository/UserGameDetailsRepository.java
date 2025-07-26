@@ -139,6 +139,13 @@ public interface UserGameDetailsRepository extends JpaRepository<UserGameDetails
     Long countGameReviews(@Param("gameId") UUID gameId);
 
     /**
+     * Cuenta usuarios que han dado rating a un juego específico
+     */
+    @Query("SELECT COUNT(ugd) FROM UserGameDetails ugd " +
+            "WHERE ugd.game.id = :gameId AND ugd.rating IS NOT NULL")
+    Long countByGameIdAndRatingNotNull(@Param("gameId") UUID gameId);
+
+    /**
      * Cuenta usuarios que tienen el juego por cada estado
      */
     @Query("SELECT ugd.status, COUNT(ugd) FROM UserGameDetails ugd " +
