@@ -16,7 +16,7 @@ import java.util.UUID;
  *
  * FILOSOFÍA: Endpoints centrados en páginas/funcionalidades del frontend
  * - El frontend NO sabe de RAWG vs BD (transparencia total)
- * - Cada endpoint trae TODO lo necesario para una página completa
+ * - Los Enpoints principales traen to lo necesario para una página completa
  * - Mínimo número de llamadas desde el frontend
  */
 @RestController
@@ -66,8 +66,9 @@ public class GameController {
      *
      * 📋 LÓGICA:
      * - Usuario hace click en juego desde search results
-     * - Frontend navega a /game/{rawgId} y llama este endpoint
-     * - Primera vez: obtener de RAWG + guardar en BD
+     * - Frontend navega a /game/{identifier} y llama este endpoint
+     * - Identificador puede ser: rawgId (22511) o slug (minecraft)
+     * - Primera vez: obtener de RAWG + guardar en BD + generar slug
      * - Siguientes veces: usar datos de BD (cache inteligente)
      * - SIEMPRE incluir: mi estado personal + reviews de otros usuarios
      *
@@ -77,22 +78,38 @@ public class GameController {
      *   - Reviews recientes de otros usuarios (2-3 últimas)
      *
      * 📤 FRONTEND: Una sola llamada para cargar página completa
+     *
+     * 🔗 EJEMPLOS DE URLs:
+     *   /game/minecraft                    → Búsqueda por slug
+     *   /game/22511                       → Búsqueda por rawgId
+     *   /game/grand-theft-auto-v          → Slug amigable
      */
-    @GetMapping("/game/{rawgId}")
+    @GetMapping("/game/{identifier}")
     public Mono<ResponseEntity<GamePageDto>> getGamePage(
-            @PathVariable Integer rawgId,
+            @PathVariable String identifier,
             @AuthenticationPrincipal User currentUser) {
 
-        logger.info("🎮 GAME PAGE: rawgId={}, user={}", rawgId,
+        logger.info("🎮 GAME PAGE: identifier='{}', user={}", identifier,
                 currentUser != null ? currentUser.getUsername() : "anonymous");
 
         // TODO: Implementar lógica
+        // boolean isRawgId = identifier.matches("\\d+");
         // if (currentUser != null) {
-        //     return gameService.getGamePageWithUserData(rawgId, currentUser)
-        //         .map(ResponseEntity::ok);
+        //     if (isRawgId) {
+        //         return gameService.getGamePageWithUserData(Integer.parseInt(identifier), currentUser)
+        //             .map(ResponseEntity::ok);
+        //     } else {
+        //         return gameService.getGamePageBySlugWithUserData(identifier, currentUser)
+        //             .map(ResponseEntity::ok);
+        //     }
         // } else {
-        //     return gameService.getGamePagePublic(rawgId)
-        //         .map(ResponseEntity::ok);
+        //     if (isRawgId) {
+        //         return gameService.getGamePagePublic(Integer.parseInt(identifier))
+        //             .map(ResponseEntity::ok);
+        //     } else {
+        //         return gameService.getGamePageBySlugPublic(identifier)
+        //             .map(ResponseEntity::ok);
+        //     }
         // }
 
         return Mono.just(ResponseEntity.ok(new GamePageDto()));
@@ -115,131 +132,90 @@ public class GameController {
      *
      * 📤 FRONTEND: Botones en página del juego para cambiar estado/rating
      *
-     * 💭 DEBATE: ¿Un endpoint unificado o separar por acción?
-     *    - UNIFICADO: Más simple, menos llamadas
-     *    - SEPARADO: Más granular, mejor para UI reactiva
+     * 💭 ENDPOINT UNIFICADO: Más simple, menos llamadas, campos opcionales
      *
-     *    MI OPINIÓN: Unificado, porque el frontend puede enviar solo
-     *    los campos que cambiaron
+     * 🔗 EJEMPLOS:
+     *   PUT /game/minecraft/my-review     → Por slug
+     *   PUT /game/22511/my-review        → Por rawgId
      */
-    @PutMapping("/game/{rawgId}/my-review")
+    @PutMapping("/game/{identifier}/my-review")
     public Mono<ResponseEntity<MyGameStatusDto>> updateMyGameReview(
-            @PathVariable Integer rawgId,
+            @PathVariable String identifier,
             @AuthenticationPrincipal User currentUser,
             @RequestBody UpdateMyGameRequest request) {
 
-        logger.info("💭 UPDATE REVIEW: rawgId={}, user={}, status={}, rating={}",
-                rawgId, currentUser.getUsername(), request.getStatus(), request.getRating());
+        logger.info("💭 UPDATE REVIEW: identifier='{}', user={}, status={}, rating={}",
+                identifier, currentUser.getUsername(), request.getStatus(), request.getRating());
 
         // TODO: Implementar lógica
-        // return gameService.updateMyGameReview(rawgId, currentUser, request)
-        //     .map(ResponseEntity::ok)
-        //     .onErrorReturn(ResponseEntity.badRequest().build());
+        // boolean isRawgId = identifier.matches("\\d+");
+        // if (isRawgId) {
+        //     return gameService.updateMyGameReview(Integer.parseInt(identifier), currentUser, request)
+        //         .map(ResponseEntity::ok)
+        //         .onErrorReturn(ResponseEntity.badRequest().build());
+        // } else {
+        //     return gameService.updateMyGameReviewBySlug(identifier, currentUser, request)
+        //         .map(ResponseEntity::ok)
+        //         .onErrorReturn(ResponseEntity.badRequest().build());
+        // }
 
         return Mono.just(ResponseEntity.ok(new MyGameStatusDto()));
     }
 
-    // ===== FUNCIONALIDAD 4: MIS REVIEWS RECIENTES (HOME) =====
+    // ===== FUNCIONALIDAD 4: MIS REVIEWS (HOME + PÁGINA COMPLETA) =====
 
     /**
-     * 🎯 OBJETIVO: Mostrar mis últimas reviews en el home
+     * 🎯 OBJETIVO: Mostrar mis reviews (home + página completa)
      *
      * 📋 LÓGICA:
-     * - Usuario autenticado entra al home
-     * - Frontend llama este endpoint para mostrar sección "Mis últimas reviews"
-     * - Devolver últimas 3-5 reviews con datos básicos del juego
+     * - CASO 1 (Home): Frontend llama sin parámetros → 3 reviews por defecto
+     * - CASO 2 (Ver todas): Frontend llama con paginación → página completa
+     * - Devolver mis reviews ordenadas por fecha (más recientes primero)
+     * - Incluir datos básicos del juego para mostrar con la review
      *
-     * 📊 RESPUESTA: Lista de mis reviews con imagen y nombre del juego
-     * 📤 FRONTEND: Sección en home "Tus reviews recientes"
+     * 📊 RESPUESTA: Lista de mis reviews con paginación
+     * 📤 FRONTEND:
+     *   - Home: "Tus reviews recientes" (3 reviews)
+     *   - Página: "Todas mis reviews" (paginado)
+     *
+     * 🔗 EJEMPLOS DE USO:
+     *   GET /my-reviews                    → Home (3 por defecto)
+     *   GET /my-reviews?limit=3            → Home explícito
+     *   GET /my-reviews?page=0&size=20     → Página completa con paginación
      */
-    @GetMapping("/my-recent-reviews")
-    public ResponseEntity<List<MyRecentReviewDto>> getMyRecentReviews(
+    @GetMapping("/my-reviews")
+    public ResponseEntity<MyReviewsResponseDto> getMyReviews(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam(value = "limit", defaultValue = "5") int limit) {
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size) {
 
-        logger.info("📝 MY RECENT REVIEWS: user={}, limit={}",
-                currentUser.getUsername(), limit);
+        // Determinar si es para home o página completa
+        boolean isForHome = (page == null && size == null);
 
-        // TODO: Implementar lógica
-        // List<MyRecentReviewDto> reviews = gameService.getMyRecentReviews(currentUser, limit);
-        // return ResponseEntity.ok(reviews);
+        if (isForHome) {
+            // CASO 1: Para home (sin paginación)
+            int finalLimit = (limit != null) ? limit : 3;  // Default 3 para home
+            logger.info("📝 MY REVIEWS (HOME): user={}, limit={}",
+                    currentUser.getUsername(), finalLimit);
 
-        return ResponseEntity.ok(List.of());
-    }
+            // TODO: Implementar lógica para home
+            // List<MyRecentReviewDto> reviews = gameService.getMyRecentReviews(currentUser, finalLimit);
+            // return ResponseEntity.ok(MyReviewsResponseDto.forHome(reviews));
 
-    // ===== FUNCIONALIDADES ADICIONALES SUGERIDAS =====
+        } else {
+            // CASO 2: Para página completa (con paginación)
+            int finalPage = (page != null) ? page : 0;
+            int finalSize = (size != null) ? size : 20;
+            logger.info("📝 MY REVIEWS (FULL): user={}, page={}, size={}",
+                    currentUser.getUsername(), finalPage, finalSize);
 
-    /**
-     * 🎯 OBJETIVO: Obtener solo mi estado con un juego específico
-     *
-     * 📋 LÓGICA:
-     * - Para cuando el frontend necesita solo verificar mi estado
-     * - Sin datos del juego, solo mi relación con él
-     * - Útil para botones reactivos sin recargar página completa
-     *
-     * 💭 PREGUNTA: ¿Es necesario o ya lo cubre getGamePage?
-     */
-    @GetMapping("/game/{rawgId}/my-status")
-    public ResponseEntity<MyGameStatusDto> getMyGameStatus(
-            @PathVariable Integer rawgId,
-            @AuthenticationPrincipal User currentUser) {
+            // TODO: Implementar lógica para página completa
+            // MyReviewsResponseDto reviews = gameService.getMyReviewsPaginated(currentUser, finalPage, finalSize);
+            // return ResponseEntity.ok(reviews);
+        }
 
-        logger.debug("🔍 MY STATUS: rawgId={}, user={}", rawgId, currentUser.getUsername());
-
-        // TODO: Implementar
-        // Optional<MyGameStatusDto> status = gameService.getMyGameStatus(rawgId, currentUser);
-        // return status.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-
-        return ResponseEntity.ok(new MyGameStatusDto());
-    }
-
-    /**
-     * 🎯 OBJETIVO: Mi biblioteca/colección personal
-     *
-     * 📋 LÓGICA:
-     * - Página separada con todos mis juegos
-     * - Filtros por estado (wishlist, playing, completed)
-     * - Útil para gestión personal de biblioteca
-     *
-     * 💭 PREGUNTA: ¿Es una página importante o se puede omitir inicialmente?
-     */
-    @GetMapping("/my-library")
-    public ResponseEntity<MyLibraryDto> getMyLibrary(
-            @AuthenticationPrincipal User currentUser,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "20") int size) {
-
-        logger.info("📚 MY LIBRARY: user={}, status={}, page={}",
-                currentUser.getUsername(), status, page);
-
-        // TODO: Implementar
-        // return ResponseEntity.ok(gameService.getMyLibrary(currentUser, status, page, size));
-
-        return ResponseEntity.ok(new MyLibraryDto());
-    }
-
-    /**
-     * 🎯 OBJETIVO: Eliminar juego de mi biblioteca
-     *
-     * 📋 LÓGICA:
-     * - Usuario decide que ya no quiere el juego en su biblioteca
-     * - Eliminar relación UserGameDetails (hard delete)
-     * - Recalcular community rating del juego
-     */
-    @DeleteMapping("/game/{rawgId}/my-review")
-    public ResponseEntity<Void> removeFromMyLibrary(
-            @PathVariable Integer rawgId,
-            @AuthenticationPrincipal User currentUser) {
-
-        logger.info("🗑️ REMOVE FROM LIBRARY: rawgId={}, user={}",
-                rawgId, currentUser.getUsername());
-
-        // TODO: Implementar
-        // gameService.removeFromMyLibrary(rawgId, currentUser);
-        // return ResponseEntity.ok().build();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new MyReviewsResponseDto());
     }
 
     // ===== HEALTH CHECK =====
@@ -296,8 +272,44 @@ public class GameController {
         // gameName, gameImage, rating, reviewText, reviewDate
     }
 
-    public static class MyLibraryDto {
-        // Mi biblioteca completa con paginación
-        // List<games>, pagination, stats
+    public static class MyReviewsResponseDto {
+        // Flexible: puede ser lista simple (home) o paginada (página completa)
+        private List<MyRecentReviewDto> reviews;
+
+        // Campos de paginación (solo para página completa, null para home)
+        private Integer currentPage;
+        private Integer totalPages;
+        private Long totalReviews;
+        private Boolean hasMore;
+
+        // Constructor para home (sin paginación)
+        public static MyReviewsResponseDto forHome(List<MyRecentReviewDto> reviews) {
+            MyReviewsResponseDto dto = new MyReviewsResponseDto();
+            dto.reviews = reviews;
+            // Campos de paginación quedan null
+            return dto;
+        }
+
+        // Constructor para página completa (con paginación)
+        public static MyReviewsResponseDto forPage(List<MyRecentReviewDto> reviews,
+                                                   int currentPage, int totalPages, long totalReviews, boolean hasMore) {
+            MyReviewsResponseDto dto = new MyReviewsResponseDto();
+            dto.reviews = reviews;
+            dto.currentPage = currentPage;
+            dto.totalPages = totalPages;
+            dto.totalReviews = totalReviews;
+            dto.hasMore = hasMore;
+            return dto;
+        }
+
+        // Getters
+        public List<MyRecentReviewDto> getReviews() { return reviews; }
+        public Integer getCurrentPage() { return currentPage; }
+        public Integer getTotalPages() { return totalPages; }
+        public Long getTotalReviews() { return totalReviews; }
+        public Boolean getHasMore() { return hasMore; }
+
+        // Método útil para frontend
+        public boolean isForHome() { return currentPage == null; }
     }
 }
