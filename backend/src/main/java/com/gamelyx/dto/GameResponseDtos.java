@@ -11,7 +11,7 @@ import java.util.List;
  * - Records para DTOs simples (inmutables, limpios)
  * - Clases para DTOs complejos con factory methods
  */
-public class GameDtos {
+public class GameResponseDtos {
 
     // ===== 1. RECORDS SIMPLES =====
 
@@ -319,21 +319,4 @@ public class GameDtos {
         public LocalDateTime getLastUpdated() { return lastUpdated; }
         public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
     }
-}
-
-// ===== REQUEST DTOs (RECORDS PERFECTOS) =====
-
-/**
- * DTOs para requests - RECORDS ideales por inmutabilidad
- */
-class GameRequestDtos {
-
-    /**
-     * Para: PUT /game/{identifier}/my-review → Request Body - RECORD
-     */
-    public record UpdateMyGameRequest(
-            String status,    // WISHLIST, PLAYING, COMPLETED
-            Integer rating,   // 1-10
-            String reviewText // Texto de review
-    ) {}
 }

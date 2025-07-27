@@ -1,7 +1,8 @@
 package com.gamelyx.service;
 
 import com.gamelyx.dto.external.RawgApiDtos;
-import com.gamelyx.dto.GameDtos;
+import com.gamelyx.dto.GameResponseDtos;
+import com.gamelyx.dto.GameRequestDtos.*;
 import com.gamelyx.entity.Game;
 import com.gamelyx.entity.User;
 import com.gamelyx.entity.UserGameDetails;
@@ -63,18 +64,18 @@ public class GameService {
      * - Convertir respuesta RAWG a nuestros DTOs
      * - No guardar en BD aquí (solo cuando usuario visite página específica)
      */
-    public Mono<GameDtos.GameSearchResultsDto> searchGamesForResults(String query, int page, int size) {
+    public Mono<GameResponseDtos.GameSearchResultsDto> searchGamesForResults(String query, int page, int size) {
         logger.info("🔍 SEARCH SERVICE: query='{}', page={}, size={}", query, page, size);
 
         return rawgApiService.searchGames(query, page, size)
                 .map(rawgResponse -> {
                     // Convertir items de RAWG a nuestros DTOs
-                    List<GameDtos.GameSearchItem> gameItems = rawgResponse.getResults().stream()
+                    List<GameResponseDtos.GameSearchItem> gameItems = rawgResponse.getResults().stream()
                             .map(this::convertRawgToSearchItem)
                             .toList();
 
                     // Construir respuesta con paginación
-                    GameDtos.GameSearchResultsDto response = new GameDtos.GameSearchResultsDto(
+                    GameResponseDtos.GameSearchResultsDto response = new GameResponseDtos.GameSearchResultsDto(
                             gameItems,
                             page,
                             calculateTotalPages(rawgResponse.getCount(), size),
@@ -100,12 +101,12 @@ public class GameService {
      * - Si existe en BD → usar datos locales
      * - SIEMPRE incluir: mi estado + reviews de otros
      */
-    public Mono<GameDtos.GamePageDto> getGamePageWithUserData(String identifier, User user) {
+    public Mono<GameResponseDtos.GamePageDto> getGamePageWithUserData(String identifier, User user) {
         logger.info("🎮 GAME PAGE WITH USER: identifier='{}', user={}", identifier, user.getUsername());
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    GameDtos.GamePageDto gamePageDto = buildGamePageDto(game);
+                    GameResponseDtos.GamePageDto gamePageDto = buildGamePageDto(game);
 
                     // Agregar mi estado personal
                     Optional<UserGameDetails> myGameDetails = userGameDetailsRepository
@@ -136,12 +137,12 @@ public class GameService {
      * - Igual que arriba pero sin mi estado personal
      * - Solo datos del juego + reviews de otros
      */
-    public Mono<GameDtos.GamePageDto> getGamePagePublic(String identifier) {
+    public Mono<GameResponseDtos.GamePageDto> getGamePagePublic(String identifier) {
         logger.info("🎮 GAME PAGE PUBLIC: identifier='{}'", identifier);
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    GameDtos.GamePageDto gamePageDto = buildGamePageDto(game);
+                    GameResponseDtos.GamePageDto gamePageDto = buildGamePageDto(game);
                     // myStatus queda null (no autenticado)
 
                     // Reviews de otros usuarios (últimas 3)
@@ -168,7 +169,7 @@ public class GameService {
      * - Recalcular community rating
      * - Devolver estado actualizado + community rating nuevo
      */
-    public Mono<GameDtos.UpdatedGameStatusDto> updateMyGameReview(
+    public Mono<GameResponseDtos.UpdatedGameStatusDto> updateMyGameReview(
             String identifier, User user, UpdateMyGameRequest request) {
 
         logger.info("💭 UPDATE REVIEW SERVICE: identifier='{}', user={}, status={}, rating={}",
@@ -202,7 +203,7 @@ public class GameService {
                     Game updatedGame = gameRepository.findById(game.getId()).orElse(game);
 
                     // Construir respuesta
-                    GameDtos.UpdatedGameStatusDto response = new GameDtos.UpdatedGameStatusDto(
+                    GameResponseDtos.UpdatedGameStatusDto response = new GameResponseDtos.UpdatedGameStatusDto(
                             saved.getStatus() != null ? saved.getStatus().name() : null,
                             saved.getRating(),
                             saved.getReviewText(),
@@ -223,7 +224,7 @@ public class GameService {
     /**
      * 🎯 Para: GET /my-reviews (para home - sin paginación)
      */
-    public List<GameDtos.MyReviewDto> getMyRecentReviews(User user, int limit) {
+    public List<GameResponseDtos.MyReviewDto> getMyRecentReviews(User user, int limit) {
         logger.info("📝 MY RECENT REVIEWS: user={}, limit={}", user.getUsername(), limit);
 
         Pageable pageable = PageRequest.of(0, limit, Sort.by("reviewUpdatedAt").descending());
@@ -238,19 +239,19 @@ public class GameService {
     /**
      * 🎯 Para: GET /my-reviews (para página completa - con paginación)
      */
-    public GameDtos.MyReviewsResponseDto getMyReviewsPaginated(User user, int page, int size) {
+    public GameResponseDtos.MyReviewsResponseDto getMyReviewsPaginated(User user, int page, int size) {
         logger.info("📝 MY REVIEWS PAGINATED: user={}, page={}, size={}",
                 user.getUsername(), page, size);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("reviewUpdatedAt").descending());
         var reviewsPage = userGameDetailsRepository.findUserReviews(user.getId(), pageable);
 
-        List<GameDtos.MyReviewDto> reviewDtos = reviewsPage.getContent()
+        List<GameResponseDtos.MyReviewDto> reviewDtos = reviewsPage.getContent()
                 .stream()
                 .map(this::convertToMyReviewDto)
                 .toList();
 
-        return GameDtos.MyReviewsResponseDto.forPage(
+        return GameResponseDtos.MyReviewsResponseDto.forPage(
                 reviewDtos,
                 page,
                 reviewsPage.getTotalPages(),
@@ -295,8 +296,8 @@ public class GameService {
     /**
      * Convierte RawgApiDtos.GameSummary → GameDtos.GameSearchItem
      */
-    private GameDtos.GameSearchItem convertRawgToSearchItem(RawgApiDtos.GameSummary rawgGame) {
-        return new GameDtos.GameSearchItem(
+    private GameResponseDtos.GameSearchItem convertRawgToSearchItem(RawgApiDtos.GameSummary rawgGame) {
+        return new GameResponseDtos.GameSearchItem(
                 rawgGame.getId(),
                 null, // slug - no lo tenemos hasta guardarlo en BD
                 rawgGame.getName(),
@@ -316,8 +317,8 @@ public class GameService {
     /**
      * Construye GamePageDto a partir de Game entity
      */
-    private GameDtos.GamePageDto buildGamePageDto(Game game) {
-        GameDtos.GamePageDto dto = new GameDtos.GamePageDto();
+    private GameResponseDtos.GamePageDto buildGamePageDto(Game game) {
+        GameResponseDtos.GamePageDto dto = new GameResponseDtos.GamePageDto();
 
         // Datos básicos
         dto.setRawgId(game.getRawgId());
@@ -355,8 +356,8 @@ public class GameService {
     /**
      * Convierte UserGameDetails → MyGameStatus
      */
-    private GameDtos.MyGameStatus convertToMyGameStatus(UserGameDetails ugd) {
-        return new GameDtos.MyGameStatus(
+    private GameResponseDtos.MyGameStatus convertToMyGameStatus(UserGameDetails ugd) {
+        return new GameResponseDtos.MyGameStatus(
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
                 ugd.getRating(),
                 ugd.getReviewText(),
@@ -367,8 +368,8 @@ public class GameService {
     /**
      * Convierte UserGameDetails → OtherUserReview
      */
-    private GameDtos.OtherUserReview convertToOtherUserReview(UserGameDetails ugd) {
-        return new GameDtos.OtherUserReview(
+    private GameResponseDtos.OtherUserReview convertToOtherUserReview(UserGameDetails ugd) {
+        return new GameResponseDtos.OtherUserReview(
                 ugd.getUser().getUsername(),
                 ugd.getRating(),
                 truncateReviewText(ugd.getReviewText(), 200), // Truncar para preview
@@ -380,9 +381,9 @@ public class GameService {
     /**
      * Convierte UserGameDetails → MyReviewDto
      */
-    private GameDtos.MyReviewDto convertToMyReviewDto(UserGameDetails ugd) {
+    private GameResponseDtos.MyReviewDto convertToMyReviewDto(UserGameDetails ugd) {
         Game game = ugd.getGame();
-        return new GameDtos.MyReviewDto(
+        return new GameResponseDtos.MyReviewDto(
                 game.getRawgId(),
                 generateSlugFromName(game.getName()), // TODO: usar slug real
                 game.getName(),
@@ -508,6 +509,4 @@ public class GameService {
         return tags != null ? List.of(tags.split(",")) : List.of();
     }
 
-    // Record para request (simplificado)
-    public record UpdateMyGameRequest(String status, Integer rating, String reviewText) {}
 }
