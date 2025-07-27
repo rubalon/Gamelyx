@@ -64,13 +64,13 @@ public class Game {
     private String coverImage;
 
     // Ratings y valoraciones
-    @Column(precision = 3, scale = 2)
+    @Column
     private Double rating; // Rating externo (RAWG/Steam)
 
     @Column(name = "rating_top")
     private Integer ratingTop;
 
-    @Column(name = "community_rating", precision = 3, scale = 2)
+    @Column(name = "community_rating")
     private Double communityRating; // Rating promedio de nuestra comunidad
 
     @Column(name = "community_reviews_count")
