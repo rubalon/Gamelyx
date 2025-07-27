@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Repository para la entidad Game
  *
- * Métodos básicos para buscar juegos por IDs externos y nombre.
+ * Métodos básicos para buscar juegos por IDs externos, nombre y slug.
  */
 @Repository
 public interface GameRepository extends JpaRepository<Game, UUID> {
@@ -40,6 +40,20 @@ public interface GameRepository extends JpaRepository<Game, UUID> {
      * Verifica si existe un juego con el Steam App ID dado
      */
     boolean existsBySteamAppId(String steamAppId);
+
+    // ===== BÚSQUEDAS POR SLUG =====
+
+    /**
+     * Busca un juego por su slug (URLs amigables)
+     * Ejemplo: findBySlug("minecraft") o findBySlug("grand-theft-auto-v")
+     */
+    Optional<Game> findBySlug(String slug);
+
+    /**
+     * Verifica si existe un juego con el slug dado
+     * Útil para generar slugs únicos en GameService
+     */
+    boolean existsBySlug(String slug);
 
     // ===== BÚSQUEDAS POR NOMBRE =====
 

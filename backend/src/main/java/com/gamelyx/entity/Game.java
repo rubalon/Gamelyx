@@ -19,7 +19,8 @@ import java.util.UUID;
         @Index(name = "idx_game_rawg_id", columnList = "rawg_id"),
         @Index(name = "idx_game_steam_app_id", columnList = "steam_app_id"),
         @Index(name = "idx_game_name", columnList = "name"),
-        @Index(name = "idx_game_rating", columnList = "rating")
+        @Index(name = "idx_game_rating", columnList = "rating"),
+        @Index(name = "idx_game_slug", columnList = "slug")  // Nuevo índice para slug
 })
 public class Game {
 
@@ -38,6 +39,14 @@ public class Game {
     @Column(nullable = false, length = 255)
     private String name;
 
+    /**
+     * Slug para URLs amigables
+     * Ejemplo: "grand-theft-auto-v", "minecraft", "the-witcher-3"
+     * Generado automáticamente por GameService cuando se guarda el juego
+     */
+    @Column(name = "slug", unique = true, length = 255)
+    private String slug;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -47,8 +56,12 @@ public class Game {
     @Column(name = "background_image", length = 500)
     private String backgroundImage;
 
-    @Column(name = "background_image_additional", length = 500)
-    private String backgroundImageAdditional;
+    /**
+     * Imagen de carátula/portada del juego
+     * Diferente de backgroundImage - más enfocada para mostrar en listas/cards
+     */
+    @Column(name = "cover_image", length = 500)
+    private String coverImage;
 
     // Ratings y valoraciones
     @Column(precision = 3, scale = 2)
@@ -130,6 +143,9 @@ public class Game {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
@@ -139,8 +155,8 @@ public class Game {
     public String getBackgroundImage() { return backgroundImage; }
     public void setBackgroundImage(String backgroundImage) { this.backgroundImage = backgroundImage; }
 
-    public String getBackgroundImageAdditional() { return backgroundImageAdditional; }
-    public void setBackgroundImageAdditional(String backgroundImageAdditional) { this.backgroundImageAdditional = backgroundImageAdditional; }
+    public String getCoverImage() { return coverImage; }
+    public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
 
     public Double getRating() { return rating; }
     public void setRating(Double rating) { this.rating = rating; }
@@ -223,7 +239,7 @@ public class Game {
 
     @Override
     public String toString() {
-        return String.format("Game{id=%s, name='%s', rating=%.2f, platforms='%s'}",
-                id, name, rating, platforms);
+        return String.format("Game{id=%s, name='%s', slug='%s', rating=%.2f, platforms='%s'}",
+                id, name, slug, rating, platforms);
     }
 }

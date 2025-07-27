@@ -106,6 +106,30 @@ public class RawgApiService {
     }
 
     /**
+     * Obtiene detalles completos de un juego por su SLUG
+     *
+     * @param gameSlug Slug del juego en RAWG (ej: "minecraft", "grand-theft-auto-v")
+     * @return Mono con los detalles del juego
+     */
+    public Mono<RawgApiDtos.GameDetails> getGameDetailsBySlug(String gameSlug) {
+        logger.debug("Getting game details for slug: '{}'", gameSlug);
+
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/games/{slug}")
+                        .queryParam("key", gameApiConfig.getRawg().getKey())
+                        .build(gameSlug))
+                .retrieve()
+                .bodyToMono(RawgApiDtos.GameDetails.class)
+                .retryWhen(createRetrySpec("getGameDetailsBySlug"))
+                .doOnSuccess(game -> logger.debug("Game details retrieved by slug '{}': '{}'",
+                        gameSlug, game != null ? game.getName() : "unknown"))
+                .doOnError(error -> logger.error("Failed to get game details for slug '{}': {}",
+                        gameSlug, error.getMessage()));
+    }
+
+    /**
      * Obtiene screenshots de un juego
      *
      * @param gameId ID del juego en RAWG

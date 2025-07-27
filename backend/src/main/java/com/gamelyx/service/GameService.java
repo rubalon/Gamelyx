@@ -31,6 +31,7 @@ import java.util.UUID;
  * - Métodos que coinciden exactamente con endpoints del controller
  * - Transparencia total entre RAWG y BD para el frontend
  * - Un método = una funcionalidad completa
+ * - Generación automática de slugs únicos
  */
 @Service
 @Transactional
@@ -260,7 +261,7 @@ public class GameService {
         );
     }
 
-    // ===== MÉTODOS PRIVADOS DE CONVERSIÓN =====
+    // ===== MÉTODOS PRIVADOS DE RESOLUCIÓN Y CONVERSIÓN =====
 
     /**
      * Resuelve identifier (rawgId o slug) → Game entity
@@ -271,37 +272,62 @@ public class GameService {
 
         if (isRawgId) {
             Integer rawgId = Integer.parseInt(identifier);
-
-            // Buscar en BD primero
-            Optional<Game> existing = gameRepository.findByRawgId(rawgId);
-            if (existing.isPresent()) {
-                logger.debug("Game found in database: rawgId={}", rawgId);
-                return Mono.just(existing.get());
-            }
-
-            // Si no existe, obtener de RAWG
-            logger.debug("Game not in database, fetching from RAWG: rawgId={}", rawgId);
-            return rawgApiService.getGameDetails(rawgId)
-                    .map(this::saveGameFromRawgDetails);
-
+            logger.debug("Resolving as rawgId: {}", rawgId);
+            return resolveByRawgId(rawgId);
         } else {
-            // Búsqueda por slug
-            // TODO: Implementar búsqueda por slug cuando tengamos el campo
-            // Por ahora, error
-            logger.warn("Slug search not implemented yet: {}", identifier);
-            return Mono.error(new RuntimeException("Slug search not implemented: " + identifier));
+            logger.debug("Resolving as slug: '{}'", identifier);
+            return resolveBySlug(identifier);
         }
+    }
+
+    /**
+     * Resuelve juego por rawgId
+     */
+    private Mono<Game> resolveByRawgId(Integer rawgId) {
+        // Buscar en BD primero
+        Optional<Game> existing = gameRepository.findByRawgId(rawgId);
+        if (existing.isPresent()) {
+            logger.debug("Game found in database: rawgId={}, slug='{}'", rawgId, existing.get().getSlug());
+            return Mono.just(existing.get());
+        }
+
+        // Si no existe, obtener de RAWG por ID
+        logger.debug("Game not in database, fetching from RAWG: rawgId={}", rawgId);
+        return rawgApiService.getGameDetails(rawgId)
+                .map(this::saveGameFromRawgDetails);
+    }
+
+    /**
+     * Resuelve juego por slug
+     */
+    private Mono<Game> resolveBySlug(String slug) {
+        // Buscar en BD primero
+        Optional<Game> existing = gameRepository.findBySlug(slug);
+        if (existing.isPresent()) {
+            logger.debug("Game found by slug: '{}' → '{}'", slug, existing.get().getName());
+            return Mono.just(existing.get());
+        }
+
+        // Si no existe, obtener DIRECTAMENTE de RAWG por slug
+        logger.debug("Game not found by slug '{}', fetching from RAWG", slug);
+        return rawgApiService.getGameDetailsBySlug(slug)
+                .map(this::saveGameFromRawgDetails)
+                .doOnError(error -> logger.error("Failed to get game by slug '{}': {}", slug, error.getMessage()));
     }
 
     /**
      * Convierte RawgApiDtos.GameSummary → GameDtos.GameSearchItem
      */
     private GameResponseDtos.GameSearchItem convertRawgToSearchItem(RawgApiDtos.GameSummary rawgGame) {
+        // Verificar si ya existe en BD para incluir el slug de BD (puede ser diferente)
+        Optional<Game> existingGame = gameRepository.findByRawgId(rawgGame.getId());
+        String slug = existingGame.map(Game::getSlug).orElse(rawgGame.getSlug()); // Usar slug de BD o RAWG
+
         return new GameResponseDtos.GameSearchItem(
                 rawgGame.getId(),
-                null, // slug - no lo tenemos hasta guardarlo en BD
+                slug, // Slug disponible desde RAWG o BD
                 rawgGame.getName(),
-                rawgGame.getBackgroundImage(),
+                rawgGame.getBackgroundImage(), // Usar como coverImage para lista
                 truncateDescription(rawgGame.getName()), // TODO: obtener descripción real
                 rawgGame.getRating(),
                 rawgGame.getReleased(),
@@ -322,12 +348,12 @@ public class GameService {
 
         // Datos básicos
         dto.setRawgId(game.getRawgId());
-        dto.setSlug(generateSlugFromName(game.getName())); // TODO: usar slug real de BD
+        dto.setSlug(game.getSlug()); // Usar slug real de BD
         dto.setName(game.getName());
         dto.setDescription(game.getDescription());
         dto.setDescriptionRaw(game.getDescriptionRaw());
         dto.setBackgroundImage(game.getBackgroundImage());
-        dto.setCoverImage(game.getBackgroundImage()); // Usar backgroundImage como coverImage
+        dto.setCoverImage(game.getCoverImage()); // Usar coverImage real
         dto.setScreenshots(game.getScreenshotsList());
 
         // Ratings
@@ -385,9 +411,9 @@ public class GameService {
         Game game = ugd.getGame();
         return new GameResponseDtos.MyReviewDto(
                 game.getRawgId(),
-                generateSlugFromName(game.getName()), // TODO: usar slug real
+                game.getSlug(), // Usar slug real de BD
                 game.getName(),
-                game.getBackgroundImage(), // coverImage
+                game.getCoverImage() != null ? game.getCoverImage() : game.getBackgroundImage(), // coverImage o fallback
                 ugd.getRating(),
                 ugd.getReviewText(),
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
@@ -397,16 +423,17 @@ public class GameService {
     }
 
     /**
-     * Guarda Game desde RawgApiDtos.GameDetails
+     * Guarda Game desde RawgApiDtos.GameDetails usando slug de RAWG
      */
     private Game saveGameFromRawgDetails(RawgApiDtos.GameDetails rawgGame) {
         Game game = new Game();
         game.setRawgId(rawgGame.getId());
         game.setName(rawgGame.getName());
+        game.setSlug(rawgGame.getSlug()); // ✅ Usar slug directo de RAWG
         game.setDescription(rawgGame.getDescription());
         game.setDescriptionRaw(rawgGame.getDescriptionRaw());
         game.setBackgroundImage(rawgGame.getBackgroundImage());
-        game.setBackgroundImageAdditional(rawgGame.getBackgroundImageAdditional());
+        game.setCoverImage(rawgGame.getBackgroundImageAdditional()); // Mapear backgroundImageAdditional → coverImage
         game.setRating(rawgGame.getRating());
         game.setRatingTop(rawgGame.getRatingTop());
         game.setReleased(rawgGame.getReleased());
@@ -430,8 +457,47 @@ public class GameService {
         // TODO: Agregar developers, publishers, tags, screenshots
 
         Game saved = gameRepository.save(game);
-        logger.info("Game saved from RAWG: '{}' (ID: {})", saved.getName(), saved.getId());
+        logger.info("Game saved from RAWG: '{}' with slug '{}' (ID: {})",
+                saved.getName(), saved.getSlug(), saved.getId());
         return saved;
+    }
+
+    /**
+     * Genera slug base desde nombre del juego
+     */
+    private String generateSlugFromName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return "unnamed-game";
+        }
+
+        return name.toLowerCase()
+                .trim()
+                .replaceAll("[^a-z0-9\\s-]", "") // Remover caracteres especiales
+                .replaceAll("\\s+", "-")         // Espacios → guiones
+                .replaceAll("-+", "-")           // Múltiples guiones → uno solo
+                .replaceAll("^-|-$", "");        // Remover guiones al inicio/final
+    }
+
+    /**
+     * Asegura que el slug sea único agregando número si es necesario
+     */
+    private String ensureUniqueSlug(String baseSlug) {
+        String candidateSlug = baseSlug;
+        int counter = 1;
+
+        while (gameRepository.existsBySlug(candidateSlug)) {
+            candidateSlug = baseSlug + "-" + counter;
+            counter++;
+
+            // Prevenir bucle infinito
+            if (counter > 1000) {
+                candidateSlug = baseSlug + "-" + System.currentTimeMillis();
+                break;
+            }
+        }
+
+        logger.debug("Generated unique slug: '{}' from base: '{}'", candidateSlug, baseSlug);
+        return candidateSlug;
     }
 
     /**
@@ -484,17 +550,11 @@ public class GameService {
     }
 
     private String truncateDescription(String text) {
-        // TODO: Implementar truncamiento inteligente
         return text != null && text.length() > 150 ? text.substring(0, 150) + "..." : text;
     }
 
     private String truncateReviewText(String text, int maxLength) {
         return text != null && text.length() > maxLength ? text.substring(0, maxLength) + "..." : text;
-    }
-
-    private String generateSlugFromName(String name) {
-        // TODO: Implementar generación de slug real
-        return name != null ? name.toLowerCase().replaceAll("[^a-z0-9]", "-") : null;
     }
 
     private List<String> parseDevelopers(String developers) {
@@ -508,5 +568,4 @@ public class GameService {
     private List<String> parseTags(String tags) {
         return tags != null ? List.of(tags.split(",")) : List.of();
     }
-
 }
