@@ -48,22 +48,24 @@ public class GameController {
      * 📤 FRONTEND: Muestra lista vertical de juegos para elegir
      */
     @GetMapping("/search")
-    public Mono<ResponseEntity<GameResponseDtos.GameSearchResultsDto>> searchGames(
+    public ResponseEntity<GameResponseDtos.GameSearchResultsDto> searchGames(
             @RequestParam("q") String query,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size) {
 
         logger.info("🔍 SEARCH: query='{}', page={}, size={}", query, page, size);
 
-        return gameService.searchGamesForResults(query, page, size)
-                .map(response -> {
-                    logger.debug("Search completed: {} games found", response.getTotalResults());
-                    return ResponseEntity.ok(response);
-                })
-                .onErrorResume(error -> {
-                    logger.error("Search failed for query '{}': {}", query, error.getMessage());
-                    return Mono.just(ResponseEntity.internalServerError().<GameResponseDtos.GameSearchResultsDto>build());
-                });
+        try {
+            GameResponseDtos.GameSearchResultsDto response = gameService.searchGamesForResults(query, page, size)
+                    .block(); // ✅ Convertir a síncrono
+
+            logger.debug("Search completed: {} games found", response.getTotalResults());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception error) {
+            logger.error("Search failed for query '{}': {}", query, error.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     // ===== FUNCIONALIDAD 2: PÁGINA COMPLETA DEL JUEGO =====
@@ -92,36 +94,38 @@ public class GameController {
      *   /game/grand-theft-auto-v          → Slug amigable
      */
     @GetMapping("/game/{identifier}")
-    public Mono<ResponseEntity<GameResponseDtos.GamePageDto>> getGamePage(
+    public ResponseEntity<GameResponseDtos.GamePageDto> getGamePage(
             @PathVariable String identifier,
             @AuthenticationPrincipal User currentUser) {
 
         logger.info("🎮 GAME PAGE: identifier='{}', user={}", identifier,
                 currentUser != null ? currentUser.getUsername() : "anonymous");
 
-        if (currentUser != null) {
-            // Usuario autenticado → incluir mi estado personal
-            return gameService.getGamePageWithUserData(identifier, currentUser)
-                    .map(gamePageDto -> {
-                        logger.debug("Game page loaded with user data: '{}'", gamePageDto.getName());
-                        return ResponseEntity.ok(gamePageDto);
-                    })
-                    .onErrorResume(error -> {
-                        logger.error("Failed to load game page '{}' for user {}: {}",
-                                identifier, currentUser.getUsername(), error.getMessage());
-                        return Mono.just(ResponseEntity.notFound().<GameResponseDtos.GamePageDto>build());
-                    });
-        } else {
-            // Usuario no autenticado → solo datos públicos
-            return gameService.getGamePagePublic(identifier)
-                    .map(gamePageDto -> {
-                        logger.debug("Game page loaded (public): '{}'", gamePageDto.getName());
-                        return ResponseEntity.ok(gamePageDto);
-                    })
-                    .onErrorResume(error -> {
-                        logger.error("Failed to load game page '{}' (public): {}", identifier, error.getMessage());
-                        return Mono.just(ResponseEntity.notFound().<GameResponseDtos.GamePageDto>build());
-                    });
+        try {
+            GameResponseDtos.GamePageDto gamePageDto;
+
+            if (currentUser != null) {
+                // Usuario autenticado → incluir mi estado personal
+                gamePageDto = gameService.getGamePageWithUserData(identifier, currentUser)
+                        .block(); // ✅ Convertir a síncrono
+
+                logger.debug("Game page loaded with user data: '{}'", gamePageDto.getName());
+            } else {
+                // Usuario no autenticado → solo datos públicos
+                gamePageDto = gameService.getGamePagePublic(identifier)
+                        .block(); // ✅ Convertir a síncrono
+
+                logger.debug("Game page loaded (public): '{}'", gamePageDto.getName());
+            }
+
+            return ResponseEntity.ok(gamePageDto);
+
+        } catch (Exception error) {
+            logger.error("Failed to load game page '{}' for user {}: {}",
+                    identifier,
+                    currentUser != null ? currentUser.getUsername() : "anonymous",
+                    error.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

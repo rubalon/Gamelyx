@@ -15,7 +15,7 @@ import java.util.UUID;
  * Esta entidad combina:
  * - Estado del juego en la biblioteca del usuario (wishlist, playing, completed, archived)
  * - Rating y review del usuario sobre el juego
- * - Metadata de progreso (horas jugadas, fecha de finalización, etc.)
+ * - Metadata de progreso y timestamps
  *
  * Diseño unificado: Una sola entidad maneja tanto el estado como las reviews,
  * simplificando las consultas y manteniendo la consistencia de datos.
@@ -31,7 +31,7 @@ import java.util.UUID;
                 @Index(name = "idx_user_game_game_id", columnList = "game_id"),
                 @Index(name = "idx_user_game_status", columnList = "status"),
                 @Index(name = "idx_user_game_rating", columnList = "rating"),
-                @Index(name = "idx_user_game_created", columnList = "created_at")
+                @Index(name = "idx_user_review_time_updated", columnList = "review_updated_at")
         })
 public class UserGameDetails {
 
@@ -45,11 +45,11 @@ public class UserGameDetails {
         ARCHIVED
     }
 
+    // ===== ID Y RELACIONES =====
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    // ===== RELACIONES =====
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -59,37 +59,18 @@ public class UserGameDetails {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
-    // ===== SECCIÓN: ESTADO Y PROGRESO =====
+    // ===== ESTADO DEL JUEGO =====
 
     /**
      * Estado del juego en la biblioteca del usuario
      * NULLABLE - El usuario puede agregar un juego sin categorizar inicialmente
      */
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "status", length = 20)
     private GameStatus status;
 
-    /**
-     * Cuándo se añadió el juego a la biblioteca del usuario
-     */
-    @CreationTimestamp
-    @Column(name = "added_at", nullable = false, updatable = false)
-    private LocalDateTime addedAt;
 
-    /**
-     * Última vez que se cambió el status
-     */
-    @Column(name = "status_updated_at")
-    private LocalDateTime statusUpdatedAt;
-
-    /**
-     * Cuándo se marcó como completado (solo para status COMPLETED)
-     */
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
-
-
-    // ===== SECCIÓN: RATING Y REVIEW =====
+    // ===== RATING Y REVIEW =====
 
     /**
      * Rating del usuario para este juego (1-10)
@@ -119,7 +100,7 @@ public class UserGameDetails {
     @Column(name = "review_updated_at")
     private LocalDateTime reviewUpdatedAt;
 
-    // ===== SECCIÓN: METADATA Y CONTROL =====
+    // ===== TIMESTAMPS AUTOMÁTICOS =====
 
     /**
      * Cualquier cambio en este registro
@@ -141,11 +122,11 @@ public class UserGameDetails {
         this.user = user;
         this.game = game;
         this.status = status;
-        this.statusUpdatedAt = LocalDateTime.now();
     }
 
     // ===== GETTERS Y SETTERS =====
 
+    // ID y relaciones
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -155,38 +136,16 @@ public class UserGameDetails {
     public Game getGame() { return game; }
     public void setGame(Game game) { this.game = game; }
 
+    // Estado del juego
     public GameStatus getStatus() { return status; }
     public void setStatus(GameStatus status) {
         this.status = status;
-        this.statusUpdatedAt = LocalDateTime.now();
-
-        // Auto-set completedAt cuando se marca como completado
-        if (status == GameStatus.COMPLETED && this.completedAt == null) {
-            this.completedAt = LocalDateTime.now();
-        }
     }
 
-    public LocalDateTime getAddedAt() { return addedAt; }
-    public void setAddedAt(LocalDateTime addedAt) { this.addedAt = addedAt; }
-
-    public LocalDateTime getStatusUpdatedAt() { return statusUpdatedAt; }
-    public void setStatusUpdatedAt(LocalDateTime statusUpdatedAt) { this.statusUpdatedAt = statusUpdatedAt; }
-
-    public LocalDateTime getCompletedAt() { return completedAt; }
-    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
-
-
+    // Rating y review
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) {
         this.rating = rating;
-
-        // Auto-set review timestamps cuando se agrega rating
-        if (rating != null) {
-            if (this.reviewCreatedAt == null) {
-                this.reviewCreatedAt = LocalDateTime.now();
-            }
-            this.reviewUpdatedAt = LocalDateTime.now();
-        }
     }
 
     public String getReviewText() { return reviewText; }
@@ -208,9 +167,9 @@ public class UserGameDetails {
     public LocalDateTime getReviewUpdatedAt() { return reviewUpdatedAt; }
     public void setReviewUpdatedAt(LocalDateTime reviewUpdatedAt) { this.reviewUpdatedAt = reviewUpdatedAt; }
 
+    // Timestamps automáticos
     public LocalDateTime getLastUpdatedAt() { return lastUpdatedAt; }
     public void setLastUpdatedAt(LocalDateTime lastUpdatedAt) { this.lastUpdatedAt = lastUpdatedAt; }
-
 
     // ===== MÉTODOS DE UTILIDAD =====
 
@@ -228,62 +187,6 @@ public class UserGameDetails {
         return status != null;
     }
 
-    /**
-     * Verifica si el juego está en la biblioteca del usuario
-     */
-    public boolean isInLibrary() {
-        return status != null;
-    }
-
-    /**
-     * Verifica si la review es completa (tiene rating y texto)
-     */
-    public boolean hasCompleteReview() {
-        return rating != null && reviewText != null && !reviewText.trim().isEmpty();
-    }
-
-    /**
-     * Verifica si puede tener una review completa basado en el estado
-     */
-    public boolean canHaveCompleteReview() {
-        return status == GameStatus.COMPLETED || status == GameStatus.PLAYING;
-    }
-
-    /**
-     * Obtiene un resumen del progreso para mostrar en UI
-     */
-    public String getProgressSummary() {
-        if (status == null) {
-            return "Sin estado";
-        }
-
-        StringBuilder summary = new StringBuilder(status.name());
-
-
-        if (rating != null) {
-            summary.append(" • ").append("★").append(rating).append("/10");
-        }
-
-        return summary.toString();
-    }
-
-    /**
-     * Actualiza tanto rating como review de una vez
-     */
-    public void updateReview(Integer newRating, String newReviewText) {
-        setRating(newRating);
-        setReviewText(newReviewText);
-    }
-
-    /**
-     * Actualiza el estado y opcionalmente la fecha de completado
-     */
-    public void updateStatus(GameStatus newStatus, LocalDateTime completionDate) {
-        setStatus(newStatus);
-        if (newStatus == GameStatus.COMPLETED && completionDate != null) {
-            this.completedAt = completionDate;
-        }
-    }
 
     @Override
     public String toString() {

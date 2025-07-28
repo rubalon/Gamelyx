@@ -180,9 +180,7 @@ public interface UserGameDetailsRepository extends JpaRepository<UserGameDetails
      * Encuentra juegos completados recientemente por un usuario
      */
     @Query("SELECT ugd FROM UserGameDetails ugd JOIN FETCH ugd.game g " +
-            "WHERE ugd.user.id = :userId AND ugd.status = 'COMPLETED' " +
-            "AND ugd.completedAt IS NOT NULL " +
-            "ORDER BY ugd.completedAt DESC")
+            "WHERE ugd.user.id = :userId AND ugd.status = 'COMPLETED' " )
     List<UserGameDetails> findRecentlyCompletedGames(@Param("userId") UUID userId, Pageable pageable);
 
     /**
