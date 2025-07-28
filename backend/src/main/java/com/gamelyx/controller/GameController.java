@@ -152,8 +152,8 @@ public class GameController {
      *   PUT /game/minecraft/my-review     → Por slug
      *   PUT /game/22511/my-review        → Por rawgId
      */
-    @PutMapping("/game/{identifier}/my-review")
-    public Mono<ResponseEntity<GameResponseDtos.UpdatedGameStatusDto>> updateMyGameReview(
+    @PutMapping("/game/{identifier}/my-game-details")
+    public ResponseEntity<GameResponseDtos.UpdatedGameStatusDto> updateMyGameReview(
             @PathVariable String identifier,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UpdateMyGameRequest request) {
@@ -161,17 +161,20 @@ public class GameController {
         logger.info("💭 UPDATE REVIEW: identifier='{}', user={}, status={}, rating={}",
                 identifier, currentUser.getUsername(), request.status(), request.rating());
 
-        return gameService.updateMyGameReview(identifier, currentUser, request)
-                .map(updatedStatus -> {
-                    logger.info("Review updated successfully: '{}' for user '{}' → community rating: {}",
-                            identifier, currentUser.getUsername(), updatedStatus.communityRating());
-                    return ResponseEntity.ok(updatedStatus);
-                })
-                .onErrorResume(error -> {
-                    logger.error("Failed to update review for '{}' by user {}: {}",
-                            identifier, currentUser.getUsername(), error.getMessage());
-                    return Mono.just(ResponseEntity.badRequest().<GameResponseDtos.UpdatedGameStatusDto>build());
-                });
+        try {
+            GameResponseDtos.UpdatedGameStatusDto updatedStatus = gameService.updateMyGameReview(identifier, currentUser, request)
+                    .block(); // ✅ Convertir a síncrono
+
+            logger.info("Review updated successfully: '{}' for user '{}' → community rating: {}",
+                    identifier, currentUser.getUsername(), updatedStatus.communityRating());
+
+            return ResponseEntity.ok(updatedStatus);
+
+        } catch (Exception error) {
+            logger.error("Failed to update review for '{}' by user {}: {}",
+                    identifier, currentUser.getUsername(), error.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // ===== FUNCIONALIDAD 4: MIS REVIEWS (HOME + PÁGINA COMPLETA) =====
