@@ -70,6 +70,8 @@ public class SecurityConfig {
                         // Endpoints de testing y salud (públicos para desarrollo)
                         .requestMatchers("/api/auth/health", "/api/auth/test-email").permitAll()
 
+                        .requestMatchers("/api/test/**").permitAll()
+
                         // 🔒 PRODUCCIÓN: Endpoints de games requieren autenticación
                         .requestMatchers("/api/games/**").authenticated()
 
