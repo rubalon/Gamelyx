@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 
@@ -66,20 +68,33 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos de autenticación
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll() // AÑADIDO: refresh también es público
 
                         // Endpoints de testing y salud (públicos para desarrollo)
                         .requestMatchers("/api/auth/health", "/api/auth/test-email").permitAll()
-
                         .requestMatchers("/api/test/**").permitAll()
 
-                        // 🔒 PRODUCCIÓN: Endpoints de games requieren autenticación
-                        .requestMatchers("/api/games/**").authenticated()
+
+                        // Enpoints de games ( necesitan autenticación)
+                        .requestMatchers("GET","/api/games/health").authenticated()
+                        .requestMatchers("GET","/api/games/search").authenticated()
+                        .requestMatchers("GET", "/api/games/game/*").authenticated()
+                        .requestMatchers("PUT", "/api/games/game/*/my-game-details").authenticated()
+                        .requestMatchers("GET","/api/games/my-reviews").authenticated()
 
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        // Todos los demás endpoints requieren autenticación
-                        .anyRequest().authenticated()
+                        // Esto permite que endpoints no definidos devuelvan 404 en lugar de 403
+                        .anyRequest().permitAll()
+                )
+
+                // Manejo de excepciones
+                .exceptionHandling(exceptions -> exceptions
+                                // Cuando falta autenticación (no hay token), devolver 401 en lugar de 403
+                                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        // Nota: accessDeniedHandler se usa cuando SÍ hay token pero no tiene permisos
+                        // Por ahora no lo necesitamos porque no manejamos roles
                 )
 
                 // Añadir nuestro filtro JWT antes del filtro de autenticación estándar
