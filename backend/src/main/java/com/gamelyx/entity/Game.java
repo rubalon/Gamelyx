@@ -61,7 +61,7 @@ public class Game {
      * Diferente de backgroundImage - más enfocada para mostrar en listas/cards
      */
     @Column(name = "cover_image", length = 500)
-    private String coverImage;
+    private String BackgroundImageAlt;
 
     // Ratings y valoraciones
     @Column
@@ -155,8 +155,8 @@ public class Game {
     public String getBackgroundImage() { return backgroundImage; }
     public void setBackgroundImage(String backgroundImage) { this.backgroundImage = backgroundImage; }
 
-    public String getCoverImage() { return coverImage; }
-    public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
+    public String getBackgroundImageAlt() { return BackgroundImageAlt; }
+    public void setBackgroundImageAlt(String BackgroundImageAlt) { this.BackgroundImageAlt = BackgroundImageAlt; }
 
     public Double getRating() { return rating; }
     public void setRating(Double rating) { this.rating = rating; }

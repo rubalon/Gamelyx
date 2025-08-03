@@ -327,7 +327,7 @@ public class GameService {
                 rawgGame.getId(),
                 slug, // Slug disponible desde RAWG o BD
                 rawgGame.getName(),
-                rawgGame.getBackgroundImage(), // Usar como coverImage para lista
+                rawgGame.getBackgroundImage(), // Usar como BackgroundImageAlt para lista
                 truncateDescription(rawgGame.getName()), // TODO: obtener descripción real
                 rawgGame.getRating(),
                 rawgGame.getReleased(),
@@ -353,7 +353,7 @@ public class GameService {
         dto.setDescription(game.getDescription());
         dto.setDescriptionRaw(game.getDescriptionRaw());
         dto.setBackgroundImage(game.getBackgroundImage());
-        dto.setCoverImage(game.getCoverImage()); // Usar coverImage real
+        dto.setBackgroundImageAlt(game.getBackgroundImageAlt()); // Usar BackgroundImageAlt real
         dto.setScreenshots(game.getScreenshotsList());
 
         // Ratings
@@ -413,7 +413,7 @@ public class GameService {
                 game.getRawgId(),
                 game.getSlug(), // Usar slug real de BD
                 game.getName(),
-                game.getCoverImage() != null ? game.getCoverImage() : game.getBackgroundImage(), // coverImage o fallback
+                game.getBackgroundImageAlt() != null ? game.getBackgroundImageAlt() : game.getBackgroundImage(), // BackgroundImageAlt o fallback
                 ugd.getRating(),
                 ugd.getReviewText(),
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
@@ -433,7 +433,7 @@ public class GameService {
         game.setDescription(rawgGame.getDescription());
         game.setDescriptionRaw(rawgGame.getDescriptionRaw());
         game.setBackgroundImage(rawgGame.getBackgroundImage());
-        game.setCoverImage(rawgGame.getBackgroundImageAdditional()); // Mapear backgroundImageAdditional → coverImage
+        game.setBackgroundImageAlt(rawgGame.getBackgroundImageAdditional()); // Mapear backgroundImageAdditional → BackgroundImageAlt
         game.setRating(rawgGame.getRating());
         game.setRatingTop(rawgGame.getRatingTop());
         game.setReleased(rawgGame.getReleased());

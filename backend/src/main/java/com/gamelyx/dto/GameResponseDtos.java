@@ -23,7 +23,7 @@ public class GameResponseDtos {
             Integer rawgId,           // Para construir URL /game/{rawgId}
             String slug,              // Para URL amigable /game/{slug} (si ya existe)
             String name,              // "Minecraft"
-            String coverImage,        // Carátula del juego para mostrar en lista
+            String BackgroundImageAlt,        // Carátula del juego para mostrar en lista
             String description,       // Descripción corta/truncada para preview
             Double rating,            // Rating RAWG (4.2)
             String released,          // "2011-11-18"
@@ -57,7 +57,7 @@ public class GameResponseDtos {
             Integer gameRawgId,       // Para construir link
             String gameSlug,          // Para URL amigable
             String gameName,          // "Minecraft"
-            String coverImage,         // Imagen del juego
+            String BackgroundImageAlt,         // Imagen del juego
 
             // Mi review
             Integer rating,           // Mi rating 1-10
@@ -217,7 +217,7 @@ public class GameResponseDtos {
         private String description;       // HTML description
         private String descriptionRaw;    // Plain text para excerpts
         private String backgroundImage;   // Imagen principal/hero
-        private String coverImage; // Imagen secundaria si existe
+        private String BackgroundImageAlt; // Imagen secundaria si existe
         private List<String> screenshots; // URLs de capturas
 
         // Metadata del juego
@@ -268,8 +268,8 @@ public class GameResponseDtos {
         public String getBackgroundImage() { return backgroundImage; }
         public void setBackgroundImage(String backgroundImage) { this.backgroundImage = backgroundImage; }
 
-        public String getCoverImage() { return coverImage; }
-        public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
+        public String getBackgroundImageAlt() { return BackgroundImageAlt; }
+        public void setBackgroundImageAlt(String BackgroundImageAlt) { this.BackgroundImageAlt = BackgroundImageAlt; }
 
         public List<String> getScreenshots() { return screenshots; }
         public void setScreenshots(List<String> screenshots) { this.screenshots = screenshots; }

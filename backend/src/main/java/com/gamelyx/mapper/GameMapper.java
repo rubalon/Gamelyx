@@ -39,7 +39,7 @@ public class GameMapper {
                 rawgGame.getId(),
                 rawgGame.getSlug(),                    // Slug de RAWG
                 rawgGame.getName(),
-                rawgGame.getBackgroundImage(),         // Usar como coverImage
+                rawgGame.getBackgroundImage(),         // Usar como BackgroundImageAlt
                 shortDescription,                      // Descripción corta
                 rawgGame.getRating(),
                 rawgGame.getReleased(),
@@ -81,7 +81,7 @@ public class GameMapper {
         dto.setDescription(game.getDescription());
         dto.setDescriptionRaw(game.getDescriptionRaw());
         dto.setBackgroundImage(game.getBackgroundImage());
-        dto.setCoverImage(game.getCoverImage()); // Mapear backgroundImageAdditional → coverImage
+        dto.setBackgroundImageAlt(game.getBackgroundImageAlt()); // Mapear backgroundImageAdditional → BackgroundImageAlt
         dto.setScreenshots(stringToList(game.getScreenshots()));
 
         // Ratings
@@ -178,8 +178,8 @@ public class GameMapper {
                 game.getRawgId(),
                 game.getSlug(),
                 game.getName(),
-                game.getCoverImage() != null ?
-                        game.getCoverImage() : game.getBackgroundImage(), // coverImage o fallback
+                game.getBackgroundImageAlt() != null ?
+                        game.getBackgroundImageAlt() : game.getBackgroundImage(), // BackgroundImageAlt o fallback
                 ugd.getRating(),
                 ugd.getReviewText(),
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
@@ -222,7 +222,7 @@ public class GameMapper {
         game.setDescription(rawgGame.getDescription());
         game.setDescriptionRaw(rawgGame.getDescriptionRaw());
         game.setBackgroundImage(rawgGame.getBackgroundImage());
-        game.setCoverImage(rawgGame.getBackgroundImageAdditional());
+        game.setBackgroundImageAlt(rawgGame.getBackgroundImageAdditional());
 
         // Ratings
         game.setRating(rawgGame.getRating());
