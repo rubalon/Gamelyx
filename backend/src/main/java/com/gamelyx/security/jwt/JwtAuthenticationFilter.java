@@ -1,5 +1,7 @@
 package com.gamelyx.security.jwt;
 
+import com.gamelyx.entity.User;
+import com.gamelyx.security.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,10 +63,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Validar el token con los detalles del usuario
                 if (jwtUtil.validateToken(jwt, userDetails)) {
 
+                    // User Entity
+                    User user = ((CustomUserDetailsService.CustomUserPrincipal) userDetails).getUser();
+
+
                     // Crear el objeto de autenticación
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
+                                    user,
                                     null,
                                     userDetails.getAuthorities()
                             );
