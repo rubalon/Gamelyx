@@ -70,7 +70,6 @@ public class RawgApiService {
                         .queryParam("search", query)
                         .queryParam("page", page)
                         .queryParam("page_size", Math.min(pageSize, 40)) // RAWG max es 40
-                        .queryParam("ordering", "-rating") // Ordenar por rating descendente
                         .build())
                 .retrieve()
                 .bodyToMono(RawgApiDtos.GameSearchResponse.class)

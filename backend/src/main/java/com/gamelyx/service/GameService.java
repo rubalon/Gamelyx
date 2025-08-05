@@ -22,16 +22,19 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
- * GameService rediseñado para funcionalidades centradas en el frontend
+ * GameService refactorizado - SOLO LÓGICA DE NEGOCIO
  *
- * FILOSOFÍA:
- * - Métodos que coinciden exactamente con endpoints del controller
- * - Transparencia total entre RAWG y BD para el frontend
- * - Un método = una funcionalidad completa
- * - Generación automática de slugs únicos
+ * RESPONSABILIDADES:
+ * - Coordinación de flujos de trabajo
+ * - Acceso a repositorios y APIs externas
+ * - Validaciones y cálculos de negocio
+ * - Usar GameMapper para TODAS las conversiones
+ *
+ * NO HACE:
+ * - Conversiones (delegadas a GameMapper)
+ * - Transformaciones de datos (delegadas a GameMapper)
  */
 @Service
 @Transactional
@@ -42,7 +45,7 @@ public class GameService {
     private final RawgApiService rawgApiService;
     private final GameRepository gameRepository;
     private final UserGameDetailsRepository userGameDetailsRepository;
-    private final GameMapper gameMapper;
+    private final GameMapper gameMapper; // ✅ INYECTADO Y USADO
 
     public GameService(
             RawgApiService rawgApiService,
@@ -55,27 +58,30 @@ public class GameService {
         this.gameMapper = gameMapper;
     }
 
-    // ===== FUNCIONALIDAD 1: BÚSQUEDA PARA RESULTADOS =====
+    // ===== FUNCIONALIDAD 1: BÚSQUEDA =====
 
     /**
      * 🎯 Para: GET /search
      *
-     * LÓGICA:
-     * - Siempre usar RAWG API (datos frescos)
-     * - Convertir respuesta RAWG a nuestros DTOs
-     * - No guardar en BD aquí (solo cuando usuario visite página específica)
+     * LÓGICA DE NEGOCIO:
+     * - Consultar RAWG API (datos frescos)
+     * - Usar GameMapper para conversiones
+     * - Calcular paginación
      */
     public Mono<GameResponseDtos.GameSearchResultsDto> searchGamesForResults(String query, int page, int size) {
         logger.info("🔍 SEARCH SERVICE: query='{}', page={}, size={}", query, page, size);
 
         return rawgApiService.searchGames(query, page, size)
                 .map(rawgResponse -> {
-                    // Convertir items de RAWG a nuestros DTOs
                     List<GameResponseDtos.GameSearchItem> gameItems = rawgResponse.getResults().stream()
-                            .map(this::convertRawgToSearchItem)
+                            .map(rawgGame -> {
+                                // Verificar si existe en BD para usar slug correcto
+                                Optional<Game> existingGame = gameRepository.findByRawgId(rawgGame.getId());
+                                return gameMapper.rawgSummaryToSearchItem(rawgGame, existingGame);
+                            })
                             .toList();
 
-                    // Construir respuesta con paginación
+                    // Construir respuesta con paginación calculada
                     GameResponseDtos.GameSearchResultsDto response = new GameResponseDtos.GameSearchResultsDto(
                             gameItems,
                             page,
@@ -91,40 +97,38 @@ public class GameService {
                 .doOnError(error -> logger.error("Search failed for query '{}': {}", query, error.getMessage()));
     }
 
-    // ===== FUNCIONALIDAD 2: PÁGINA COMPLETA DEL JUEGO =====
+    // ===== FUNCIONALIDAD 2: PÁGINA DEL JUEGO =====
 
     /**
      * 🎯 Para: GET /game/{identifier} (usuario autenticado)
      *
-     * LÓGICA:
-     * - Resolver identifier (rawgId o slug)
-     * - Si no existe en BD → obtener de RAWG + guardar + generar slug
-     * - Si existe en BD → usar datos locales
-     * - SIEMPRE incluir: mi estado + reviews de otros
+     * LÓGICA DE NEGOCIO:
+     * - Resolver identifier → Game
+     * - Obtener mi estado personal
+     * - Obtener reviews de otros usuarios
+     * - Usar GameMapper para todas las conversiones
      */
     public Mono<GameResponseDtos.GamePageDto> getGamePageWithUserData(String identifier, User user) {
         logger.info("🎮 GAME PAGE WITH USER: identifier='{}', user={}", identifier, user.getUsername());
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    GameResponseDtos.GamePageDto gamePageDto = buildGamePageDto(game);
+                    // ✅ USAR MAPPER para conversión base
+                    GameResponseDtos.GamePageDto gamePageDto = gameMapper.gameToPageDto(game);
 
-                    // Agregar mi estado personal
+                    // LÓGICA DE NEGOCIO: Obtener mi estado personal
                     Optional<UserGameDetails> myGameDetails = userGameDetailsRepository
                             .findByUserIdAndGameId(user.getId(), game.getId());
 
                     if (myGameDetails.isPresent()) {
-                        gamePageDto.setMyStatus(convertToMyGameStatus(myGameDetails.get()));
+                        // ✅ USAR MAPPER para conversión
+                        gamePageDto.setMyStatus(gameMapper.userGameDetailsToMyStatus(myGameDetails.get()));
                     }
-                    // Si no hay myGameDetails, myStatus queda null (usuario no ha interactuado)
 
-                    // Agregar reviews de otros usuarios (últimas 3)
+                    // LÓGICA DE NEGOCIO: Obtener reviews de otros usuarios
                     List<UserGameDetails> otherReviews = getOtherUsersReviews(game.getId(), user.getId(), 3);
-                    gamePageDto.setRecentReviews(
-                            otherReviews.stream()
-                                    .map(this::convertToOtherUserReview)
-                                    .toList()
-                    );
+                    // ✅ USAR MAPPER para conversión de lista
+                    gamePageDto.setRecentReviews(gameMapper.userGameDetailsListToOtherReviews(otherReviews));
 
                     logger.debug("Game page built: '{}' with user data", game.getName());
                     return gamePageDto;
@@ -134,41 +138,41 @@ public class GameService {
     /**
      * 🎯 Para: GET /game/{identifier} (usuario NO autenticado)
      *
-     * LÓGICA:
-     * - Igual que arriba pero sin mi estado personal
-     * - Solo datos del juego + reviews de otros
+     * LÓGICA DE NEGOCIO:
+     * - Resolver identifier → Game
+     * - Obtener reviews públicas
+     * - Usar GameMapper para conversiones
      */
     public Mono<GameResponseDtos.GamePageDto> getGamePagePublic(String identifier) {
         logger.info("🎮 GAME PAGE PUBLIC: identifier='{}'", identifier);
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    GameResponseDtos.GamePageDto gamePageDto = buildGamePageDto(game);
+                    // ✅ USAR MAPPER para conversión base
+                    GameResponseDtos.GamePageDto gamePageDto = gameMapper.gameToPageDto(game);
+
                     // myStatus queda null (no autenticado)
 
-                    // Reviews de otros usuarios (últimas 3)
+                    // LÓGICA DE NEGOCIO: Obtener reviews públicas
                     List<UserGameDetails> recentReviews = getPublicReviews(game.getId(), 3);
-                    gamePageDto.setRecentReviews(
-                            recentReviews.stream()
-                                    .map(this::convertToOtherUserReview)
-                                    .toList()
-                    );
+                    // ✅ USAR MAPPER para conversión de lista
+                    gamePageDto.setRecentReviews(gameMapper.userGameDetailsListToOtherReviews(recentReviews));
 
                     logger.debug("Game page built: '{}' (public)", game.getName());
                     return gamePageDto;
                 });
     }
 
-    // ===== FUNCIONALIDAD 3: ACTUALIZAR MI REVIEW/ESTADO =====
+    // ===== FUNCIONALIDAD 3: ACTUALIZAR MI REVIEW =====
 
     /**
      * 🎯 Para: PUT /game/{identifier}/my-review
      *
-     * LÓGICA:
+     * LÓGICA DE NEGOCIO:
      * - Resolver identifier → Game
      * - Crear/actualizar UserGameDetails
      * - Recalcular community rating
-     * - Devolver estado actualizado + community rating nuevo
+     * - Construir respuesta
      */
     public Mono<GameResponseDtos.UpdatedGameStatusDto> updateMyGameReview(
             String identifier, User user, UpdateMyGameRequest request) {
@@ -178,32 +182,24 @@ public class GameService {
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    // Buscar o crear UserGameDetails
+                    // LÓGICA DE NEGOCIO: Buscar o crear UserGameDetails
                     UserGameDetails userGameDetails = userGameDetailsRepository
                             .findByUserIdAndGameId(user.getId(), game.getId())
                             .orElse(new UserGameDetails(user, game));
 
-                    // Aplicar cambios del request
-                    if (request.status() != null) {
-                        userGameDetails.setStatus(UserGameDetails.GameStatus.valueOf(request.status()));
-                    }
-                    if (request.rating() != null) {
-                        userGameDetails.setRating(request.rating());
-                    }
-                    if (request.reviewText() != null) {
-                        userGameDetails.setReviewText(request.reviewText());
-                    }
+                    // LÓGICA DE NEGOCIO: Aplicar cambios del request
+                    applyGameDetailsUpdates(userGameDetails, request);
 
-                    // Guardar cambios
+                    // LÓGICA DE NEGOCIO: Guardar cambios
                     UserGameDetails saved = userGameDetailsRepository.save(userGameDetails);
 
-                    // Recalcular community rating
+                    // LÓGICA DE NEGOCIO: Recalcular community rating
                     updateCommunityRating(game);
 
                     // Recargar game con community rating actualizado
                     Game updatedGame = gameRepository.findById(game.getId()).orElse(game);
 
-                    // Construir respuesta
+                    // Construir respuesta (no usar mapper porque es específica)
                     GameResponseDtos.UpdatedGameStatusDto response = new GameResponseDtos.UpdatedGameStatusDto(
                             saved.getStatus() != null ? saved.getStatus().name() : null,
                             saved.getRating(),
@@ -224,21 +220,30 @@ public class GameService {
 
     /**
      * 🎯 Para: GET /my-reviews (para home - sin paginación)
+     *
+     * LÓGICA DE NEGOCIO:
+     * - Consultar mis reviews ordenadas
+     * - Usar GameMapper para conversiones
      */
     public List<GameResponseDtos.MyReviewDto> getMyRecentReviews(User user, int limit) {
         logger.info("📝 MY RECENT REVIEWS: user={}, limit={}", user.getUsername(), limit);
 
         Pageable pageable = PageRequest.of(0, limit, Sort.by("reviewUpdatedAt").descending());
 
-        return userGameDetailsRepository.findUserReviews(user.getId(), pageable)
-                .getContent()
-                .stream()
-                .map(this::convertToMyReviewDto)
-                .toList();
+        List<UserGameDetails> userReviews = userGameDetailsRepository.findUserReviews(user.getId(), pageable)
+                .getContent();
+
+        // ✅ USAR MAPPER para conversión de lista
+        return gameMapper.userGameDetailsListToMyReviews(userReviews);
     }
 
     /**
      * 🎯 Para: GET /my-reviews (para página completa - con paginación)
+     *
+     * LÓGICA DE NEGOCIO:
+     * - Consultar mis reviews paginadas
+     * - Usar GameMapper para conversiones
+     * - Construir respuesta con metadata de paginación
      */
     public GameResponseDtos.MyReviewsResponseDto getMyReviewsPaginated(User user, int page, int size) {
         logger.info("📝 MY REVIEWS PAGINATED: user={}, page={}, size={}",
@@ -247,10 +252,9 @@ public class GameService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("reviewUpdatedAt").descending());
         var reviewsPage = userGameDetailsRepository.findUserReviews(user.getId(), pageable);
 
-        List<GameResponseDtos.MyReviewDto> reviewDtos = reviewsPage.getContent()
-                .stream()
-                .map(this::convertToMyReviewDto)
-                .toList();
+        // ✅ USAR MAPPER para conversión de lista
+        List<GameResponseDtos.MyReviewDto> reviewDtos = gameMapper.userGameDetailsListToMyReviews(
+                reviewsPage.getContent());
 
         return GameResponseDtos.MyReviewsResponseDto.forPage(
                 reviewDtos,
@@ -261,11 +265,11 @@ public class GameService {
         );
     }
 
-    // ===== MÉTODOS PRIVADOS DE RESOLUCIÓN Y CONVERSIÓN =====
+    // ===== MÉTODOS PRIVADOS - LÓGICA DE NEGOCIO =====
 
     /**
-     * Resuelve identifier (rawgId o slug) → Game entity
-     * Si no existe, lo obtiene de RAWG y lo guarda
+     * LÓGICA DE NEGOCIO: Resolver identifier → Game entity
+     * Si no existe, obtenerlo de RAWG y guardarlo
      */
     private Mono<Game> resolveGameFromIdentifier(String identifier) {
         boolean isRawgId = identifier.matches("\\d+");
@@ -281,7 +285,7 @@ public class GameService {
     }
 
     /**
-     * Resuelve juego por rawgId
+     * LÓGICA DE NEGOCIO: Resolver juego por rawgId
      */
     private Mono<Game> resolveByRawgId(Integer rawgId) {
         // Buscar en BD primero
@@ -291,14 +295,14 @@ public class GameService {
             return Mono.just(existing.get());
         }
 
-        // Si no existe, obtener de RAWG por ID
+        // Si no existe, obtener de RAWG
         logger.debug("Game not in database, fetching from RAWG: rawgId={}", rawgId);
         return rawgApiService.getGameDetails(rawgId)
-                .map(this::saveGameFromRawgDetails);
+                .map(this::saveGameFromRawg); // ✅ Método local simplificado
     }
 
     /**
-     * Resuelve juego por slug
+     * LÓGICA DE NEGOCIO: Resolver juego por slug
      */
     private Mono<Game> resolveBySlug(String slug) {
         // Buscar en BD primero
@@ -308,153 +312,19 @@ public class GameService {
             return Mono.just(existing.get());
         }
 
-        // Si no existe, obtener DIRECTAMENTE de RAWG por slug
+        // Si no existe, obtener de RAWG por slug
         logger.debug("Game not found by slug '{}', fetching from RAWG", slug);
         return rawgApiService.getGameDetailsBySlug(slug)
-                .map(this::saveGameFromRawgDetails)
+                .map(this::saveGameFromRawg)
                 .doOnError(error -> logger.error("Failed to get game by slug '{}': {}", slug, error.getMessage()));
     }
 
     /**
-     * Convierte RawgApiDtos.GameSummary → GameDtos.GameSearchItem
+     * LÓGICA DE NEGOCIO: Guardar Game desde RAWG usando GameMapper
      */
-    private GameResponseDtos.GameSearchItem convertRawgToSearchItem(RawgApiDtos.GameSummary rawgGame) {
-        // Verificar si ya existe en BD para incluir el slug de BD (puede ser diferente)
-        Optional<Game> existingGame = gameRepository.findByRawgId(rawgGame.getId());
-        String slug = existingGame.map(Game::getSlug).orElse(rawgGame.getSlug()); // Usar slug de BD o RAWG
-
-        return new GameResponseDtos.GameSearchItem(
-                rawgGame.getId(),
-                slug, // Slug disponible desde RAWG o BD
-                rawgGame.getName(),
-                rawgGame.getBackgroundImage(), // Usar como BackgroundImageAlt para lista
-                truncateDescription(rawgGame.getName()), // TODO: obtener descripción real
-                rawgGame.getRating(),
-                rawgGame.getReleased(),
-                rawgGame.getPlatforms() != null ?
-                        rawgGame.getPlatforms().stream().map(p -> p.getPlatform().getName()).toList() :
-                        List.of(),
-                rawgGame.getGenres() != null ?
-                        rawgGame.getGenres().stream().map(RawgApiDtos.Genre::getName).toList() :
-                        List.of()
-        );
-    }
-
-    /**
-     * Construye GamePageDto a partir de Game entity
-     */
-    private GameResponseDtos.GamePageDto buildGamePageDto(Game game) {
-        GameResponseDtos.GamePageDto dto = new GameResponseDtos.GamePageDto();
-
-        // Datos básicos
-        dto.setRawgId(game.getRawgId());
-        dto.setSlug(game.getSlug()); // Usar slug real de BD
-        dto.setName(game.getName());
-        dto.setDescription(game.getDescription());
-        dto.setDescriptionRaw(game.getDescriptionRaw());
-        dto.setBackgroundImage(game.getBackgroundImage());
-        dto.setBackgroundImageAlt(game.getBackgroundImageAlt()); // Usar BackgroundImageAlt real
-        dto.setScreenshots(game.getScreenshotsList());
-
-        // Ratings
-        dto.setRating(game.getRating());
-        dto.setCommunityRating(game.getCommunityRating());
-        dto.setTotalCommunityReviews(game.getCommunityReviewsCount());
-
-        // Metadata
-        dto.setReleased(game.getReleased());
-        dto.setWebsite(game.getWebsite());
-        dto.setMetacriticScore(game.getMetacriticScore());
-        dto.setAveragePlaytime(game.getAveragePlaytime());
-
-        // Listas
-        dto.setPlatforms(game.getPlatformsList());
-        dto.setGenres(game.getGenresList());
-        dto.setDevelopers(parseDevelopers(game.getDevelopers()));
-        dto.setPublishers(parsePublishers(game.getPublishers()));
-        dto.setTags(parseTags(game.getTags()));
-
-        dto.setLastUpdated(game.getUpdatedAt());
-
-        return dto;
-    }
-
-    /**
-     * Convierte UserGameDetails → MyGameStatus
-     */
-    private GameResponseDtos.MyGameStatus convertToMyGameStatus(UserGameDetails ugd) {
-        return new GameResponseDtos.MyGameStatus(
-                ugd.getStatus() != null ? ugd.getStatus().name() : null,
-                ugd.getRating(),
-                ugd.getReviewText(),
-                ugd.getReviewUpdatedAt()
-        );
-    }
-
-    /**
-     * Convierte UserGameDetails → OtherUserReview
-     */
-    private GameResponseDtos.OtherUserReview convertToOtherUserReview(UserGameDetails ugd) {
-        return new GameResponseDtos.OtherUserReview(
-                ugd.getUser().getUsername(),
-                ugd.getRating(),
-                truncateReviewText(ugd.getReviewText(), 200), // Truncar para preview
-                ugd.getStatus() != null ? ugd.getStatus().name() : null,
-                ugd.getReviewCreatedAt()
-        );
-    }
-
-    /**
-     * Convierte UserGameDetails → MyReviewDto
-     */
-    private GameResponseDtos.MyReviewDto convertToMyReviewDto(UserGameDetails ugd) {
-        Game game = ugd.getGame();
-        return new GameResponseDtos.MyReviewDto(
-                game.getRawgId(),
-                game.getSlug(), // Usar slug real de BD
-                game.getName(),
-                game.getBackgroundImageAlt() != null ? game.getBackgroundImageAlt() : game.getBackgroundImage(), // BackgroundImageAlt o fallback
-                ugd.getRating(),
-                ugd.getReviewText(),
-                ugd.getStatus() != null ? ugd.getStatus().name() : null,
-                ugd.getReviewCreatedAt(),
-                ugd.getReviewUpdatedAt()
-        );
-    }
-
-    /**
-     * Guarda Game desde RawgApiDtos.GameDetails usando slug de RAWG
-     */
-    private Game saveGameFromRawgDetails(RawgApiDtos.GameDetails rawgGame) {
-        Game game = new Game();
-        game.setRawgId(rawgGame.getId());
-        game.setName(rawgGame.getName());
-        game.setSlug(rawgGame.getSlug()); // ✅ Usar slug directo de RAWG
-        game.setDescription(rawgGame.getDescription());
-        game.setDescriptionRaw(rawgGame.getDescriptionRaw());
-        game.setBackgroundImage(rawgGame.getBackgroundImage());
-        game.setBackgroundImageAlt(rawgGame.getBackgroundImageAdditional()); // Mapear backgroundImageAdditional → BackgroundImageAlt
-        game.setRating(rawgGame.getRating());
-        game.setRatingTop(rawgGame.getRatingTop());
-        game.setReleased(rawgGame.getReleased());
-        game.setWebsite(rawgGame.getWebsite());
-        game.setMetacriticScore(rawgGame.getMetacriticScore());
-        game.setAveragePlaytime(rawgGame.getAveragePlaytime());
-        game.setDataSource("RAWG");
-        game.setLastExternalUpdate(LocalDateTime.now());
-
-        // Convertir listas
-        if (rawgGame.getPlatforms() != null) {
-            game.setPlatformsList(rawgGame.getPlatforms().stream()
-                    .map(p -> p.getPlatform().getName())
-                    .toList());
-        }
-        if (rawgGame.getGenres() != null) {
-            game.setGenresList(rawgGame.getGenres().stream()
-                    .map(RawgApiDtos.Genre::getName)
-                    .toList());
-        }
-        // TODO: Agregar developers, publishers, tags, screenshots
+    private Game saveGameFromRawg(RawgApiDtos.GameDetails rawgGame) {
+        // ✅ USAR MAPPER para conversión
+        Game game = gameMapper.rawgDetailsToGameEntity(rawgGame);
 
         Game saved = gameRepository.save(game);
         logger.info("Game saved from RAWG: '{}' with slug '{}' (ID: {})",
@@ -463,45 +333,22 @@ public class GameService {
     }
 
     /**
-     * Genera slug base desde nombre del juego
+     * LÓGICA DE NEGOCIO: Aplicar actualizaciones a UserGameDetails
      */
-    private String generateSlugFromName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            return "unnamed-game";
+    private void applyGameDetailsUpdates(UserGameDetails userGameDetails, UpdateMyGameRequest request) {
+        if (request.status() != null) {
+            userGameDetails.setStatus(UserGameDetails.GameStatus.valueOf(request.status()));
         }
-
-        return name.toLowerCase()
-                .trim()
-                .replaceAll("[^a-z0-9\\s-]", "") // Remover caracteres especiales
-                .replaceAll("\\s+", "-")         // Espacios → guiones
-                .replaceAll("-+", "-")           // Múltiples guiones → uno solo
-                .replaceAll("^-|-$", "");        // Remover guiones al inicio/final
+        if (request.rating() != null) {
+            userGameDetails.setRating(request.rating());
+        }
+        if (request.reviewText() != null) {
+            userGameDetails.setReviewText(request.reviewText());
+        }
     }
 
     /**
-     * Asegura que el slug sea único agregando número si es necesario
-     */
-    private String ensureUniqueSlug(String baseSlug) {
-        String candidateSlug = baseSlug;
-        int counter = 1;
-
-        while (gameRepository.existsBySlug(candidateSlug)) {
-            candidateSlug = baseSlug + "-" + counter;
-            counter++;
-
-            // Prevenir bucle infinito
-            if (counter > 1000) {
-                candidateSlug = baseSlug + "-" + System.currentTimeMillis();
-                break;
-            }
-        }
-
-        logger.debug("Generated unique slug: '{}' from base: '{}'", candidateSlug, baseSlug);
-        return candidateSlug;
-    }
-
-    /**
-     * Recalcula community rating para un juego
+     * LÓGICA DE NEGOCIO: Recalcular community rating para un juego
      */
     private void updateCommunityRating(Game game) {
         Optional<Double> avgRating = userGameDetailsRepository.findGameAverageRating(game.getId());
@@ -516,12 +363,12 @@ public class GameService {
     }
 
     /**
-     * Obtiene reviews de otros usuarios (excluye al usuario actual)
+     * LÓGICA DE NEGOCIO: Obtener reviews de otros usuarios (excluye al usuario actual)
      */
-    private List<UserGameDetails> getOtherUsersReviews(UUID gameId, UUID excludeUserId, int limit) {
+    private List<UserGameDetails> getOtherUsersReviews(java.util.UUID gameId, java.util.UUID excludeUserId, int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by("reviewUpdatedAt").descending());
 
-        // TODO: Crear query en repositorio que excluya al usuario actual
+        // TODO: Crear query específica en repositorio que excluya al usuario actual
         // Por ahora, usar el método existente y filtrar
         return userGameDetailsRepository.findGamePublicReviews(gameId, pageable)
                 .getContent()
@@ -532,9 +379,9 @@ public class GameService {
     }
 
     /**
-     * Obtiene reviews públicas para usuarios no autenticados
+     * LÓGICA DE NEGOCIO: Obtener reviews públicas para usuarios no autenticados
      */
-    private List<UserGameDetails> getPublicReviews(UUID gameId, int limit) {
+    private List<UserGameDetails> getPublicReviews(java.util.UUID gameId, int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by("reviewUpdatedAt").descending());
         return userGameDetailsRepository.findGamePublicReviews(gameId, pageable)
                 .getContent()
@@ -543,29 +390,12 @@ public class GameService {
                 .toList();
     }
 
-    // ===== MÉTODOS DE UTILIDAD =====
+    // ===== MÉTODOS DE UTILIDAD SIMPLES =====
 
+    /**
+     * Calcular total de páginas para paginación
+     */
     private int calculateTotalPages(Integer totalResults, int size) {
         return (totalResults + size - 1) / size;
-    }
-
-    private String truncateDescription(String text) {
-        return text != null && text.length() > 150 ? text.substring(0, 150) + "..." : text;
-    }
-
-    private String truncateReviewText(String text, int maxLength) {
-        return text != null && text.length() > maxLength ? text.substring(0, maxLength) + "..." : text;
-    }
-
-    private List<String> parseDevelopers(String developers) {
-        return developers != null ? List.of(developers.split(",")) : List.of();
-    }
-
-    private List<String> parsePublishers(String publishers) {
-        return publishers != null ? List.of(publishers.split(",")) : List.of();
-    }
-
-    private List<String> parseTags(String tags) {
-        return tags != null ? List.of(tags.split(",")) : List.of();
     }
 }

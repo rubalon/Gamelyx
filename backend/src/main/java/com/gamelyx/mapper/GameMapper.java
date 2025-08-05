@@ -6,41 +6,41 @@ import com.gamelyx.entity.Game;
 import com.gamelyx.entity.UserGameDetails;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Mapper actualizado para los nuevos DTOs centrados en funcionalidades
+ * GameMapper - ÚNICA FUENTE DE VERDAD para conversiones
  *
- * CAMBIOS:
- * - Métodos alineados con nuevos DTOs (records + classes)
- * - Solo usar campos que existen en entidades simplificadas
- * - Conversiones específicas para cada endpoint
+ * RESPONSABILIDADES:
+ * - Todas las conversiones entre DTOs y entidades
+ * - Manejo consistente de nomenclatura de campos
+ * - Sin lógica de negocio (solo transformaciones)
+ *
+ * PRINCIPIO: Una conversión = un método en GameMapper
  */
 @Component
 public class GameMapper {
 
-    // ===== CONVERSIONES PARA GET /search =====
+    // ===== CONVERSIONES: RAWG API → SEARCH RESULTS =====
 
     /**
      * Convierte RawgApiDtos.GameSummary → GameResponseDtos.GameSearchItem
-     * Para: GET /search (lista de resultados de búsqueda)
+     * Para: GET /search
      */
     public GameResponseDtos.GameSearchItem rawgSummaryToSearchItem(RawgApiDtos.GameSummary rawgGame) {
         if (rawgGame == null) {
             return null;
         }
 
-        // Truncar descripción para preview (usar nombre como fallback por ahora)
-        String shortDescription = rawgGame.getName() != null ?
-                "Juego: " + rawgGame.getName() : "Sin descripción disponible";
-
         return new GameResponseDtos.GameSearchItem(
                 rawgGame.getId(),
-                rawgGame.getSlug(),                    // Slug de RAWG
+                rawgGame.getSlug(),
                 rawgGame.getName(),
-                rawgGame.getBackgroundImage(),         // Usar como BackgroundImageAlt
-                shortDescription,                      // Descripción corta
+                rawgGame.getBackgroundImage(),         // ✅ Usar backgroundImage como coverImage
+                createShortDescription(rawgGame.getName()), // Descripción generada
                 rawgGame.getRating(),
                 rawgGame.getReleased(),
                 extractPlatformNames(rawgGame.getPlatforms()),
@@ -49,23 +49,36 @@ public class GameMapper {
     }
 
     /**
-     * Convierte lista de RawgApiDtos.GameSummary → lista de GameSearchItem
+     * Convierte RawgApiDtos.GameSummary → GameSearchItem con slug de BD si existe
+     * Para: búsquedas que verifican BD local
      */
-    public List<GameResponseDtos.GameSearchItem> rawgSummaryListToSearchItems(List<RawgApiDtos.GameSummary> rawgGames) {
-        if (rawgGames == null) {
-            return List.of();
+    public GameResponseDtos.GameSearchItem rawgSummaryToSearchItem(RawgApiDtos.GameSummary rawgGame,
+                                                                   Optional<Game> existingGame) {
+        if (rawgGame == null) {
+            return null;
         }
 
-        return rawgGames.stream()
-                .map(this::rawgSummaryToSearchItem)
-                .collect(Collectors.toList());
+        // Usar slug de BD si existe, sino el de RAWG
+        String slug = existingGame.map(Game::getSlug).orElse(rawgGame.getSlug());
+
+        return new GameResponseDtos.GameSearchItem(
+                rawgGame.getId(),
+                slug,
+                rawgGame.getName(),
+                rawgGame.getBackgroundImage(),
+                createShortDescription(rawgGame.getName()),
+                rawgGame.getRating(),
+                rawgGame.getReleased(),
+                extractPlatformNames(rawgGame.getPlatforms()),
+                extractGenreNames(rawgGame.getGenres())
+        );
     }
 
-    // ===== CONVERSIONES PARA GET /game/{identifier} =====
+    // ===== CONVERSIONES: GAME ENTITY → GAME PAGE =====
 
     /**
-     * Convierte Game entity → GameResponseDtos.GamePageDto (base)
-     * Para: GET /game/{identifier} (página completa del juego)
+     * Convierte Game entity → GameResponseDtos.GamePageDto
+     * Para: GET /game/{identifier}
      */
     public GameResponseDtos.GamePageDto gameToPageDto(Game game) {
         if (game == null) {
@@ -74,15 +87,22 @@ public class GameMapper {
 
         GameResponseDtos.GamePageDto dto = new GameResponseDtos.GamePageDto();
 
-        // Datos básicos
+        // IDs y datos básicos
         dto.setRawgId(game.getRawgId());
         dto.setSlug(game.getSlug());
         dto.setName(game.getName());
         dto.setDescription(game.getDescription());
         dto.setDescriptionRaw(game.getDescriptionRaw());
         dto.setBackgroundImage(game.getBackgroundImage());
-        dto.setBackgroundImageAlt(game.getBackgroundImageAlt()); // Mapear backgroundImageAdditional → BackgroundImageAlt
+        dto.setBackgroundImageAlt(game.getBackgroundImageAlt());
+
+        // Listas (convertir strings con comas → listas)
         dto.setScreenshots(stringToList(game.getScreenshots()));
+        dto.setPlatforms(stringToList(game.getPlatforms()));
+        dto.setGenres(stringToList(game.getGenres()));
+        dto.setDevelopers(stringToList(game.getDevelopers()));
+        dto.setPublishers(stringToList(game.getPublishers()));
+        dto.setTags(stringToList(game.getTags()));
 
         // Ratings
         dto.setRating(game.getRating());
@@ -94,27 +114,20 @@ public class GameMapper {
         dto.setWebsite(game.getWebsite());
         dto.setMetacriticScore(game.getMetacriticScore());
         dto.setAveragePlaytime(game.getAveragePlaytime());
-
-        // Listas (convertir strings con comas a listas)
-        dto.setPlatforms(stringToList(game.getPlatforms()));
-        dto.setGenres(stringToList(game.getGenres()));
-        dto.setDevelopers(stringToList(game.getDevelopers()));
-        dto.setPublishers(stringToList(game.getPublishers()));
-        dto.setTags(stringToList(game.getTags()));
-
-        // Timestamps
         dto.setLastUpdated(game.getUpdatedAt());
 
-        // myStatus y recentReviews se setean externamente en el service
-        dto.setMyStatus(null);           // Se asigna en service si hay usuario
-        dto.setRecentReviews(List.of()); // Se asigna en service
+        // Estados iniciales (se setean externamente en service)
+        dto.setMyStatus(null);
+        dto.setRecentReviews(List.of());
 
         return dto;
     }
 
+    // ===== CONVERSIONES: USER GAME DETAILS → USER STATUS =====
+
     /**
      * Convierte UserGameDetails → GameResponseDtos.MyGameStatus
-     * Para: parte de GamePageDto (mi estado personal)
+     * Para: mi estado personal en GamePageDto
      */
     public GameResponseDtos.MyGameStatus userGameDetailsToMyStatus(UserGameDetails ugd) {
         if (ugd == null) {
@@ -125,13 +138,13 @@ public class GameMapper {
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
                 ugd.getRating(),
                 ugd.getReviewText(),
-                ugd.getReviewUpdatedAt()  // ✅ Campo que existe
+                ugd.getReviewUpdatedAt()
         );
     }
 
     /**
      * Convierte UserGameDetails → GameResponseDtos.OtherUserReview
-     * Para: parte de GamePageDto (reviews de otros usuarios)
+     * Para: reviews de otros usuarios en GamePageDto
      */
     public GameResponseDtos.OtherUserReview userGameDetailsToOtherReview(UserGameDetails ugd) {
         if (ugd == null || !ugd.hasReview()) {
@@ -143,29 +156,13 @@ public class GameMapper {
                 ugd.getRating(),
                 truncateText(ugd.getReviewText(), 200), // Truncar para preview
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
-                ugd.getReviewCreatedAt()  // ✅ Campo que existe
+                ugd.getReviewCreatedAt()
         );
     }
 
     /**
-     * Convierte lista de UserGameDetails → lista de OtherUserReview
-     */
-    public List<GameResponseDtos.OtherUserReview> userGameDetailsListToOtherReviews(List<UserGameDetails> ugdList) {
-        if (ugdList == null) {
-            return List.of();
-        }
-
-        return ugdList.stream()
-                .filter(UserGameDetails::hasReview) // Solo los que tienen review
-                .map(this::userGameDetailsToOtherReview)
-                .collect(Collectors.toList());
-    }
-
-    // ===== CONVERSIONES PARA GET /my-reviews =====
-
-    /**
      * Convierte UserGameDetails → GameResponseDtos.MyReviewDto
-     * Para: GET /my-reviews (mis reviews recientes o paginadas)
+     * Para: GET /my-reviews
      */
     public GameResponseDtos.MyReviewDto userGameDetailsToMyReview(UserGameDetails ugd) {
         if (ugd == null || !ugd.hasReview()) {
@@ -178,35 +175,22 @@ public class GameMapper {
                 game.getRawgId(),
                 game.getSlug(),
                 game.getName(),
-                game.getBackgroundImageAlt() != null ?
-                        game.getBackgroundImageAlt() : game.getBackgroundImage(), // BackgroundImageAlt o fallback
+                // ✅ Usar coverImage consistente: backgroundImageAdditional o fallback
+                game.getBackgroundImage() != null ?
+                        game.getBackgroundImage() : game.getBackgroundImageAlt(),
                 ugd.getRating(),
                 ugd.getReviewText(),
                 ugd.getStatus() != null ? ugd.getStatus().name() : null,
-                ugd.getReviewCreatedAt(),   // ✅ Campo que existe
-                ugd.getReviewUpdatedAt()    // ✅ Campo que existe
+                ugd.getReviewCreatedAt(),
+                ugd.getReviewUpdatedAt()
         );
     }
 
-    /**
-     * Convierte lista de UserGameDetails → lista de MyReviewDto
-     */
-    public List<GameResponseDtos.MyReviewDto> userGameDetailsListToMyReviews(List<UserGameDetails> ugdList) {
-        if (ugdList == null) {
-            return List.of();
-        }
-
-        return ugdList.stream()
-                .filter(UserGameDetails::hasReview) // Solo los que tienen review
-                .map(this::userGameDetailsToMyReview)
-                .collect(Collectors.toList());
-    }
-
-    // ===== CONVERSIONES DESDE RAWG A GAME ENTITY =====
+    // ===== CONVERSIONES: RAWG API → GAME ENTITY =====
 
     /**
-     * Convierte RawgApiDtos.GameDetails → Game entity (para guardar en BD)
-     * Para: cuando obtenemos juego de RAWG por primera vez
+     * Convierte RawgApiDtos.GameDetails → Game entity
+     * Para: guardar juego desde RAWG en BD
      */
     public Game rawgDetailsToGameEntity(RawgApiDtos.GameDetails rawgGame) {
         if (rawgGame == null) {
@@ -215,9 +199,11 @@ public class GameMapper {
 
         Game game = new Game();
 
-        // IDs y datos básicos
+        // IDs y slug
         game.setRawgId(rawgGame.getId());
         game.setSlug(rawgGame.getSlug());
+
+        // Datos básicos
         game.setName(rawgGame.getName());
         game.setDescription(rawgGame.getDescription());
         game.setDescriptionRaw(rawgGame.getDescriptionRaw());
@@ -234,34 +220,71 @@ public class GameMapper {
         game.setMetacriticScore(rawgGame.getMetacriticScore());
         game.setAveragePlaytime(rawgGame.getAveragePlaytime());
 
-        // Convertir listas a strings con comas
+        // Listas (convertir listas RAWG → strings con comas)
         game.setPlatforms(extractPlatformNamesAsString(rawgGame.getPlatforms()));
         game.setGenres(extractGenreNamesAsString(rawgGame.getGenres()));
         game.setDevelopers(extractDeveloperNamesAsString(rawgGame.getDevelopers()));
         game.setPublishers(extractPublisherNamesAsString(rawgGame.getPublishers()));
+        game.setTags(extractTagNamesAsString(rawgGame.getTags()));
 
-        // Tags y screenshots
-        if (rawgGame.getTags() != null) {
-            game.setTags(rawgGame.getTags().stream()
-                    .map(RawgApiDtos.Tag::getName)
-                    .collect(Collectors.joining(",")));
-        }
+        // Screenshots (por ahora null, implementar después con endpoint específico)
+        game.setScreenshots(null);
 
-        // TODO: Screenshots - necesitaremos un endpoint separado en RAWG
-        game.setScreenshots(null); // Por ahora null, implementar después
-
-        // Control
+        // Control de datos
         game.setDataSource("RAWG");
-        game.setLastExternalUpdate(java.time.LocalDateTime.now());
+        game.setLastExternalUpdate(LocalDateTime.now());
 
         return game;
     }
 
-    // ===== MÉTODOS DE UTILIDAD =====
+    // ===== CONVERSIONES: LISTAS =====
 
     /**
-     * Convierte string con comas a lista de strings
-     * Ejemplo: "PC,PlayStation 4,Xbox One" → ["PC", "PlayStation 4", "Xbox One"]
+     * Convierte lista de RawgApiDtos.GameSummary → lista de GameSearchItem
+     */
+    public List<GameResponseDtos.GameSearchItem> rawgSummaryListToSearchItems(List<RawgApiDtos.GameSummary> rawgGames) {
+        if (rawgGames == null) {
+            return List.of();
+        }
+
+        return rawgGames.stream()
+                .map(this::rawgSummaryToSearchItem)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Convierte lista de UserGameDetails → lista de OtherUserReview
+     */
+    public List<GameResponseDtos.OtherUserReview> userGameDetailsListToOtherReviews(List<UserGameDetails> ugdList) {
+        if (ugdList == null) {
+            return List.of();
+        }
+
+        return ugdList.stream()
+                .filter(UserGameDetails::hasReview)
+                .map(this::userGameDetailsToOtherReview)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Convierte lista de UserGameDetails → lista de MyReviewDto
+     */
+    public List<GameResponseDtos.MyReviewDto> userGameDetailsListToMyReviews(List<UserGameDetails> ugdList) {
+        if (ugdList == null) {
+            return List.of();
+        }
+
+        return ugdList.stream()
+                .filter(UserGameDetails::hasReview)
+                .map(this::userGameDetailsToMyReview)
+                .collect(Collectors.toList());
+    }
+
+    // ===== MÉTODOS DE UTILIDAD PARA CONVERSIONES =====
+
+    /**
+     * Convierte string con comas → lista de strings
+     * "PC,PlayStation 4,Xbox One" → ["PC", "PlayStation 4", "Xbox One"]
      */
     private List<String> stringToList(String commaSeparatedString) {
         if (commaSeparatedString == null || commaSeparatedString.trim().isEmpty()) {
@@ -276,8 +299,8 @@ public class GameMapper {
     }
 
     /**
-     * Convierte lista de strings a string con comas
-     * Ejemplo: ["PC", "PlayStation 4", "Xbox One"] → "PC,PlayStation 4,Xbox One"
+     * Convierte lista de strings → string con comas
+     * ["PC", "PlayStation 4", "Xbox One"] → "PC,PlayStation 4,Xbox One"
      */
     public String listToString(List<String> list) {
         if (list == null || list.isEmpty()) {
@@ -361,6 +384,21 @@ public class GameMapper {
     }
 
     /**
+     * Extrae nombres de tags de RAWG como string con comas
+     */
+    private String extractTagNamesAsString(List<RawgApiDtos.Tag> tags) {
+        if (tags == null) {
+            return null;
+        }
+
+        List<String> names = tags.stream()
+                .map(RawgApiDtos.Tag::getName)
+                .collect(Collectors.toList());
+
+        return listToString(names);
+    }
+
+    /**
      * Trunca texto para previews
      */
     private String truncateText(String text, int maxLength) {
@@ -369,5 +407,14 @@ public class GameMapper {
         }
 
         return text.substring(0, maxLength) + "...";
+    }
+
+    /**
+     * Crea descripción corta para search items
+     */
+    private String createShortDescription(String gameName) {
+        return gameName != null ?
+                "Juego: " + gameName :
+                "Sin descripción disponible";
     }
 }
