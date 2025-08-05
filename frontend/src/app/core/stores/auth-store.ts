@@ -1,8 +1,10 @@
+// src/app/core/stores/auth-store.ts (REFACTORIZADO)
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment'; // 🆕 Import centralizado
 
 // Interfaces para tipado
 export interface LoginRequest {
@@ -46,8 +48,8 @@ export class AuthStore {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  // URL base del backend
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  // 🆕 URL base del backend desde environment
+  private readonly API_URL = `${environment.apiUrl}/auth`;
 
   // Estado de autenticación usando signals (Angular 20)
   private _authState = signal<AuthState>({
