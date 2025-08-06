@@ -1,0 +1,16 @@
+/* Animación adicional para el input focus */
+    input:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(147, 51, 234, 0.2);
+    }
+
+    /* Efecto hover en el botón */
+    button:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(147, 51, 234, 0.3);
+    }
+
+    /* Animación del spinner */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }

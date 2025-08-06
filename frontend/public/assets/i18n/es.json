@@ -36,10 +36,18 @@
     }
   },
   "home": {
-    "title": "INICIO",
-    "welcome": "Bienvenido a tu dashboard de gaming",
-    "construction": "🚧 Página en construcción",
-    "constructionDetails": "Aquí irá el contenido principal del dashboard"
+    "title": "Home",
+    "welcome": "Busca tus juegos favoritos",
+    "construction": "🚧 En construcción",
+    "construction.details": "Pronto tendrás acceso a todas las funcionalidades",
+    "search": {
+      "placeholder": "Buscar juegos...",
+      "button": "Buscar",
+      "recent": "Búsquedas recientes:",
+      "noResults": "No se encontraron juegos",
+      "searching": "Buscando...",
+      "error": "Error al buscar juegos"
+    }
   },
   "auth": {
     "welcome": "¡Bienvenido a Gamelyx!",

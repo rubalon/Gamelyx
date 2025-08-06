@@ -36,10 +36,18 @@
     }
   },
   "home": {
-    "title": "HOME",
-    "welcome": "Welcome to your gaming dashboard",
-    "construction": "🚧 Page under construction",
-    "constructionDetails": "Here will be the main dashboard content"
+    "title": "Home",
+    "welcome": "Search your favourite games",
+    "construction": "🚧 Under construction",
+    "construction.details": "You'll soon have access to all features",
+    "search": {
+      "placeholder": "Search games...",
+      "button": "Search",
+      "recent": "Recent searches:",
+      "noResults": "No games found",
+      "searching": "Searching...",
+      "error": "Error searching games"
+    }
   },
   "auth": {
     "welcome": "Welcome to Gamelyx!",
