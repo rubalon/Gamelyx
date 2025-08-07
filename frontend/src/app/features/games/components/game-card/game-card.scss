@@ -1,0 +1,27 @@
+// src/app/features/games/components/game-card/game-card.scss
+
+.game-card {
+  &__image-container {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__title {
+    // Truncar título a 1 línea
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  &__description {
+    // Truncar descripción a 3 líneas
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}

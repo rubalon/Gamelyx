@@ -1,0 +1,102 @@
+<!-- src/app/features/games/components/game-card/game-card.html -->
+<div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-purple-500 hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer group transform hover:-translate-y-1 relative">
+  
+  <!-- Game Cover Image -->
+  <div class="game-card__image-container">
+    <img 
+      [src]="game.coverImage" 
+      [alt]="game.name"
+      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      loading="lazy"
+      (error)="onImageError($event)"
+    />
+    
+    <!-- Hover overlay -->
+    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Rating Badge -->
+    @if (game.rating > 0) {
+      <div class="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full flex items-center">
+        <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+        </svg>
+        {{ game.rating | number:'1.1-1' }}
+      </div>
+    }
+  </div>
+  
+  <!-- Game Info -->
+  <div class="p-4">
+    <!-- Game Title -->
+    <h3 class="text-white font-bold text-lg mb-2 group-hover:text-purple-400 transition-colors game-card__title">
+      {{ game.name }}
+    </h3>
+    
+    <!-- Game Description (truncated) -->
+    <p class="text-gray-400 text-sm mb-3 game-card__description">
+      {{ game.description }}
+    </p>
+    
+    <!-- Game Metadata -->
+    <div class="space-y-2">
+      <!-- Release Date -->
+      @if (game.released) {
+        <div class="flex items-center text-gray-500 text-xs">
+          <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          {{ formatDate(game.released) }}
+        </div>
+      }
+      
+      <!-- Platforms (limited to 3) -->
+      @if (game.platforms && game.platforms.length > 0) {
+        <div class="flex flex-wrap gap-1">
+          @for (platform of game.platforms.slice(0, 3); track platform) {
+            <span class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded">
+              {{ platform }}
+            </span>
+          }
+          @if (game.platforms.length > 3) {
+            <span class="text-gray-500 text-xs px-2 py-1">
+              +{{ game.platforms.length - 3 }}
+            </span>
+          }
+        </div>
+      }
+      
+      <!-- Genres (limited to 2) -->
+      @if (game.genres && game.genres.length > 0) {
+        <div class="flex flex-wrap gap-1">
+          @for (genre of game.genres.slice(0, 2); track genre) {
+            <span class="bg-purple-900/30 text-purple-300 text-xs px-2 py-1 rounded">
+              {{ genre }}
+            </span>
+          }
+          @if (game.genres.length > 2) {
+            <span class="text-purple-400 text-xs px-2 py-1">
+              +{{ game.genres.length - 2 }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  
+  <!-- Click to view details link -->
+  <a 
+    [routerLink]="['/games/game', game.slug]"
+    class="absolute inset-0"
+    [attr.aria-label]="'Ver detalles de ' + game.name"
+  ></a>
+</div>

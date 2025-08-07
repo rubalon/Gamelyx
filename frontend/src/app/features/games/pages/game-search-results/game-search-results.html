@@ -1,0 +1,145 @@
+<!-- src/app/features/games/pages/game-search-results/game-search-results.html -->
+<div class="min-h-screen bg-gray-900">
+  
+  <!-- Header reutilizable -->
+  <app-header></app-header>
+  
+  <!-- Main Content -->
+  <main class="pt-20 pb-16 px-4">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Search Bar Section -->
+      <section class="mb-8">
+        <div class="max-w-3xl mx-auto">
+          <h1 class="text-3xl font-bold text-white mb-6 text-center">
+            Buscar Juegos
+          </h1>
+          <app-game-search-bar></app-game-search-bar>
+        </div>
+      </section>
+      
+      <!-- Results Section -->
+      <section>
+        
+        <!-- Loading State -->
+        @if (isLoading()) {
+          <div class="flex items-center justify-center py-12">
+            <div class="text-center">
+              <!-- Loading Spinner -->
+              <div class="mb-4">
+                <svg class="animate-spin h-12 w-12 text-purple-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" 
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+              </div>
+              <p class="text-gray-400">Buscando juegos...</p>
+            </div>
+          </div>
+        } @else {
+          @if (error()) {
+            <!-- Error State -->
+            <div class="flex items-center justify-center py-12">
+              <div class="text-center max-w-md">
+                <div class="mb-4">
+                  <svg class="h-16 w-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Error al buscar juegos</h3>
+                <p class="text-gray-400 mb-4">{{ error() }}</p>
+                <button 
+                  (click)="retrySearch()"
+                  class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Reintentar
+                </button>
+              </div>
+            </div>
+          } @else {
+            @if (searchResults(); as results) {
+              <!-- Results -->
+              <div>
+                
+                <!-- Results Header -->
+                <div class="mb-6">
+                  <h2 class="text-2xl font-bold text-white mb-2">
+                    Resultados para: "{{ results.searchQuery }}"
+                  </h2>
+                  <p class="text-gray-400">
+                    {{ results.totalResults }} juego{{ results.totalResults !== 1 ? 's' : '' }} encontrado{{ results.totalResults !== 1 ? 's' : '' }}
+                  </p>
+                </div>
+                
+                <!-- No Results -->
+                @if (results.games.length === 0) {
+                  <div class="text-center py-12">
+                    <div class="mb-4">
+                      <svg class="h-16 w-16 text-gray-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">No se encontraron juegos</h3>
+                    <p class="text-gray-400 mb-4">
+                      Intenta con términos más generales o verifica la ortografía
+                    </p>
+                    <div class="text-gray-500 text-sm">
+                      💡 Sugerencias: "Minecraft", "GTA", "Zelda", "FIFA"
+                    </div>
+                  </div>
+                } @else {
+                  <!-- Games Grid -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 search-results__games-grid">
+                    @for (game of results.games; track game.rawgId) {
+                      <app-game-card [game]="game"></app-game-card>
+                    }
+                  </div>
+                  
+                  <!-- Pagination -->
+                  @if (results.totalPages > 1) {
+                    <div class="flex justify-center items-center mt-12 space-x-2">
+                      
+                      <!-- Previous Button -->
+                      <button
+                        (click)="goToPage(currentPage() - 1)"
+                        [disabled]="currentPage() <= 1"
+                        class="px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                      >
+                        Anterior
+                      </button>
+                      
+                      <!-- Page Numbers -->
+                      @for (page of getPageNumbers(); track page) {
+                        <button
+                          (click)="goToPage(page)"
+                          class="px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                          [class]="page === currentPage() 
+                            ? 'bg-purple-600 text-white font-semibold hover:bg-purple-600' 
+                            : 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700'"
+                        >
+                          {{ page }}
+                        </button>
+                      }
+                      
+                      <!-- Next Button -->
+                      <button
+                        (click)="goToPage(currentPage() + 1)"
+                        [disabled]="!results.hasMore"
+                        class="px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          }
+        }
+        
+      </section>
+    </div>
+  </main>
+</div>

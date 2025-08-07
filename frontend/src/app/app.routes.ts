@@ -1,5 +1,6 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { canActivateAuth, canActivateGuest } from '@core/guards/auth-guard';
+import { canActivateAuth, canActivateGuest } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   { 
@@ -19,6 +20,30 @@ export const routes: Routes = [
       .then(m => m.HomePage),
     canActivate: [canActivateAuth] // 👈 Solo si está logueado
   },
+  
+  // 🎮 Games Feature Routes - Solo para usuarios autenticados
+  {
+    path: 'games',
+    canActivate: [canActivateAuth], // Proteger toda la sección de games
+    children: [
+      // 🔍 Search Results Page
+      {
+        path: 'search',
+        loadComponent: () => import('./features/games/pages/game-search-results/game-search-results')
+          .then(m => m.GameSearchResults)
+      },
+      
+      // 🎮 Game Details Page (para el futuro)
+      /*
+      {
+        path: 'game/:identifier',
+        loadComponent: () => import('./features/games/pages/game-details/game-details')
+          .then(m => m.GameDetails)
+      }
+      */
+    ]
+  },
+  
   {
     path: '**',
     redirectTo: '/landing'

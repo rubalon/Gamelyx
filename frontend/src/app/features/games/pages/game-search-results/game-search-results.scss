@@ -1,0 +1,30 @@
+// src/app/features/games/pages/game-search-results/game-search-results.scss
+
+.search-results {
+  &__games-grid {
+    // Animaciones para las cards que aparecen
+    & > * {
+      animation: fadeInUp 0.4s ease-out;
+      animation-fill-mode: both;
+      
+      // Escalonar la animación
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{($i - 1) * 0.05}s;
+        }
+      }
+    }
+  }
+}
+
+// Animaciones personalizadas
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
