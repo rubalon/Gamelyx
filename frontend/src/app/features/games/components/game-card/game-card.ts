@@ -30,7 +30,10 @@ export class GameCard {
    * 🖼️ Manejar error de imagen
    */
   onImageError(event: any): void {
-    // Fallback image placeholder
-    event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDIwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik05MiAxMDBMMTA4IDEwMEwxMDAgMTEyTDkyIDEwMFoiIGZpbGw9IiM2QjcyODAiLz4KPHJlY3QgeD0iNjAiIHk9IjEyMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjNkI3MjgwIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMjAwIiBmaWxsPSIjOUI5QkEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iYXJpYWwiIGZvbnQtc2l6ZT0iMTIiPkdhbWUgSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==';
+    console.log('Error loading image:', event.target.src);
+    console.log('Game:', this.game.name);
+    
+    // Fallback image - placeholder gris con texto
+    event.target.src = `data:image/svg+xml;charset=UTF-8,%3Csvg width="400" height="225" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="100%25" height="100%25" fill="%23374151"/%3E%3Ctext x="50%25" y="50%25" font-size="16" fill="%23D1D5DB" text-anchor="middle" dy=".3em"%3E${encodeURIComponent(this.game.name)}%3C/text%3E%3C/svg%3E`;
   }
 }

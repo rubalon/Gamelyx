@@ -1,8 +1,8 @@
 // src/app/features/games/components/game-card/game-card.scss
 
 .game-card {
-  &__image-container {
-    aspect-ratio: 3/4;
+  &__image-container-horizontal {
+    aspect-ratio: 16/9; // Formato horizontal para imágenes de juegos
     overflow: hidden;
     position: relative;
   }

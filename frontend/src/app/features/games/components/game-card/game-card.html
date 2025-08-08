@@ -2,26 +2,14 @@
 <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-purple-500 hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer group transform hover:-translate-y-1 relative">
   
   <!-- Game Cover Image -->
-  <div class="game-card__image-container">
+  <div class="game-card__image-container-horizontal">
     <img 
       [src]="game.coverImage" 
       [alt]="game.name"
       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
       loading="lazy"
       (error)="onImageError($event)"
-    />
-    
-    <!-- Hover overlay -->
-    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-        </svg>
-      </div>
-    </div>
+    /> 
     
     <!-- Rating Badge -->
     @if (game.rating > 0) {
@@ -40,11 +28,7 @@
     <h3 class="text-white font-bold text-lg mb-2 group-hover:text-purple-400 transition-colors game-card__title">
       {{ game.name }}
     </h3>
-    
-    <!-- Game Description (truncated) -->
-    <p class="text-gray-400 text-sm mb-3 game-card__description">
-      {{ game.description }}
-    </p>
+  
     
     <!-- Game Metadata -->
     <div class="space-y-2">
