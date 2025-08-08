@@ -4,7 +4,7 @@
   <!-- Game Cover Image -->
   <div class="game-card__image-container-horizontal">
     <img 
-      [src]="game.coverImage" 
+      [src]="getOptimizedImageUrl(game.coverImage)" 
       [alt]="game.name"
       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
       loading="lazy"
