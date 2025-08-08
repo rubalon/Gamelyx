@@ -10,7 +10,6 @@ export interface GameSearchItem {
   slug: string;
   name: string;
   coverImage: string;
-  description: string;
   rating: number;
   released: string;
   platforms: string[];

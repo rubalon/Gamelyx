@@ -24,7 +24,6 @@ public class GameResponseDtos {
             String slug,              // Para URL amigable /game/{slug} (si ya existe)
             String name,              // "Minecraft"
             String coverImage,        // Carátula del juego para mostrar en lista
-            String description,       // Descripción corta/truncada para preview
             Double rating,            // Rating RAWG (4.2)
             String released,          // "2011-11-18"
             List<String> platforms,   // ["PC", "PlayStation 4"] - opcional para UI

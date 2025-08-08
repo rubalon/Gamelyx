@@ -40,7 +40,6 @@ public class GameMapper {
                 rawgGame.getSlug(),
                 rawgGame.getName(),
                 rawgGame.getBackgroundImage(),         // ✅ Usar backgroundImage como coverImage
-                createShortDescription(rawgGame.getName()), // Descripción generada
                 rawgGame.getRating(),
                 rawgGame.getReleased(),
                 extractPlatformNames(rawgGame.getPlatforms()),
@@ -66,7 +65,6 @@ public class GameMapper {
                 slug,
                 rawgGame.getName(),
                 rawgGame.getBackgroundImage(),
-                createShortDescription(rawgGame.getName()),
                 rawgGame.getRating(),
                 rawgGame.getReleased(),
                 extractPlatformNames(rawgGame.getPlatforms()),
