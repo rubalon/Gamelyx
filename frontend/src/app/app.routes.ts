@@ -34,13 +34,13 @@ export const routes: Routes = [
       },
       
       // 🎮 Game Details Page (para el futuro)
-      /*
+
       {
         path: 'game/:identifier',
-        loadComponent: () => import('./features/games/pages/game-details/game-details')
-          .then(m => m.GameDetails)
+        loadComponent: () => import('./features/games/pages/game-page/game-page')
+          .then(m => m.GamePage)
       }
-      */
+
     ]
   },
   

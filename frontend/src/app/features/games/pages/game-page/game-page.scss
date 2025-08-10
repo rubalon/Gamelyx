@@ -1,0 +1,302 @@
+// src/app/features/games/pages/game-page/game-page.scss
+
+// 📖 Utilidad para truncar texto (line-clamp)
+.line-clamp-4 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+// 🎮 Hero Section Enhancements
+.game-hero {
+  &__background {
+    // Parallax effect para el background (opcional)
+    will-change: transform;
+    transition: transform 0.1s ease-out;
+  }
+
+  &__cover-image {
+    // Hover effect en la cover image
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  &__title {
+    // Text shadow para mejor legibilidad
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  }
+}
+
+// 🖼️ Screenshots Section
+.screenshots {
+  &__main-image {
+    // Transición suave al cambiar screenshots
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    
+    &.loading {
+      opacity: 0.7;
+      transform: scale(0.98);
+    }
+  }
+
+  &__thumbnail {
+    // Efectos de hover en thumbnails
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+
+    &--active {
+      // Thumbnail activo con glow effect
+      box-shadow: 0 0 0 2px rgb(147 51 234), 
+                  0 0 20px rgba(147, 51, 234, 0.5);
+    }
+
+    // Efecto de loading para imágenes
+    img {
+      transition: opacity 0.2s ease;
+      
+      &[src=""], &:not([src]) {
+        opacity: 0.5;
+        background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+}
+
+// ✨ Shimmer effect para loading states
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+// 📊 Stats Cards
+.stats-card {
+  // Hover effect en cards de información
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border-color: rgba(147, 51, 234, 0.5);
+  }
+}
+
+// ⭐ Rating Stars Animation
+.rating-stars {
+  .star {
+    transition: all 0.2s ease;
+    
+    &--filled {
+      animation: starGlow 2s ease-in-out infinite alternate;
+    }
+    
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+}
+
+@keyframes starGlow {
+  0% { filter: brightness(1); }
+  100% { filter: brightness(1.2) drop-shadow(0 0 5px #fbbf24); }
+}
+
+// 🏷️ Tags and Badges
+.game-tags {
+  .tag {
+    // Hover effect en tags
+    transition: all 0.2s ease;
+    cursor: default;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    // Diferentes colores para diferentes tipos
+    &--platform {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: rgb(147, 197, 253);
+      
+      &:hover {
+        background: rgba(59, 130, 246, 0.3);
+      }
+    }
+
+    &--genre {
+      background: rgba(147, 51, 234, 0.2);
+      border-color: rgba(147, 51, 234, 0.3);
+      color: rgb(196, 181, 253);
+      
+      &:hover {
+        background: rgba(147, 51, 234, 0.3);
+      }
+    }
+
+    &--general {
+      background: rgba(75, 85, 99, 1);
+      color: rgb(209, 213, 219);
+      
+      &:hover {
+        background: rgba(107, 114, 128, 1);
+      }
+    }
+  }
+}
+
+// 🔄 Loading Animations
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// 📱 Responsive Adjustments
+@media (max-width: 768px) {
+  .game-hero {
+    &__title {
+      // Título más pequeño en móvil
+      font-size: 2.5rem;
+      line-height: 1.1;
+    }
+  }
+
+  .screenshots {
+    &__thumbnails {
+      // Menos thumbnails visibles en móvil
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .game-hero {
+    &__cover-image {
+      // Cover más pequeña en móviles pequeños
+      width: 5rem;
+      height: 7rem;
+    }
+
+    &__title {
+      font-size: 2rem;
+    }
+  }
+}
+
+// 🎯 Focus States para Accessibility
+button:focus,
+a:focus {
+  outline: 2px solid rgb(147, 51, 234);
+  outline-offset: 2px;
+}
+
+// 🌟 Scroll Behavior
+html {
+  scroll-behavior: smooth;
+}
+
+// 💫 Custom Scrollbar (opcional)
+.game-content {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(55, 65, 81, 0.5);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(147, 51, 234, 0.5);
+    border-radius: 4px;
+    
+    &:hover {
+      background: rgba(147, 51, 234, 0.7);
+    }
+  }
+}
+
+// 🎨 Description Section
+.description-content {
+  // Styling para el HTML content de la descripción
+  h1, h2, h3, h4, h5, h6 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  ul, ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  a {
+    color: rgb(147, 51, 234);
+    text-decoration: underline;
+    
+    &:hover {
+      color: rgb(196, 181, 253);
+    }
+  }
+
+  strong, b {
+    color: white;
+    font-weight: 600;
+  }
+
+  em, i {
+    font-style: italic;
+  }
+}
+
+// 🔗 Back Button Animation
+.back-button {
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover svg {
+    transform: translateX(-4px);
+  }
+}
+
+// 🎭 Fade In Animation para contenido
+.fade-in {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

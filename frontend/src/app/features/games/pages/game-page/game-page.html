@@ -1,0 +1,347 @@
+<!-- src/app/features/games/pages/game-page/game-page.html -->
+<div class="min-h-screen bg-gray-900">
+  
+  <!-- Header reutilizable -->
+  <app-header></app-header>
+  
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="pt-20 pb-16">
+      <div class="flex items-center justify-center py-32">
+        <div class="text-center">
+          <!-- Loading Spinner -->
+          <div class="mb-6">
+            <svg class="animate-spin h-16 w-16 text-purple-500 mx-auto" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" 
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-semibold text-white mb-2">Cargando juego...</h2>
+          <p class="text-gray-400">Obteniendo toda la información</p>
+        </div>
+      </div>
+    </div>
+  }
+  
+  <!-- Error State -->
+  @else if (error()) {
+    <div class="pt-20 pb-16">
+      <div class="flex items-center justify-center py-32">
+        <div class="text-center max-w-md mx-auto px-4">
+          <div class="mb-6">
+            <svg class="h-20 w-20 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-4">¡Ups! Algo salió mal</h2>
+          <p class="text-gray-400 mb-6">{{ error() }}</p>
+          <div class="space-x-4">
+            <button 
+              (click)="retryLoad()"
+              class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-colors"
+            >
+              Reintentar
+            </button>
+            <button 
+              (click)="goBack()"
+              class="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500/50 transition-colors"
+            >
+              Volver a búsqueda
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  
+  <!-- Game Content -->
+  @else if (gameDetails()) {
+    <main class="pt-16">
+      
+      <!-- Hero Section con Background Image -->
+      <section class="relative h-96 md:h-[500px] overflow-hidden">
+        <!-- Background Image con overlay -->
+        <div class="absolute inset-0 game-hero__background">
+          <img 
+            [src]="gameDetails()!.backgroundImage" 
+            [alt]="gameDetails()!.name"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/40"></div>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 h-full flex items-end">
+          <div class="w-full px-4 pb-8">
+            <div class="max-w-7xl mx-auto">
+              <div class="flex flex-col md:flex-row items-end gap-6">
+                
+                <!-- Cover Image -->
+                <div class="flex-shrink-0">
+                  <img 
+                    [src]="gameDetails()!.coverImage" 
+                    [alt]="gameDetails()!.name"
+                    class="w-32 h-44 md:w-40 md:h-56 object-cover rounded-lg shadow-2xl border-2 border-gray-700 game-hero__cover-image"
+                  />
+                </div>
+                
+                <!-- Game Title & Quick Info -->
+                <div class="flex-1 text-center md:text-left">
+                  
+                  <!-- Back Button -->
+                  <button 
+                    (click)="goBack()"
+                    class="inline-flex items-center text-gray-400 hover:text-white mb-4 transition-colors group"
+                  >
+                    <svg class="h-5 w-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Volver a resultados
+                  </button>
+                  
+                  <!-- Game Title -->
+                  <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight game-hero__title">
+                    {{ gameDetails()!.name }}
+                  </h1>
+                  
+                  <!-- Quick Stats -->
+                  <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4">
+                    
+                    <!-- Rating Stars -->
+                    @if (gameDetails()!.rating > 0) {
+                      <div class="flex items-center">
+                        <div class="flex mr-2">
+                          @for (star of getRatingStars(gameDetails()!.rating); track $index) {
+                            <svg 
+                              class="h-5 w-5"
+                              [class]="star.filled ? 'text-yellow-400' : 'text-gray-600'"
+                              fill="currentColor" 
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                          }
+                        </div>
+                        <span class="text-white font-semibold">{{ gameDetails()!.rating | number:'1.1-1' }}/10</span>
+                      </div>
+                    }
+                    
+                    <!-- Metacritic Score -->
+                    @if (gameDetails()!.metacriticScore > 0) {
+                      <div class="flex items-center bg-gray-800/80 px-3 py-1 rounded-lg">
+                        <span class="text-gray-400 text-sm mr-2">Metacritic:</span>
+                        <span class="font-bold" [class]="getMetacriticColor(gameDetails()!.metacriticScore)">
+                          {{ gameDetails()!.metacriticScore }}
+                        </span>
+                      </div>
+                    }
+                    
+                    <!-- Release Date -->
+                    @if (gameDetails()!.released) {
+                      <div class="flex items-center bg-gray-800/80 px-3 py-1 rounded-lg">
+                        <svg class="h-4 w-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-gray-300 text-sm">{{ formatReleaseDate(gameDetails()!.released) }}</span>
+                      </div>
+                    }
+                  </div>
+                  
+                  <!-- Platforms -->
+                  @if (gameDetails()!.platforms && gameDetails()!.platforms.length > 0) {
+                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                      @for (platform of gameDetails()!.platforms.slice(0, 4); track platform) {
+                        <span class="bg-blue-600/20 text-blue-300 text-sm px-3 py-1 rounded-lg border border-blue-600/30">
+                          {{ platform }}
+                        </span>
+                      }
+                      @if (gameDetails()!.platforms.length > 4) {
+                        <span class="text-blue-400 text-sm px-3 py-1">
+                          +{{ gameDetails()!.platforms.length - 4 }} más
+                        </span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Main Content -->
+      <div class="px-4 py-12">
+        <div class="max-w-7xl mx-auto">
+          <div class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Main Info -->
+            <div class="lg:col-span-2 space-y-8">
+              
+              <!-- Description Section -->
+              @if (gameDetails()!.descriptionRaw) {
+                <section class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                  <h2 class="text-2xl font-bold text-white mb-4">Descripción</h2>
+                  <div class="text-gray-300 leading-relaxed description-content">
+                    <p [class]="!showFullDescription() ? 'line-clamp-4' : ''" [innerHTML]="gameDetails()!.description"></p>
+                    
+                    @if (gameDetails()!.descriptionRaw.length > 300) {
+                      <button 
+                        (click)="toggleDescription()" 
+                        class="text-purple-400 hover:text-purple-300 font-medium mt-3 flex items-center transition-colors"
+                      >
+                        @if (showFullDescription()) {
+                          Mostrar menos
+                          <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                          </svg>
+                        } @else {
+                          Leer más
+                          <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                          </svg>
+                        }
+                      </button>
+                    }
+                  </div>
+                </section>
+              }
+              
+              <!-- Screenshots Section -->
+              @if (gameDetails()!.screenshots && gameDetails()!.screenshots.length > 0) {
+                <section class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                  <h2 class="text-2xl font-bold text-white mb-4">Capturas de pantalla</h2>
+                  
+                  <!-- Main Screenshot -->
+                  <div class="mb-4">
+                    <img 
+                      [src]="gameDetails()!.screenshots[activeScreenshot()]" 
+                      [alt]="'Captura ' + (activeScreenshot() + 1) + ' de ' + gameDetails()!.name"
+                      class="w-full aspect-video object-cover rounded-lg screenshots__main-image"
+                    />
+                  </div>
+                  
+                  <!-- Thumbnails -->
+                  <div class="grid grid-cols-4 md:grid-cols-6 gap-2">
+                    @for (screenshot of gameDetails()!.screenshots; track $index) {
+                      <button 
+                        (click)="setActiveScreenshot($index)"
+                        class="aspect-video rounded overflow-hidden border-2 transition-all"
+                        [class]="$index === activeScreenshot() 
+                          ? 'border-purple-500 ring-2 ring-purple-500/50' 
+                          : 'border-gray-600 hover:border-gray-500'"
+                      >
+                        <img 
+                          [src]="screenshot" 
+                          [alt]="'Thumbnail ' + ($index + 1)"
+                          class="w-full h-full object-cover hover:scale-105 transition-transform"
+                        />
+                      </button>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+            
+            <!-- Right Column: Sidebar Info -->
+            <div class="space-y-6">
+              
+              <!-- Game Stats -->
+              <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-4">Información del juego</h3>
+                <div class="space-y-4">
+                  
+                  <!-- Developers -->
+                  @if (gameDetails()!.developers && gameDetails()!.developers.length > 0) {
+                    <div>
+                      <span class="text-gray-400 text-sm block mb-1">Desarrollador</span>
+                      <span class="text-white">{{ gameDetails()!.developers.join(', ') }}</span>
+                    </div>
+                  }
+                  
+                  <!-- Publishers -->
+                  @if (gameDetails()!.publishers && gameDetails()!.publishers.length > 0) {
+                    <div>
+                      <span class="text-gray-400 text-sm block mb-1">Editor</span>
+                      <span class="text-white">{{ gameDetails()!.publishers.join(', ') }}</span>
+                    </div>
+                  }
+                  
+                  <!-- Average Playtime -->
+                  @if (gameDetails()!.averagePlaytime > 0) {
+                    <div>
+                      <span class="text-gray-400 text-sm block mb-1">Tiempo promedio</span>
+                      <span class="text-white">{{ gameDetails()!.averagePlaytime }} horas</span>
+                    </div>
+                  }
+                  
+                  <!-- Community Rating -->
+                  @if (gameDetails()!.communityRating > 0) {
+                    <div>
+                      <span class="text-gray-400 text-sm block mb-1">Rating de la comunidad</span>
+                      <div class="flex items-center">
+                        <span class="text-white font-semibold mr-2">{{ gameDetails()!.communityRating | number:'1.1-1' }}/10</span>
+                        <span class="text-gray-500 text-sm">({{ gameDetails()!.totalCommunityReviews }} reviews)</span>
+                      </div>
+                    </div>
+                  }
+                  
+                  <!-- Website Link -->
+                  @if (gameDetails()!.website) {
+                    <div>
+                      <button 
+                        (click)="openWebsite(gameDetails()!.website)"
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
+                      >
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                        Sitio web oficial
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+              
+              <!-- Genres -->
+              @if (gameDetails()!.genres && gameDetails()!.genres.length > 0) {
+                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                  <h3 class="text-xl font-bold text-white mb-4">Géneros</h3>
+                  <div class="flex flex-wrap gap-2">
+                    @for (genre of gameDetails()!.genres; track genre) {
+                      <span class="bg-purple-600/20 text-purple-300 text-sm px-3 py-2 rounded-lg border border-purple-600/30">
+                        {{ genre }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+              
+              <!-- Tags -->
+              @if (gameDetails()!.tags && gameDetails()!.tags.length > 0) {
+                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                  <h3 class="text-xl font-bold text-white mb-4">Tags</h3>
+                  <div class="flex flex-wrap gap-2">
+                    @for (tag of gameDetails()!.tags.slice(0, 8); track tag) {
+                      <span class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded">
+                        {{ tag }}
+                      </span>
+                    }
+                    @if (gameDetails()!.tags.length > 8) {
+                      <span class="text-gray-500 text-xs px-2 py-1">
+                        +{{ gameDetails()!.tags.length - 8 }} más
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  }
+</div>
