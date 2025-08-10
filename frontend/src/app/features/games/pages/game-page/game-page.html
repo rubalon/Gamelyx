@@ -58,7 +58,7 @@
   
   <!-- Game Content -->
   @else if (gameDetails()) {
-    <main class="pt-16">
+    <main >
       
       <!-- Hero Section con Background Image -->
       <section class="relative h-96 md:h-[500px] overflow-hidden">
@@ -69,21 +69,22 @@
             [alt]="gameDetails()!.name"
             class="w-full h-full object-cover"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/40"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/75 to-gray-900/20"></div>
         </div>
         
         <!-- Hero Content -->
         <div class="relative z-10 h-full flex items-end">
-          <div class="w-full px-4 pb-8">
+          <div class="w-full px-4 ">
             <div class="max-w-7xl mx-auto">
               <div class="flex flex-col md:flex-row items-end gap-6">
                 
                 <!-- Cover Image -->
                 <div class="flex-shrink-0">
                   <img 
-                    [src]="gameDetails()!.coverImage" 
+                    [src]="getOptimizedImageUrl(gameDetails()!.coverImage)" 
                     [alt]="gameDetails()!.name"
-                    class="w-32 h-44 md:w-40 md:h-56 object-cover rounded-lg shadow-2xl border-2 border-gray-700 game-hero__cover-image"
+                    class="w-80 h-45 md:w-96 md:h-54 object-cover rounded-lg shadow-2xl border-2 border-gray-700 game-hero__cover-image"
+                    style="aspect-ratio: 16/9; width: 400px; height: 225px;"
                   />
                 </div>
                 
@@ -110,22 +111,34 @@
                   <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4">
                     
                     <!-- Rating Stars -->
-                    @if (gameDetails()!.rating > 0) {
-                      <div class="flex items-center">
+                    @if (gameDetails()!.communityRating > 0) {
+                    <div class="flex items-center">
                         <div class="flex mr-2">
-                          @for (star of getRatingStars(gameDetails()!.rating); track $index) {
+                        @for (star of getRatingStars(gameDetails()!.communityRating); track $index) {
+                            <div class="relative h-5 w-5">
+                            <!-- Estrella de fondo (vacía) -->
                             <svg 
-                              class="h-5 w-5"
-                              [class]="star.filled ? 'text-yellow-400' : 'text-gray-600'"
-                              fill="currentColor" 
-                              viewBox="0 0 20 20"
+                                class="absolute inset-0 h-5 w-5 text-gray-600"
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
                             >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                             </svg>
-                          }
+                            
+                            <!-- Estrella llena (con clip-path para porcentaje) -->
+                            <svg 
+                                class="absolute inset-0 h-5 w-5 text-yellow-400"
+                                [style.clip-path]="'inset(0 ' + (100 - star.filled * 100) + '% 0 0)'"
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                            >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                            </div>
+                        }
                         </div>
-                        <span class="text-white font-semibold">{{ gameDetails()!.rating | number:'1.1-1' }}/10</span>
-                      </div>
+                        <span class="text-white font-semibold">{{ gameDetails()!.communityRating | number:'1.1-1' }}/10</span>
+                    </div>
                     }
                     
                     <!-- Metacritic Score -->
@@ -250,7 +263,7 @@
               
               <!-- Game Stats -->
               <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <h3 class="text-xl font-bold text-white mb-4">Información del juego</h3>
+                <h3 class="text-2xl font-bold text-white mb-4">Información del juego</h3>
                 <div class="space-y-4">
                   
                   <!-- Developers -->
@@ -269,25 +282,6 @@
                     </div>
                   }
                   
-                  <!-- Average Playtime -->
-                  @if (gameDetails()!.averagePlaytime > 0) {
-                    <div>
-                      <span class="text-gray-400 text-sm block mb-1">Tiempo promedio</span>
-                      <span class="text-white">{{ gameDetails()!.averagePlaytime }} horas</span>
-                    </div>
-                  }
-                  
-                  <!-- Community Rating -->
-                  @if (gameDetails()!.communityRating > 0) {
-                    <div>
-                      <span class="text-gray-400 text-sm block mb-1">Rating de la comunidad</span>
-                      <div class="flex items-center">
-                        <span class="text-white font-semibold mr-2">{{ gameDetails()!.communityRating | number:'1.1-1' }}/10</span>
-                        <span class="text-gray-500 text-sm">({{ gameDetails()!.totalCommunityReviews }} reviews)</span>
-                      </div>
-                    </div>
-                  }
-                  
                   <!-- Website Link -->
                   @if (gameDetails()!.website) {
                     <div>
@@ -303,12 +297,9 @@
                       </button>
                     </div>
                   }
-                </div>
-              </div>
-              
-              <!-- Genres -->
+
+                  <!-- Genres -->
               @if (gameDetails()!.genres && gameDetails()!.genres.length > 0) {
-                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
                   <h3 class="text-xl font-bold text-white mb-4">Géneros</h3>
                   <div class="flex flex-wrap gap-2">
                     @for (genre of gameDetails()!.genres; track genre) {
@@ -317,8 +308,11 @@
                       </span>
                     }
                   </div>
-                </div>
               }
+                </div>
+              </div>
+              
+              
               
               <!-- Tags -->
               @if (gameDetails()!.tags && gameDetails()!.tags.length > 0) {

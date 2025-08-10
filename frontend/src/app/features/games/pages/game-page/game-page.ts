@@ -154,15 +154,26 @@ export class GamePage implements OnInit, OnDestroy {
   }
 
   /**
-   * ⭐ Generar array para mostrar estrellas de rating
+   * ⭐ Generar array para mostrar estrellas de rating con fracciones
    */
-  getRatingStars(rating: number): { filled: boolean }[] {
+  getRatingStars(rating: number): { filled: number }[] {
     const stars = [];
     const maxStars = 5;
-    const filledStars = Math.round(rating / 2); // Rating de 10 a 5 estrellas
+    const scaledRating = rating / 2; // Rating de 10 a 5 estrellas
     
     for (let i = 0; i < maxStars; i++) {
-      stars.push({ filled: i < filledStars });
+        const starValue = scaledRating - i;
+        
+        if (starValue >= 1) {
+        // Estrella completamente llena
+        stars.push({ filled: 1 });
+        } else if (starValue > 0) {
+        // Estrella parcialmente llena
+        stars.push({ filled: starValue });
+        } else {
+        // Estrella vacía
+        stars.push({ filled: 0 });
+        }
     }
     
     return stars;
@@ -193,6 +204,24 @@ export class GamePage implements OnInit, OnDestroy {
     if (url) {
       window.open(url, '_blank', 'noopener noreferrer');
     }
+  }
+
+  /**
+   * 🖼️ Optimizar URL de imagen RAWG para reducir tamaño
+   * Convierte: https://media.rawg.io/media/games/image.jpg
+   * En: https://media.rawg.io/media/resize/640/-/games/image.jpg
+   */
+  getOptimizedImageUrl(originalUrl: string): string {
+
+    
+    // Solo optimizar imágenes de RAWG API
+    if (originalUrl.includes('media.rawg.io')) {
+      // Insertar parámetro resize en la URL
+      return originalUrl.replace('/media/', '/media/resize/640/-/');
+    }
+    
+    // Para otras URLs, devolver original
+    return originalUrl;
   }
 
   // 🎯 Getters para template

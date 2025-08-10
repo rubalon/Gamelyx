@@ -17,7 +17,7 @@ export class GameCard {
   /**
    * 🖼️ Optimizar URL de imagen RAWG para reducir tamaño
    * Convierte: https://media.rawg.io/media/games/image.jpg
-   * En: https://media.rawg.io/media/resize/400/-/games/image.jpg
+   * En: https://media.rawg.io/media/resize/640/-/games/image.jpg
    */
   getOptimizedImageUrl(originalUrl: string): string {
     if (!originalUrl) {

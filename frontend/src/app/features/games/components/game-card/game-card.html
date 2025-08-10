@@ -12,6 +12,8 @@
     /> 
     
     <!-- Rating Badge -->
+     <!-- Actualmente esta usando el rating de RAWG en lugar de el nuestro, por lo que a no ser que modifiquemos el enpoint para que devuelva nuestro rating no tiene sentido poner 2 ratings distintos uno para la busqueda y otro dentro de la pagina. -->
+     <!--
     @if (game.rating > 0) {
       <div class="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full flex items-center">
         <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -20,6 +22,7 @@
         {{ game.rating | number:'1.1-1' }}
       </div>
     }
+    -->
   </div>
   
   <!-- Game Info -->
