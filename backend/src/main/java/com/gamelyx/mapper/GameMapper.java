@@ -91,8 +91,8 @@ public class GameMapper {
         dto.setName(game.getName());
         dto.setDescription(game.getDescription());
         dto.setDescriptionRaw(game.getDescriptionRaw());
-        dto.setBackgroundImage(game.getBackgroundImage());
-        dto.setBackgroundImageAlt(game.getBackgroundImageAlt());
+        dto.setBackgroundImage(game.getBackgroundImageAlt());
+        dto.setCoverImage(game.getBackgroundImage());
 
         // Listas (convertir strings con comas → listas)
         dto.setScreenshots(stringToList(game.getScreenshots()));
@@ -111,7 +111,6 @@ public class GameMapper {
         dto.setReleased(game.getReleased());
         dto.setWebsite(game.getWebsite());
         dto.setMetacriticScore(game.getMetacriticScore());
-        dto.setAveragePlaytime(game.getAveragePlaytime());
         dto.setLastUpdated(game.getUpdatedAt());
 
         // Estados iniciales (se setean externamente en service)

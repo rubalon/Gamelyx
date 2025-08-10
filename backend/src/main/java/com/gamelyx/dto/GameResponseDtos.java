@@ -215,8 +215,8 @@ public class GameResponseDtos {
         private String name;
         private String description;       // HTML description
         private String descriptionRaw;    // Plain text para excerpts
-        private String coverImage;        // Imagen principal cover
-        private String backgroundImage;   // Imagen secundaria fondo
+        private String backgroundImage;        // Imagen principal cover
+        private String coverImage;   // Imagen secundaria fondo
         private List<String> screenshots; // URLs de capturas
 
         // Metadata del juego
@@ -226,7 +226,6 @@ public class GameResponseDtos {
         private String released;          // "2011-11-18"
         private String website;           // Sitio oficial
         private Integer metacriticScore;  // Puntuación Metacritic
-        private Integer averagePlaytime;  // Horas promedio de juego
 
         // Categorización
         private List<String> platforms;   // ["PC", "PlayStation 4"]
@@ -268,7 +267,7 @@ public class GameResponseDtos {
         public void setBackgroundImage(String backgroundImage) { this.backgroundImage = backgroundImage; }
 
         public String getCoverImage() { return coverImage; }
-        public void setBackgroundImageAlt(String coverImage) { this.coverImage = coverImage; }
+        public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
 
         public List<String> getScreenshots() { return screenshots; }
         public void setScreenshots(List<String> screenshots) { this.screenshots = screenshots; }
@@ -290,9 +289,6 @@ public class GameResponseDtos {
 
         public Integer getMetacriticScore() { return metacriticScore; }
         public void setMetacriticScore(Integer metacriticScore) { this.metacriticScore = metacriticScore; }
-
-        public Integer getAveragePlaytime() { return averagePlaytime; }
-        public void setAveragePlaytime(Integer averagePlaytime) { this.averagePlaytime = averagePlaytime; }
 
         public List<String> getPlatforms() { return platforms; }
         public void setPlatforms(List<String> platforms) { this.platforms = platforms; }
