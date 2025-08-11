@@ -8,6 +8,7 @@ import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
 import { Header } from '../../../../shared/components/header/header';
 import { GameApiService, GameDetails as GameDetailsInterface } from '@core/services/game-api';
 import { AuthStore } from '../../../../core/stores/auth-store';
+import { GameReviewsSection } from './components/game-reviews-section/game-reviews-section';
 
 @Component({
   selector: 'app-game-page',
@@ -15,11 +16,12 @@ import { AuthStore } from '../../../../core/stores/auth-store';
   imports: [
     CommonModule,
     TranslateModule,
-    Header
+    Header,
+    GameReviewsSection
   ],
   templateUrl: './game-page.html',
   styleUrl: './game-page.scss'
-})
+}) 
 export class GamePage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -189,7 +191,7 @@ export class GamePage implements OnInit, OnDestroy {
   }
 
   /**
-   * 🏠 Navegación de vuelta a búsqueda 
+   * 🏠 Navegación de vuelta a búsqueda
    */
   //todo: Almacenar la ultima búsqueda para volver a ella
   goBack(): void {
@@ -222,6 +224,22 @@ export class GamePage implements OnInit, OnDestroy {
     
     // Para otras URLs, devolver original
     return originalUrl;
+  }
+
+  /**
+   * 🔄 Manejar actualización de review (recargar datos del juego)
+   */
+  onReviewUpdated(): void {
+    console.log('Review actualizada, recargando datos del juego');
+    // Recargar gameDetails para reflejar la nueva review
+    const identifier = this.currentIdentifier();
+    if (identifier) {
+      this.getGameDetailsObservable(identifier).subscribe(gameDetails => {
+        if (gameDetails) {
+          this.gameDetails.set(gameDetails);
+        }
+      });
+    }
   }
 
   // 🎯 Getters para template
