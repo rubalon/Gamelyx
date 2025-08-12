@@ -8,6 +8,7 @@ import com.gamelyx.entity.User;
 import com.gamelyx.entity.UserGameDetails;
 import com.gamelyx.mapper.GameMapper;
 import com.gamelyx.repository.GameRepository;
+import com.gamelyx.repository.UserRepository;
 import com.gamelyx.repository.UserGameDetailsRepository;
 import com.gamelyx.service.external.RawgApiService;
 import org.slf4j.Logger;
@@ -44,16 +45,19 @@ public class GameService {
 
     private final RawgApiService rawgApiService;
     private final GameRepository gameRepository;
+    private final UserRepository userRepository; // 🆕 AÑADIDO para buscar User por username
     private final UserGameDetailsRepository userGameDetailsRepository;
-    private final GameMapper gameMapper; // ✅ INYECTADO Y USADO
+    private final GameMapper gameMapper;
 
     public GameService(
             RawgApiService rawgApiService,
             GameRepository gameRepository,
+            UserRepository userRepository, // 🆕 AÑADIDO
             UserGameDetailsRepository userGameDetailsRepository,
             GameMapper gameMapper) {
         this.rawgApiService = rawgApiService;
         this.gameRepository = gameRepository;
+        this.userRepository = userRepository; // 🆕 AÑADIDO
         this.userGameDetailsRepository = userGameDetailsRepository;
         this.gameMapper = gameMapper;
     }
@@ -62,11 +66,7 @@ public class GameService {
 
     /**
      * 🎯 Para: GET /search
-     *
-     * LÓGICA DE NEGOCIO:
-     * - Consultar RAWG API (datos frescos)
-     * - Usar GameMapper para conversiones
-     * - Calcular paginación
+     * SIN CAMBIOS: No requiere autenticación
      */
     public Mono<GameResponseDtos.GameSearchResultsDto> searchGamesForResults(String query, int page, int size) {
         logger.info("🔍 SEARCH SERVICE: query='{}', page={}, size={}", query, page, size);
@@ -75,13 +75,11 @@ public class GameService {
                 .map(rawgResponse -> {
                     List<GameResponseDtos.GameSearchItem> gameItems = rawgResponse.getResults().stream()
                             .map(rawgGame -> {
-                                // Verificar si existe en BD para usar slug correcto
                                 Optional<Game> existingGame = gameRepository.findByRawgId(rawgGame.getId());
                                 return gameMapper.rawgSummaryToSearchItem(rawgGame, existingGame);
                             })
                             .toList();
 
-                    // Construir respuesta con paginación calculada
                     GameResponseDtos.GameSearchResultsDto response = new GameResponseDtos.GameSearchResultsDto(
                             gameItems,
                             page,
@@ -102,18 +100,16 @@ public class GameService {
     /**
      * 🎯 Para: GET /game/{identifier} (usuario autenticado)
      *
-     * LÓGICA DE NEGOCIO:
-     * - Resolver identifier → Game
-     * - Obtener mi estado personal
-     * - Obtener reviews de otros usuarios
-     * - Usar GameMapper para todas las conversiones
+     * 🔧 REFACTORIZADO: Recibe username y busca User entity
      */
-    public Mono<GameResponseDtos.GamePageDto> getGamePageWithUserData(String identifier, User user) {
-        logger.info("🎮 GAME PAGE WITH USER: identifier='{}', user={}", identifier, user.getUsername());
+    public Mono<GameResponseDtos.GamePageDto> getGamePageWithUserData(String identifier, String username) {
+        logger.info("🎮 GAME PAGE WITH USER: identifier='{}', user={}", identifier, username);
+
+        // 🆕 NUEVO: Buscar User entity por username
+        User user = findUserByUsername(username);
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    // ✅ USAR MAPPER para conversión base
                     GameResponseDtos.GamePageDto gamePageDto = gameMapper.gameToPageDto(game);
 
                     // LÓGICA DE NEGOCIO: Obtener mi estado personal
@@ -121,13 +117,11 @@ public class GameService {
                             .findByUserIdAndGameId(user.getId(), game.getId());
 
                     if (myGameDetails.isPresent()) {
-                        // ✅ USAR MAPPER para conversión
                         gamePageDto.setMyStatus(gameMapper.userGameDetailsToMyStatus(myGameDetails.get()));
                     }
 
                     // LÓGICA DE NEGOCIO: Obtener reviews de otros usuarios
                     List<UserGameDetails> otherReviews = getOtherUsersReviews(game.getId(), user.getId(), 3);
-                    // ✅ USAR MAPPER para conversión de lista
                     gamePageDto.setRecentReviews(gameMapper.userGameDetailsListToOtherReviews(otherReviews));
 
                     logger.debug("Game page built: '{}' with user data", game.getName());
@@ -148,14 +142,10 @@ public class GameService {
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
-                    // ✅ USAR MAPPER para conversión base
                     GameResponseDtos.GamePageDto gamePageDto = gameMapper.gameToPageDto(game);
-
-                    // myStatus queda null (no autenticado)
 
                     // LÓGICA DE NEGOCIO: Obtener reviews públicas
                     List<UserGameDetails> recentReviews = getPublicReviews(game.getId(), 3);
-                    // ✅ USAR MAPPER para conversión de lista
                     gamePageDto.setRecentReviews(gameMapper.userGameDetailsListToOtherReviews(recentReviews));
 
                     logger.debug("Game page built: '{}' (public)", game.getName());
@@ -166,19 +156,18 @@ public class GameService {
     // ===== FUNCIONALIDAD 3: ACTUALIZAR MI REVIEW =====
 
     /**
-     * 🎯 Para: PUT /game/{identifier}/my-review
+     * 🎯 Para: PUT /game/{identifier}/my-game-details
      *
-     * LÓGICA DE NEGOCIO:
-     * - Resolver identifier → Game
-     * - Crear/actualizar UserGameDetails
-     * - Recalcular community rating
-     * - Construir respuesta
+     * 🔧 REFACTORIZADO: Recibe username y busca User entity
      */
     public Mono<GameResponseDtos.UpdatedGameStatusDto> updateMyGameReview(
-            String identifier, User user, UpdateMyGameRequest request) {
+            String identifier, String username, UpdateMyGameRequest request) {
 
         logger.info("💭 UPDATE REVIEW SERVICE: identifier='{}', user={}, status={}, rating={}",
-                identifier, user.getUsername(), request.status(), request.rating());
+                identifier, username, request.status(), request.rating());
+
+        // 🆕 NUEVO: Buscar User entity por username
+        User user = findUserByUsername(username);
 
         return resolveGameFromIdentifier(identifier)
                 .map(game -> {
@@ -199,7 +188,7 @@ public class GameService {
                     // Recargar game con community rating actualizado
                     Game updatedGame = gameRepository.findById(game.getId()).orElse(game);
 
-                    // Construir respuesta (no usar mapper porque es específica)
+                    // Construir respuesta
                     GameResponseDtos.UpdatedGameStatusDto response = new GameResponseDtos.UpdatedGameStatusDto(
                             saved.getStatus() != null ? saved.getStatus().name() : null,
                             saved.getRating(),
@@ -210,7 +199,7 @@ public class GameService {
                     );
 
                     logger.info("Review updated: '{}' for user '{}' → community rating: {}",
-                            game.getName(), user.getUsername(), updatedGame.getCommunityRating());
+                            game.getName(), username, updatedGame.getCommunityRating());
 
                     return response;
                 });
@@ -221,38 +210,36 @@ public class GameService {
     /**
      * 🎯 Para: GET /my-reviews (para home - sin paginación)
      *
-     * LÓGICA DE NEGOCIO:
-     * - Consultar mis reviews ordenadas
-     * - Usar GameMapper para conversiones
+     * 🔧 REFACTORIZADO: Recibe username y busca User entity
      */
-    public List<GameResponseDtos.MyReviewDto> getMyRecentReviews(User user, int limit) {
-        logger.info("📝 MY RECENT REVIEWS: user={}, limit={}", user.getUsername(), limit);
+    public List<GameResponseDtos.MyReviewDto> getMyRecentReviews(String username, int limit) {
+        logger.info("📝 MY RECENT REVIEWS: user={}, limit={}", username, limit);
+
+        // 🆕 NUEVO: Buscar User entity por username
+        User user = findUserByUsername(username);
 
         Pageable pageable = PageRequest.of(0, limit, Sort.by("reviewUpdatedAt").descending());
 
         List<UserGameDetails> userReviews = userGameDetailsRepository.findUserReviews(user.getId(), pageable)
                 .getContent();
 
-        // ✅ USAR MAPPER para conversión de lista
         return gameMapper.userGameDetailsListToMyReviews(userReviews);
     }
 
     /**
      * 🎯 Para: GET /my-reviews (para página completa - con paginación)
      *
-     * LÓGICA DE NEGOCIO:
-     * - Consultar mis reviews paginadas
-     * - Usar GameMapper para conversiones
-     * - Construir respuesta con metadata de paginación
+     * 🔧 REFACTORIZADO: Recibe username y busca User entity
      */
-    public GameResponseDtos.MyReviewsResponseDto getMyReviewsPaginated(User user, int page, int size) {
-        logger.info("📝 MY REVIEWS PAGINATED: user={}, page={}, size={}",
-                user.getUsername(), page, size);
+    public GameResponseDtos.MyReviewsResponseDto getMyReviewsPaginated(String username, int page, int size) {
+        logger.info("📝 MY REVIEWS PAGINATED: user={}, page={}, size={}", username, page, size);
+
+        // 🆕 NUEVO: Buscar User entity por username
+        User user = findUserByUsername(username);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("reviewUpdatedAt").descending());
         var reviewsPage = userGameDetailsRepository.findUserReviews(user.getId(), pageable);
 
-        // ✅ USAR MAPPER para conversión de lista
         List<GameResponseDtos.MyReviewDto> reviewDtos = gameMapper.userGameDetailsListToMyReviews(
                 reviewsPage.getContent());
 
@@ -265,12 +252,28 @@ public class GameService {
         );
     }
 
-    // ===== MÉTODOS PRIVADOS - LÓGICA DE NEGOCIO =====
+    // ===== 🆕 NUEVO MÉTODO: BÚSQUEDA DE USER =====
 
     /**
-     * LÓGICA DE NEGOCIO: Resolver identifier → Game entity
-     * Si no existe, obtenerlo de RAWG y guardarlo
+     * 🆕 NUEVO: Buscar User entity por username
+     *
+     * RESPONSABILIDAD DEL SERVICE:
+     * - GameService es responsable de buscar User cuando lo necesita
+     * - JwtAuthenticationFilter se mantiene stateless
+     * - Separación clara de responsabilidades
      */
+    private User findUserByUsername(String username) {
+        logger.debug("🔍 Searching user by username: {}", username);
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    logger.error("User not found by username: {}", username);
+                    return new RuntimeException("Usuario no encontrado: " + username);
+                });
+    }
+
+    // ===== MÉTODOS PRIVADOS - LÓGICA DE NEGOCIO (SIN CAMBIOS) =====
+
     private Mono<Game> resolveGameFromIdentifier(String identifier) {
         boolean isRawgId = identifier.matches("\\d+");
 
@@ -284,21 +287,16 @@ public class GameService {
         }
     }
 
-    /**
-     * LÓGICA DE NEGOCIO: Resolver juego por rawgId
-     */
     private Mono<Game> resolveByRawgId(Integer rawgId) {
-        // Buscar en BD primero
         Optional<Game> existing = gameRepository.findByRawgId(rawgId);
         if (existing.isPresent()) {
             logger.debug("Game found in database: rawgId={}, slug='{}'", rawgId, existing.get().getSlug());
             return Mono.just(existing.get());
         }
 
-        // Si no existe, obtener de RAWG
         logger.debug("Game not in database, fetching from RAWG: rawgId={}", rawgId);
         return rawgApiService.getGameDetails(rawgId)
-                .map(this::saveGameFromRawg); // ✅ Método local simplificado
+                .map(this::saveGameFromRawg);
     }
 
     /**
@@ -323,9 +321,7 @@ public class GameService {
      * LÓGICA DE NEGOCIO: Guardar Game desde RAWG usando GameMapper
      */
     private Game saveGameFromRawg(RawgApiDtos.GameDetails rawgGame) {
-        // ✅ USAR MAPPER para conversión
         Game game = gameMapper.rawgDetailsToGameEntity(rawgGame);
-
         Game saved = gameRepository.save(game);
         logger.info("Game saved from RAWG: '{}' with slug '{}' (ID: {})",
                 saved.getName(), saved.getSlug(), saved.getId());

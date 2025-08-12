@@ -1,30 +1,25 @@
 package com.gamelyx.security.jwt;
 
-import com.gamelyx.entity.User;
-import com.gamelyx.security.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -57,22 +52,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             try {
-                // Cargar los detalles del usuario desde la base de datos
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-                // Validar el token con los detalles del usuario
-                if (jwtUtil.validateToken(jwt, userDetails)) {
-
-                    // User Entity
-                    User user = ((CustomUserDetailsService.CustomUserPrincipal) userDetails).getUser();
+                // ✅ CORREGIDO: Solo validar el JWT sin consultar base de datos
+                if (jwtUtil.validateToken(jwt)) {
 
 
-                    // Crear el objeto de autenticación
+                    // Crear las autoridades por defecto (todos los usuarios verificados tienen ROLE_USER)
+                    List<SimpleGrantedAuthority> authorities = List.of(
+                            new SimpleGrantedAuthority("ROLE_USER")
+                    );
+
+                    // Crear el objeto de autenticación usando SOLO el username del JWT
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
-                                    user,
-                                    null,
-                                    userDetails.getAuthorities()
+                                    username,   // Principal: SOLO el username (String)
+                                    null,       // Credentials: null para JWT
+                                    authorities // Authorities: roles por defecto
                             );
 
                     // Añadir detalles adicionales de la petición
@@ -81,11 +75,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // Establecer la autenticación en el contexto de seguridad
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    logger.debug("Usuario autenticado: " + username);
+                    logger.debug("Usuario autenticado vía JWT: " + username);
                 }
             } catch (Exception e) {
-                // Log del error al cargar usuario o validar token
-                logger.warn("Error durante la autenticación JWT: " + e.getMessage());
+                // Log del error al validar token
+                logger.warn("Error durante la validación del JWT: " + e.getMessage());
             }
         }
 
