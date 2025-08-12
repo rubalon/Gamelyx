@@ -25,7 +25,6 @@ export class AuthModal implements OnInit, OnDestroy {
   private translateService = inject(TranslateService);
   private router = inject(Router); 
 
-
   // Control de pestañas
   activeTab: 'login' | 'register' = 'login';
 
@@ -53,11 +52,15 @@ export class AuthModal implements OnInit, OnDestroy {
   onClose(): void {
     this.modalService.closeAuthModal();
     this.authStore.clearError();
+    // 🆕 NUEVO: Limpiar estado de registro pendiente al cerrar
+    this.authStore.clearRegistrationPending();
   }
 
   switchTab(tab: 'login' | 'register'): void {
     this.modalService.setAuthModalTab(tab);
     this.authStore.clearError();
+    // 🆕 NUEVO: Limpiar estado de registro pendiente al cambiar pestañas
+    this.authStore.clearRegistrationPending();
   }
 
   private initializeForms(): void {
@@ -66,7 +69,6 @@ export class AuthModal implements OnInit, OnDestroy {
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
-    // Formulario de registro - CORREGIDO: Sintaxis Angular 20
     this.registerForm = this.formBuilder.nonNullable.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]], 
       email: ['', [Validators.required, Validators.email]],
@@ -82,12 +84,11 @@ export class AuthModal implements OnInit, OnDestroy {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
     
-    // Si las contraseñas no coinciden
     if (password?.value !== confirmPassword?.value) {
       return { passwordMismatch: true }; 
     }
     
-    return null; // ✅ Todo bien
+    return null;
   }
 
   onLogin(): void {
@@ -98,7 +99,6 @@ export class AuthModal implements OnInit, OnDestroy {
       };
 
       console.log('Iniciando login:', loginData);
-
 
       this.authStore.login(loginData).subscribe({
         next: (response) => {
@@ -122,7 +122,7 @@ export class AuthModal implements OnInit, OnDestroy {
         username: this.registerForm.value.username,
         email: this.registerForm.value.email,
         password: this.registerForm.value.password,
-        confirmPassword: this.registerForm.value.confirmPassword //faltaba este campo por lo que el backend no lo aceptaba
+        confirmPassword: this.registerForm.value.confirmPassword
       };
 
       console.log('Iniciando registro:', registerData);
@@ -130,7 +130,11 @@ export class AuthModal implements OnInit, OnDestroy {
       this.authStore.register(registerData).subscribe({
         next: (response) => {
           console.log('Registro exitoso:', response);
-          this.modalService.closeAuthModal();
+          // 🔧 CORREGIDO: NO cerrar modal, mostrar mensaje de verificación
+          // ❌ this.modalService.closeAuthModal();
+          
+          // 🆕 NUEVO: El estado de registrationPending se actualiza automáticamente
+          // El template mostrará el mensaje de verificación
         },
         error: (error) => {
           console.error('Error en registro:', error);
@@ -141,6 +145,7 @@ export class AuthModal implements OnInit, OnDestroy {
       this.markFormGroupTouched(this.registerForm);
     }
   }
+
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(field => {
       const control = formGroup.get(field);
@@ -172,7 +177,6 @@ export class AuthModal implements OnInit, OnDestroy {
     return null;
   }
 
-
   get isLoading() {
     return this.authStore.isLoading();
   }
@@ -183,5 +187,10 @@ export class AuthModal implements OnInit, OnDestroy {
 
   get isAuthenticated() {
     return this.authStore.isAuthenticated();
+  }
+
+  // 🆕 NUEVO: Getter para estado de registro pendiente
+  get registrationPending() {
+    return this.authStore.registrationPending();
   }
 }

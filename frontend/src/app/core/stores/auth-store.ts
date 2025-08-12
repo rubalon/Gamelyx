@@ -1,10 +1,10 @@
-// src/app/core/stores/auth-store.ts (REFACTORIZADO)
+// src/app/core/stores/auth-store.ts (ACTUALIZADO)
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { environment } from '../../../environments/environment'; // 🆕 Import centralizado
+import { environment } from '../../../environments/environment';
 
 // Interfaces para tipado
 export interface LoginRequest {
@@ -27,6 +27,15 @@ export interface AuthResponse {
   message: string;
 }
 
+// 🆕 NUEVA: Respuesta del registro sin JWT
+export interface RegisterResponse {
+  userId: string;
+  username: string;
+  email: string;
+  message: string;
+  emailVerificationRequired: boolean;
+}
+
 export interface User {
   id: string;
   username: string;
@@ -34,11 +43,17 @@ export interface User {
   emailVerified: boolean;
 }
 
+// 🆕 ACTUALIZADO: Estado con información de registro pendiente
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  // 🆕 NUEVO: Estado para mostrar mensaje de verificación
+  registrationPending: {
+    email: string;
+    message: string;
+  } | null;
 }
 
 @Injectable({
@@ -48,7 +63,6 @@ export class AuthStore {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  // 🆕 URL base del backend desde environment
   private readonly API_URL = `${environment.apiUrl}/auth`;
 
   // Estado de autenticación usando signals (Angular 20)
@@ -56,7 +70,8 @@ export class AuthStore {
     user: null,
     isAuthenticated: false,
     isLoading: false,
-    error: null
+    error: null,
+    registrationPending: null // 🆕 NUEVO
   });
 
   // Estado público readonly
@@ -67,9 +82,11 @@ export class AuthStore {
   public readonly isLoading = computed(() => this._authState().isLoading);
   public readonly user = computed(() => this._authState().user);
   public readonly error = computed(() => this._authState().error);
+  
+  // 🆕 NUEVO: Signal para estado de registro pendiente
+  public readonly registrationPending = computed(() => this._authState().registrationPending);
 
   constructor() {
-    // Verificar si hay tokens almacenados al inicializar
     this.checkStoredAuth();
   }
 
@@ -90,7 +107,6 @@ export class AuthStore {
           error: null
         });
       } catch (error) {
-        // Si hay error al parsear, limpiar storage
         this.clearAuthData();
       }
     }
@@ -111,12 +127,12 @@ export class AuthStore {
    */
   private storeAuthData(response: AuthResponse): void {
     localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken); // TODO : almacenar refresh token de forma segura
+    localStorage.setItem('refreshToken', response.refreshToken);
     localStorage.setItem('userData', JSON.stringify({
       id: response.userId,
       username: response.username,
       email: response.email,
-      emailVerified: true // Asumimos verificado por defecto, se puede actualizar después
+      emailVerified: true
     }));
   }
 
@@ -159,7 +175,7 @@ export class AuthStore {
           // Almacenar tokens y datos del usuario
           this.storeAuthData(response);
           
-          // Actualizar estado
+          // Actualizar estado como autenticado
           this.updateAuthState({
             user: {
               id: response.userId,
@@ -169,7 +185,8 @@ export class AuthStore {
             },
             isAuthenticated: true,
             isLoading: false,
-            error: null
+            error: null,
+            registrationPending: null // Limpiar estado de registro
           });
         }),
         catchError(error => this.handleError(error))
@@ -177,32 +194,39 @@ export class AuthStore {
   }
 
   /**
-   * Realiza el registro del usuario
+   * 🔧 CORREGIDO: Registro NO autentica, solo muestra mensaje de verificación
    */
-  register(userData: RegisterRequest): Observable<AuthResponse> {
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
     this.updateAuthState({ isLoading: true, error: null });
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/register`, userData)
+    return this.http.post<RegisterResponse>(`${this.API_URL}/register`, userData)
       .pipe(
         tap(response => {
-          // Almacenar tokens y datos del usuario
-          this.storeAuthData(response);
+          // 🔧 CORREGIDO: NO almacenar tokens (no los hay)
+          // ❌ this.storeAuthData(response);
           
-          // Actualizar estado
+          // 🔧 CORREGIDO: NO marcar como autenticado
           this.updateAuthState({
-            user: {
-              id: response.userId,
-              username: response.username,
-              email: response.email,
-              emailVerified: false // El email no está verificado al registrarse
-            },
-            isAuthenticated: true,
+            user: null, // 👈 NO hay usuario autenticado
+            isAuthenticated: false, // 👈 NO está autenticado
             isLoading: false,
-            error: null
+            error: null,
+            // 🆕 NUEVO: Guardar info de registro pendiente
+            registrationPending: {
+              email: response.email,
+              message: response.message
+            }
           });
         }),
         catchError(error => this.handleError(error))
       );
+  }
+
+  /**
+   * 🆕 NUEVO: Limpia el estado de registro pendiente
+   */
+  clearRegistrationPending(): void {
+    this.updateAuthState({ registrationPending: null });
   }
 
   /**
@@ -214,7 +238,8 @@ export class AuthStore {
       user: null,
       isAuthenticated: false,
       isLoading: false,
-      error: null
+      error: null,
+      registrationPending: null
     });
     this.router.navigate(['/']);
   }
@@ -231,6 +256,28 @@ export class AuthStore {
    */
   getRefreshToken(): string | null {
     return localStorage.getItem('refreshToken');
+  }
+
+  /**
+   * 🆕 NUEVO: Verifica el email del usuario
+   */
+  verifyEmail(token: string): Observable<any> {
+    this.updateAuthState({ isLoading: true, error: null });
+
+    return this.http.post(`${this.API_URL}/verify-email`, { token })
+      .pipe(
+        tap((response) => {
+          console.log('Email verificado exitosamente:', response);
+          this.updateAuthState({
+            isLoading: false,
+            error: null
+          });
+        }),
+        catchError(error => {
+          this.updateAuthState({ isLoading: false });
+          return this.handleError(error);
+        })
+      );
   }
 
   /**

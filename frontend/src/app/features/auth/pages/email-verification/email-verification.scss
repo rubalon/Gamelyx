@@ -1,0 +1,45 @@
+// src/app/features/auth/pages/email-verification/email-verification.scss
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+}
+
+// Animaciones suaves para las transiciones de estado
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+// Efectos hover mejorados
+button {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Mejoras visuales para los iconos
+.bg-blue-100, .bg-green-100, .bg-red-100, .bg-yellow-100 {
+  transition: all 0.3s ease;
+}
+
+// Animación del spinner
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

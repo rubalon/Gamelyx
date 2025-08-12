@@ -1,5 +1,10 @@
+// src/main/java/com/gamelyx/service/AuthService.java
 package com.gamelyx.service;
 
+import com.gamelyx.dto.AuthDtos.RegisterRequest;
+import com.gamelyx.dto.AuthDtos.RegisterResponse;
+import com.gamelyx.dto.AuthDtos.LoginRequest;
+import com.gamelyx.dto.AuthDtos.AuthResponse;
 import com.gamelyx.entity.User;
 import com.gamelyx.repository.UserRepository;
 import com.gamelyx.security.jwt.JwtUtil;
@@ -36,26 +41,27 @@ public class AuthService {
     private EmailService emailService;
 
     /**
-     * Registra un nuevo usuario en el sistema
+     * Registra un nuevo usuario SIN devolver JWT
+     * El usuario debe verificar su email antes de poder autenticarse
      */
-    public AuthResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
         // Validar que el usuario no existe
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsername(request.username())) {
             throw new RuntimeException("El username ya está en uso");
         }
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.email())) {
             throw new RuntimeException("El email ya está registrado");
         }
 
         // Crear nuevo usuario
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
 
         // Configurar verificación de email
-        user.setEmailVerified(false); // Requerirá verificación
+        user.setEmailVerified(false);
         user.setEmailVerificationToken(UUID.randomUUID().toString());
 
         // Timestamps automáticos
@@ -71,44 +77,43 @@ public class AuthService {
             System.out.println("Email de verificación enviado a: " + savedUser.getEmail());
         } catch (Exception e) {
             System.err.println("Error enviando email de verificación: " + e.getMessage());
-            // El registro continúa aunque falle el email
         }
 
-        // Generar tokens JWT
-        String accessToken = jwtUtil.generateToken(savedUser.getUsername());
-        String refreshToken = jwtUtil.generateRefreshToken(savedUser.getUsername());
-
-        return new AuthResponse(
-                accessToken,
-                refreshToken,
+        // Devolver RegisterResponse sin tokens JWT
+        return RegisterResponse.success(
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                "Usuario registrado exitosamente. Verifica tu email."
+                "Usuario registrado exitosamente. Te hemos enviado un email de verificación."
         );
     }
 
     /**
-     * Autentica un usuario existente
+     * Login solo si el email está verificado
      */
     public AuthResponse login(LoginRequest request) {
         try {
+            // Buscar usuario ANTES de autenticar para verificar email
+            User user = userRepository.findByEmailOrUsername(request.usernameOrEmail())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+            // Verificar que el email esté verificado
+            if (!user.getEmailVerified()) {
+                throw new RuntimeException("Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.");
+            }
+
             // Autenticar usando Spring Security
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsernameOrEmail(),
-                            request.getPassword()
+                            request.usernameOrEmail(),
+                            request.password()
                     )
             );
 
             // Si llegamos aquí, la autenticación fue exitosa
             String username = authentication.getName();
 
-            // Buscar usuario para obtener información adicional
-            User user = userRepository.findByEmailOrUsername(request.getUsernameOrEmail() )
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            // Generar tokens JWT
+            // Generar tokens JWT (email verificado)
             String accessToken = jwtUtil.generateToken(username);
             String refreshToken = jwtUtil.generateRefreshToken(username);
 
@@ -173,95 +178,5 @@ public class AuthService {
         userRepository.save(user);
 
         return "Email verificado exitosamente";
-    }
-
-    // Clases DTO para requests y responses
-    public static class RegisterRequest {
-        private String username;
-        private String email;
-        private String password;
-        private String confirmPassword;
-
-        // Constructores
-        public RegisterRequest() {}
-
-        public RegisterRequest(String username, String email, String password, String confirmPassword) {
-            this.username = username;
-            this.email = email;
-            this.password = password;
-            this.confirmPassword = confirmPassword;
-        }
-
-        // Getters y setters
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-
-        public String getConfirmPassword() { return confirmPassword; }
-        public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
-    }
-
-    public static class LoginRequest {
-        private String usernameOrEmail;
-        private String password;
-
-        // Constructores
-        public LoginRequest() {}
-
-        public LoginRequest(String usernameOrEmail, String password) {
-            this.usernameOrEmail = usernameOrEmail;
-            this.password = password;
-        }
-
-        // Getters y setters
-        public String getUsernameOrEmail() { return usernameOrEmail; }
-        public void setUsernameOrEmail(String usernameOrEmail) { this.usernameOrEmail = usernameOrEmail; }
-
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-    }
-
-    public static class AuthResponse {
-        private String accessToken;
-        private String refreshToken;
-        private UUID userId;
-        private String username;
-        private String email;
-        private String message;
-
-        // Constructor
-        public AuthResponse(String accessToken, String refreshToken, UUID userId,
-                            String username, String email, String message) {
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
-            this.userId = userId;
-            this.username = username;
-            this.email = email;
-            this.message = message;
-        }
-
-        // Getters y setters
-        public String getAccessToken() { return accessToken; }
-        public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
-
-        public String getRefreshToken() { return refreshToken; }
-        public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
-
-        public UUID getUserId() { return userId; }
-        public void setUserId(UUID userId) { this.userId = userId; }
-
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
     }
 }

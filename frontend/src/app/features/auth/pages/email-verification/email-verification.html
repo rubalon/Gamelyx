@@ -1,0 +1,104 @@
+<!-- src/app/features/auth/pages/email-verification/email-verification.html -->
+<div class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
+    
+    <!-- Loading State -->
+    @if (isLoading) {
+      <div class="space-y-4">
+        <div class="mx-auto flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full">
+          <svg class="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900">Verificando Email...</h2>
+        <p class="text-gray-600">Por favor espera mientras verificamos tu cuenta.</p>
+      </div>
+    }
+
+    <!-- Success State -->
+    @if (verificationStatus === 'success') {
+      <div class="space-y-4">
+        <div class="mx-auto flex items-center justify-center w-16 h-16 bg-green-100 rounded-full">
+          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-gray-900">¡Email Verificado!</h2>
+        <p class="text-gray-600">Tu cuenta ha sido activada exitosamente.</p>
+        
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-left">
+          <h4 class="font-medium text-green-900 mb-2">¡Perfecto!</h4>
+          <p class="text-sm text-green-700">
+            Ahora puedes iniciar sesión con tus credenciales para acceder a todas las funcionalidades de Gamelyx.
+          </p>
+        </div>
+        
+        <button
+          (click)="goToLogin()"
+          class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all">
+          Iniciar Sesión Ahora
+        </button>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (verificationStatus === 'error') {
+      <div class="space-y-4">
+        <div class="mx-auto flex items-center justify-center w-16 h-16 bg-red-100 rounded-full">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-gray-900">Error de Verificación</h2>
+        <p class="text-gray-600">{{ errorMessage || 'No se pudo verificar tu email.' }}</p>
+        
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-left">
+          <h4 class="font-medium text-red-900 mb-2">Posibles causas:</h4>
+          <ul class="text-sm text-red-700 space-y-1">
+            <li>• El enlace ha expirado</li>
+            <li>• El enlace ya fue utilizado</li>
+            <li>• El token no es válido</li>
+          </ul>
+        </div>
+        
+        <div class="space-y-2">
+          <button
+            (click)="goToLanding()"
+            class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all">
+            Volver al Inicio
+          </button>
+          
+          <button
+            (click)="contactSupport()"
+            class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+            Contactar Soporte
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- No Token Error -->
+    @if (verificationStatus === 'no-token') {
+      <div class="space-y-4">
+        <div class="mx-auto flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full">
+          <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-gray-900">Enlace Incorrecto</h2>
+        <p class="text-gray-600">Este enlace de verificación no es válido.</p>
+        
+        <button
+          (click)="goToLanding()"
+          class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all">
+          Volver al Inicio
+        </button>
+      </div>
+    }
+    
+  </div>
+</div>

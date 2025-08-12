@@ -3,6 +3,22 @@
   <!-- Header sticky -->
   <app-header></app-header>
   
+  <!-- 🆕 NUEVO: Banner de verificación exitosa (solo se muestra si es necesario) -->
+  @if (showVerificationBanner) {
+    <div class="bg-green-100 border-b border-green-200 py-3">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-center">
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <p class="text-green-800 font-medium">
+            ¡Email verificado exitosamente! Ahora puedes iniciar sesión.
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+  
   <!-- Sección Hero -->
   <app-hero-section></app-hero-section>
   

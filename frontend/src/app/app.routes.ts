@@ -45,6 +45,12 @@ export const routes: Routes = [
   },
   
   {
+    path: 'auth/verify-email',
+    loadComponent: () => import('./features/auth/pages/email-verification/email-verification')
+      .then(m => m.EmailVerification)
+  },
+  
+  {
     path: '**',
     redirectTo: '/landing'
   }

@@ -1,9 +1,11 @@
 package com.gamelyx.controller;
 
+import com.gamelyx.dto.AuthDtos.RegisterRequest;
+import com.gamelyx.dto.AuthDtos.RegisterResponse;
+import com.gamelyx.dto.AuthDtos.LoginRequest;
+import com.gamelyx.dto.AuthDtos.AuthResponse;
+import com.gamelyx.dto.AuthDtos.VerifyEmailRequest;
 import com.gamelyx.service.AuthService;
-import com.gamelyx.service.AuthService.AuthResponse;
-import com.gamelyx.service.AuthService.LoginRequest;
-import com.gamelyx.service.AuthService.RegisterRequest;
 import com.gamelyx.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +31,25 @@ public class AuthController {
     /**
      * Endpoint para registrar nuevos usuarios
      * POST /api/auth/register
+     * CORREGIDO: Ahora devuelve RegisterResponse sin JWT
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
             // Validación básica de confirmación de contraseña
-            if (!request.getPassword().equals(request.getConfirmPassword())) {
+            if (!request.password().equals(request.confirmPassword())) {
                 return ResponseEntity.badRequest()
                         .body(createErrorResponse("Las contraseñas no coinciden"));
             }
 
-            // Validación de longitud de contraseña (mínimo 6 caracteres como especifica el reporte)
-            if (request.getPassword().length() < 6) {
+            // Validación de longitud de contraseña (mínimo 6 caracteres)
+            if (request.password().length() < 6) {
                 return ResponseEntity.badRequest()
                         .body(createErrorResponse("La contraseña debe tener al menos 6 caracteres"));
             }
 
-            // Registrar usuario
-            AuthResponse response = authService.register(request);
+            // Registrar usuario - CORREGIDO: Devuelve RegisterResponse
+            RegisterResponse response = authService.register(request);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
@@ -62,6 +65,7 @@ public class AuthController {
     /**
      * Endpoint para login de usuarios
      * POST /api/auth/login
+     * MEJORADO: Verifica email antes de generar JWT
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -108,16 +112,12 @@ public class AuthController {
     /**
      * Endpoint para verificar email
      * POST /api/auth/verify-email
+     * MEJORADO: Usa VerifyEmailRequest del AuthDtos
      */
     @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestBody EmailVerificationRequest request) {
+    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
         try {
-            if (request.getToken() == null || request.getToken().trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(createErrorResponse("Token de verificación requerido"));
-            }
-
-            String message = authService.verifyEmail(request.getToken());
+            String message = authService.verifyEmail(request.token());
             return ResponseEntity.ok(createSuccessResponse(message));
 
         } catch (RuntimeException e) {
@@ -140,8 +140,6 @@ public class AuthController {
         // En futuras fases se puede implementar blacklist de tokens
         return ResponseEntity.ok(createSuccessResponse("Logout exitoso"));
     }
-
-
 
     /**
      * Endpoint de salud para verificar que el servicio de auth funciona
@@ -191,7 +189,6 @@ public class AuthController {
     }
 
     // Métodos de utilidad para crear respuestas consistentes
-
     private Map<String, String> createErrorResponse(String message) {
         Map<String, String> response = new HashMap<>();
         response.put("error", message);
@@ -209,7 +206,6 @@ public class AuthController {
     }
 
     // DTOs para requests específicos del controller
-
     public static class RefreshTokenRequest {
         private String refreshToken;
 
@@ -225,24 +221,6 @@ public class AuthController {
 
         public void setRefreshToken(String refreshToken) {
             this.refreshToken = refreshToken;
-        }
-    }
-
-    public static class EmailVerificationRequest {
-        private String token;
-
-        public EmailVerificationRequest() {}
-
-        public EmailVerificationRequest(String token) {
-            this.token = token;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
         }
     }
 }
