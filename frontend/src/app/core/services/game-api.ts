@@ -139,7 +139,7 @@ export class GameApiService {
    */
   updateMyReview(identifier: string | number, review: UpdateReviewRequest): Observable<UpdateReviewResponse> {
     return this.http.put<UpdateReviewResponse>(
-      `${this.API_URL}/game/${identifier}/my-review`, 
+      `${this.API_URL}/game/${identifier}/my-game-details`, 
       review
     );
   }
