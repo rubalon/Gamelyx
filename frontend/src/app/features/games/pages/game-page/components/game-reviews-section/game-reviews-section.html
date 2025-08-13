@@ -177,4 +177,13 @@
       </div>
     }
   </div>
+
+  <!-- 🆕 Review Modal - ESTA ES LA ÚNICA ADICIÓN A TU CÓDIGO -->
+  <app-review-modal
+    [isOpen]="showReviewModal()"
+    [gameIdentifier]="gameIdentifier()"
+    [existingReview]="editingReview()"
+    (modalClosed)="onCloseModal()"
+    (reviewSubmitted)="onReviewSubmitted()"
+  ></app-review-modal>
 </section>

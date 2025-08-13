@@ -3,11 +3,12 @@ import { Component, inject, signal, computed, input, output } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { GameDetails, GameReview, GameUserStatus } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
+import { ReviewModal } from '../review-modal/review-modal'; // 🆕 Import añadido
 
 @Component({
   selector: 'app-game-reviews-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReviewModal], // 🆕 ReviewModal añadido a imports
   templateUrl: './game-reviews-section.html',
   styleUrl: './game-reviews-section.scss'
 })
@@ -22,6 +23,7 @@ export class GameReviewsSection {
   // 🎯 Estado interno del componente con Signals
   showReviewModal = signal(false);
   editingReview = signal<GameUserStatus | null>(null);
+  gameIdentifier = signal(''); // 🆕 Signal añadido para el modal
 
   // 📊 SOLO computed signals que realmente añaden valor
   currentUser = computed(() => 
@@ -36,16 +38,12 @@ export class GameReviewsSection {
     this.gameDetails().recentReviews.slice(0, 3)
   );
 
-  
-
-  
-
-
   /**
    * ✏️ Abrir modal para editar mi review
    */
   onEditMyReview(): void {
     this.editingReview.set(this.gameDetails().myStatus);
+    this.gameIdentifier.set(this.gameDetails().slug); // 🆕 Línea añadida
     this.showReviewModal.set(true);
   }
 
@@ -54,6 +52,7 @@ export class GameReviewsSection {
    */
   onAddReview(): void {
     this.editingReview.set(null);
+    this.gameIdentifier.set(this.gameDetails().slug); // 🆕 Línea añadida
     this.showReviewModal.set(true);
   }
 
@@ -63,6 +62,7 @@ export class GameReviewsSection {
   onCloseModal(): void {
     this.showReviewModal.set(false);
     this.editingReview.set(null);
+    this.gameIdentifier.set(''); // 🆕 Línea añadida
   }
 
   /**
@@ -74,7 +74,7 @@ export class GameReviewsSection {
     this.reviewUpdated.emit();
   }
 
-  // 🛠️ MÉTODOS UTILITARIOS
+  // 🛠️ MÉTODOS UTILITARIOS (mantenidos exactamente igual que tu código)
 
   /**
    * ⭐ Generar array de estrellas para mostrar rating
@@ -97,7 +97,6 @@ export class GameReviewsSection {
    * 📅 Formatear fecha de review de manera inteligente
    */
   formatReviewDate(dateString: string | undefined): string {
-
     if (!dateString) return 'Fecha no disponible';
 
     try {

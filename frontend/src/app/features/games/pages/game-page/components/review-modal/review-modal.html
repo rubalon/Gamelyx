@@ -1,0 +1,177 @@
+<!-- src/app/features/games/pages/game-page/components/review-modal/review-modal.html -->
+@if (isOpen()) {
+  <!-- Modal Backdrop -->
+  <div 
+    class="fixed inset-0 z-50 overflow-y-auto"
+    (click)="onBackdropClick($event)"
+    (keydown)="onKeyDown($event)"
+    tabindex="-1"
+  >
+    <!-- Backdrop Overlay -->
+    <div class="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+    
+    <!-- Modal Container -->
+    <div class="relative min-h-full flex items-center justify-center p-4">
+      <!-- Modal Content -->
+      <div 
+        class="relative bg-gray-800 rounded-xl shadow-2xl border border-gray-700 w-full max-w-2xl transform transition-all"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-labelledby]="'modal-title'"
+      >
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+          <div>
+            <h2 id="modal-title" class="text-2xl font-bold text-white">
+              {{ modalTitle() }}
+            </h2>
+            @if (currentUser()) {
+              <p class="text-gray-400 text-sm mt-1">
+                Escribiendo como {{ currentUser()!.username }}
+              </p>
+            }
+          </div>
+          
+          <!-- Close Button -->
+          <button 
+            (click)="onClose()"
+            [disabled]="isSubmitting()"
+            class="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar modal"
+          >
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+          
+          <!-- Rating Section -->
+          <div>
+            <label class="block text-white font-medium mb-3">
+              Puntuación
+              @if (selectedRating() > 0) {
+                <span class="ml-2 text-sm font-normal" [class]="getRatingColor(selectedRating())">
+                  {{ selectedRating() }}/10 - {{ getRatingLabel(selectedRating()) }}
+                </span>
+              }
+            </label>
+            
+            <!-- Star Rating -->
+            <div 
+              class="flex items-center space-x-1 mb-2"
+              (mouseleave)="onStarsLeave()"
+            >
+              @for (star of [1,2,3,4,5,6,7,8,9,10]; track star) {
+                <button
+                  type="button"
+                  (click)="onStarClick(star)"
+                  (mouseenter)="onStarHover(star)"
+                  [class]="getStarClasses(star)"
+                  [attr.aria-label]="'Dar ' + star + ' estrella' + (star !== 1 ? 's' : '')"
+                >
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                  </svg>
+                </button>
+              }
+            </div>
+            
+            <p class="text-gray-500 text-sm">
+              Haz click en las estrellas para puntuar (opcional)
+            </p>
+          </div>
+          
+          <!-- Review Text Section -->
+          <div>
+            <label for="review-text" class="block text-white font-medium mb-3">
+              Tu experiencia con el juego
+              <span class="text-gray-400 font-normal text-sm ml-2">(opcional)</span>
+            </label>
+            
+            <div class="relative">
+              <textarea
+                id="review-text"
+                formControlName="reviewText"
+                rows="6"
+                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                placeholder="Comparte qué te gustó, qué no te gustó, y si lo recomendarías a otros jugadores..."
+                [disabled]="isSubmitting()"
+              ></textarea>
+              
+              <!-- Character Counter -->
+              <div class="absolute bottom-3 right-3">
+                <span class="text-xs" [class]="getCharacterCountClasses()">
+                  {{ getCharacterCount() }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Textarea Error -->
+            @if (reviewForm.get('reviewText')?.errors?.['maxlength']) {
+              <p class="text-red-400 text-sm mt-2">
+                La review no puede superar los 1000 caracteres
+              </p>
+            }
+          </div>
+          
+          
+          
+          <!-- Error Message -->
+          @if (submitError()) {
+            <div class="bg-red-900/50 border border-red-500 rounded-lg p-4">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-red-300 text-sm">{{ submitError() }}</p>
+              </div>
+            </div>
+          }
+          
+          <!-- Modal Footer -->
+          <div class="flex items-center justify-between pt-4 border-t border-gray-700">
+            
+            <!-- Cancel Button -->
+            <button
+              type="button"
+              (click)="onClose()"
+              [disabled]="isSubmitting()"
+              class="px-6 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
+            
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              [disabled]="!canSubmit"
+              class="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-purple-600 disabled:hover:to-blue-600 flex items-center"
+            >
+              @if (isSubmitting()) {
+                <!-- Loading Spinner -->
+                <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" 
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                {{ isEditMode() ? 'Actualizando...' : 'Publicando...' }}
+              } @else {
+                {{ isEditMode() ? 'Actualizar review' : 'Publicar review' }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Focus trap when modal is open -->
+@if (isOpen()) {
+  <div tabindex="0" style="position: fixed; top: 0; left: 0; width: 0; height: 0; outline: none;"></div>
+}
