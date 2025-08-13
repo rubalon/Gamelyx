@@ -2,7 +2,7 @@
 import { Component, inject, signal, computed, input, output, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { GameApiService, GameUserStatus, UpdateReviewRequest } from '@core/services/game-api';
+import { GameApiService, GameUserStatus, UpdateReviewRequest, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
 import { finalize, catchError, of } from 'rxjs';
 
@@ -19,7 +19,7 @@ export class ReviewModal implements OnInit {
   gameIdentifier = input.required<string>();
   existingReview = input<GameUserStatus | null>(null);
   modalClosed = output<void>();
-  reviewSubmitted = output<void>();
+  reviewSubmitted = output<UpdateReviewResponse>(); // 🆕 CAMBIO: Ahora envía datos
 
   // 🏪 Dependencies
   private fb = inject(FormBuilder);
@@ -183,8 +183,8 @@ export class ReviewModal implements OnInit {
       )
       .subscribe(response => {
         if (response) {
-          // Éxito - cerrar modal y notificar
-          this.reviewSubmitted.emit();
+          // 🆕 CAMBIO: Emitir los datos del backend en lugar de void
+          this.reviewSubmitted.emit(response);
         }
       });
   }

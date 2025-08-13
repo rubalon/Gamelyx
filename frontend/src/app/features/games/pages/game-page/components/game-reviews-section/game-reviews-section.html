@@ -184,6 +184,6 @@
     [gameIdentifier]="gameIdentifier()"
     [existingReview]="editingReview()"
     (modalClosed)="onCloseModal()"
-    (reviewSubmitted)="onReviewSubmitted()"
+    (reviewSubmitted)="onReviewSubmitted($event)" 
   ></app-review-modal>
 </section>

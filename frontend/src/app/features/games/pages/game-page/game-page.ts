@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
 
 import { Header } from '../../../../shared/components/header/header';
-import { GameApiService, GameDetails as GameDetailsInterface } from '@core/services/game-api';
+import { GameApiService, GameDetails as GameDetailsInterface, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '../../../../core/stores/auth-store';
 import { GameReviewsSection } from './components/game-reviews-section/game-reviews-section';
 
@@ -214,8 +214,6 @@ export class GamePage implements OnInit, OnDestroy {
    * En: https://media.rawg.io/media/resize/640/-/games/image.jpg
    */
   getOptimizedImageUrl(originalUrl: string): string {
-
-    
     // Solo optimizar imágenes de RAWG API
     if (originalUrl.includes('media.rawg.io')) {
       // Insertar parámetro resize en la URL
@@ -227,19 +225,31 @@ export class GamePage implements OnInit, OnDestroy {
   }
 
   /**
-   * 🔄 Manejar actualización de review (recargar datos del juego)
+   * 🔄 Manejar actualización de review - ACTUALIZACIÓN DIRECTA CON DATOS DEL BACKEND
    */
-  onReviewUpdated(): void {
-    console.log('Review actualizada, recargando datos del juego');
-    // Recargar gameDetails para reflejar la nueva review
-    const identifier = this.currentIdentifier();
-    if (identifier) {
-      this.getGameDetailsObservable(identifier).subscribe(gameDetails => {
-        if (gameDetails) {
-          this.gameDetails.set(gameDetails);
-        }
-      });
-    }
+  onReviewUpdated(reviewData: UpdateReviewResponse): void {
+    console.log('Review actualizada con datos del backend:', reviewData);
+    
+    const currentGame = this.gameDetails();
+    if (!currentGame) return;
+
+    // 🚀 ACTUALIZAR DIRECTAMENTE SIN LLAMADA AL BACKEND
+    const updatedGame: GameDetailsInterface = {
+      ...currentGame,
+      myStatus: {
+        status: reviewData.status as "WISHLIST" | "PLAYING" | "COMPLETED" | "ARCHIVED",
+        rating: reviewData.rating,
+        reviewText: reviewData.reviewText,
+        reviewUpdatedAt: reviewData.updatedAt
+      },
+      communityRating: reviewData.communityRating,
+      totalCommunityReviews: reviewData.totalReviews
+    };
+
+    // 💫 Actualización instantánea del estado
+    this.gameDetails.set(updatedGame);
+    
+    console.log('✅ Estado actualizado instantáneamente - NO más doble llamada al backend!');
   }
 
   // 🎯 Getters para template

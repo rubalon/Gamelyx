@@ -338,7 +338,7 @@
             <div class="mt-12 min-w-7xl mx-auto">
                 <app-game-reviews-section 
                     [gameDetails]="gameDetails()!"
-                    (reviewUpdated)="onReviewUpdated()"
+                    (reviewUpdated)="onReviewUpdated($event)"
                 ></app-game-reviews-section>
             </div>
 

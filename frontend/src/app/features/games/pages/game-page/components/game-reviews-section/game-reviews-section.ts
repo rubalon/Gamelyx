@@ -1,21 +1,21 @@
 // src/app/features/games/pages/game-page/components/game-reviews-section/game-reviews-section.ts
 import { Component, inject, signal, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GameDetails, GameReview, GameUserStatus } from '@core/services/game-api';
+import { GameDetails, GameReview, GameUserStatus, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
-import { ReviewModal } from '../review-modal/review-modal'; // 🆕 Import añadido
+import { ReviewModal } from '../review-modal/review-modal';
 
 @Component({
   selector: 'app-game-reviews-section',
   standalone: true,
-  imports: [CommonModule, ReviewModal], // 🆕 ReviewModal añadido a imports
+  imports: [CommonModule, ReviewModal],
   templateUrl: './game-reviews-section.html',
   styleUrl: './game-reviews-section.scss'
 })
 export class GameReviewsSection {
   // 📡 Signal-based inputs/outputs
   gameDetails = input.required<GameDetails>();
-  reviewUpdated = output<void>();
+  reviewUpdated = output<UpdateReviewResponse>(); // 🆕 CAMBIO: Ahora pasa datos del backend
 
   // 🏪 Dependencies
   private authStore = inject(AuthStore);
@@ -23,7 +23,7 @@ export class GameReviewsSection {
   // 🎯 Estado interno del componente con Signals
   showReviewModal = signal(false);
   editingReview = signal<GameUserStatus | null>(null);
-  gameIdentifier = signal(''); // 🆕 Signal añadido para el modal
+  gameIdentifier = signal('');
 
   // 📊 SOLO computed signals que realmente añaden valor
   currentUser = computed(() => 
@@ -43,7 +43,7 @@ export class GameReviewsSection {
    */
   onEditMyReview(): void {
     this.editingReview.set(this.gameDetails().myStatus);
-    this.gameIdentifier.set(this.gameDetails().slug); // 🆕 Línea añadida
+    this.gameIdentifier.set(this.gameDetails().slug);
     this.showReviewModal.set(true);
   }
 
@@ -52,7 +52,7 @@ export class GameReviewsSection {
    */
   onAddReview(): void {
     this.editingReview.set(null);
-    this.gameIdentifier.set(this.gameDetails().slug); // 🆕 Línea añadida
+    this.gameIdentifier.set(this.gameDetails().slug);
     this.showReviewModal.set(true);
   }
 
@@ -62,16 +62,16 @@ export class GameReviewsSection {
   onCloseModal(): void {
     this.showReviewModal.set(false);
     this.editingReview.set(null);
-    this.gameIdentifier.set(''); // 🆕 Línea añadida
+    this.gameIdentifier.set('');
   }
 
   /**
-   * 💾 Manejar envío de review exitoso
+   * 💾 Manejar envío de review exitoso - RECIBE DATOS DEL BACKEND
    */
-  onReviewSubmitted(): void {
+  onReviewSubmitted(backendResponse: UpdateReviewResponse): void {
+    // 🆕 CAMBIO: Cerrar modal y pasar datos al padre
     this.onCloseModal();
-    // Notificar al padre que se actualizaron las reviews
-    this.reviewUpdated.emit();
+    this.reviewUpdated.emit(backendResponse); // 👈 Pasar datos del backend
   }
 
   // 🛠️ MÉTODOS UTILITARIOS (mantenidos exactamente igual que tu código)
