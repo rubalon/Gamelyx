@@ -31,7 +31,8 @@
             ],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "outputPath": "dist/gamelyx"
           },
           "configurations": {
             "production": {
@@ -47,12 +48,19 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "cache": false
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "cache": false
             }
           },
           "defaultConfiguration": "development"
@@ -105,6 +113,9 @@
     }
   },
   "cli": {
-    "analytics": "d3223dda-28af-435b-b3e2-e5b1adb11075"
+    "analytics": "d3223dda-28af-435b-b3e2-e5b1adb11075",
+    "cache": {
+      "enabled": false
+    }
   }
 }
