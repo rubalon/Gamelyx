@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.gamelyx.com/api', // URL de producción
+  apiUrl: 'https://api.gamelyx.es/api', // URL de producción
   version: '1.0.0',
   features: {
     enableGoogleAuth: false,
