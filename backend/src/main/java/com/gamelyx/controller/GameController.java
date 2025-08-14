@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @RequestMapping("/api/games")
-@CrossOrigin(origins = "http://localhost:4200")
 public class GameController {
 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
