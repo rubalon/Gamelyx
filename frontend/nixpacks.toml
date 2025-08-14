@@ -7,9 +7,10 @@
 nixpkgsArchive = "51ad838b03a05b1de6f9f2a0fffecee64a9788ee"
 
 [phases.build]
-# Comandos de build específicos para Angular
+# Comandos de build específicos para Angular con cache limpio
 cmds = [
-  "npm ci --omit=dev",
+  "rm -rf node_modules/.cache || true",
+  "npm ci --omit=dev --no-cache",
   "npm run build"
 ]
 
