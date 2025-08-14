@@ -45,11 +45,6 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
 
         <!-- Spring Boot Test Starter - Incluye JUnit 5, Mockito, AssertJ, etc. -->
         <dependency>

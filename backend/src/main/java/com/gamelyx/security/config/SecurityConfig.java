@@ -3,6 +3,7 @@ package com.gamelyx.security.config;
 import com.gamelyx.security.jwt.JwtAuthenticationFilter;
 import com.gamelyx.security.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -32,6 +34,10 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+
+    // AÑADIDO: Variable de configuración dinámica
+    @Value("${app.frontend.url:http://localhost:4200}")
+    private String frontendUrl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -107,8 +113,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permitir origen de Angular (ajustar según tu configuración)
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200", "http://localhost:*"));
+        // SIMPLIFICADO: Solo usar frontend URL principal + localhost para desarrollo
+        List<String> origins = Arrays.asList(
+                "http://localhost:4200",  // Desarrollo local
+                "http://localhost:*",     // Otros puertos locales
+                frontendUrl               // URL configurada dinámicamente
+        );
+
+        configuration.setAllowedOriginPatterns(origins);
 
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
