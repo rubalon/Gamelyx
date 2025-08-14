@@ -2,18 +2,16 @@
   "name": "gamelyx",
   "version": "0.0.0",
   "engines": {
-    "node": ">=22.13.0",
+    "node": ">=22.12.0",
     "npm": ">=10.0.0"
   },
   "scripts": {
     "ng": "ng",
     "start": "npx serve dist/gamelyx -s -l ${PORT:-3000}",
     "build": "ng build --configuration production",
-    "build:railway": "ng build --configuration production",
-    "serve:prod": "npx serve dist/gamelyx -s -l ${PORT:-3000}",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "postinstall": "echo 'Dependencies installed successfully'"
+    "test": "ng test"
+
   },
   "prettier": {
     "overrides": [

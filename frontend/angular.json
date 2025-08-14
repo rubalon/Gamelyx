@@ -51,16 +51,12 @@
               "outputHashing": "all",
               "optimization": true,
               "sourceMap": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "cache": false
+              "extractLicenses": true
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true,
-              "cache": false
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "development"
@@ -113,9 +109,6 @@
     }
   },
   "cli": {
-    "analytics": "d3223dda-28af-435b-b3e2-e5b1adb11075",
-    "cache": {
-      "enabled": false
-    }
+    "analytics": "d3223dda-28af-435b-b3e2-e5b1adb11075"
   }
 }
