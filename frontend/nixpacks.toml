@@ -1,0 +1,18 @@
+# frontend/nixpacks.toml
+# Configuración específica para Railway/Nixpacks
+# Esto fuerza una versión compatible de Node.js para Angular 20
+
+[phases.setup]
+# Usar un commit específico de nixpkgs que incluye Node.js 22.13+
+nixpkgsArchive = "51ad838b03a05b1de6f9f2a0fffecee64a9788ee"
+
+[phases.build]
+# Comandos de build específicos para Angular
+cmds = [
+  "npm ci --omit=dev",
+  "npm run build"
+]
+
+[start]
+# Comando para servir la aplicación
+cmd = "npx serve dist/gamelyx -s -l 3000"
