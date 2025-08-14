@@ -1,0 +1,20 @@
+# frontend/.dockerignore
+node_modules
+npm-debug.log
+.angular
+.cache
+dist
+.git
+.gitignore
+README.md
+.env
+.env.local
+.DS_Store
+*.log
+coverage
+.nyc_output
+.idea
+.vscode
+*.swp
+*.swo
+*~
