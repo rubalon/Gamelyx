@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 @Configuration
 @EnableWebSecurity
@@ -113,12 +114,18 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // SIMPLIFICADO: Solo usar frontend URL principal + localhost para desarrollo
-        List<String> origins = Arrays.asList(
-                "http://localhost:4200",  // Desarrollo local
-                "http://localhost:*",     // Otros puertos locales
-                frontendUrl               // URL configurada dinámicamente
-        );
+        // 🧠 LÓGICA INTELIGENTE: Configuración dinámica según frontendUrl
+        List<String> origins = new ArrayList<>();
+
+        // Siempre añadir la URL configurada
+        origins.add(frontendUrl);
+
+        // Si frontendUrl contiene localhost, añadir patrones de red local para móviles
+        if (frontendUrl.contains("localhost") || frontendUrl.contains("127.0.0.1")) {
+            origins.add("http://192.168.*:*");    // Red local más común
+            origins.add("http://10.*:*");         // Otra red privada común
+            origins.add("http://172.16.*:*");     // Red Docker/privada
+        }
 
         configuration.setAllowedOriginPatterns(origins);
 

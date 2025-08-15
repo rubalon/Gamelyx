@@ -167,11 +167,31 @@ export class AuthStore {
    * Realiza el login del usuario
    */
   login(credentials: LoginRequest): Observable<AuthResponse> {
+    // 🧹 LIMPIAR DATOS ANTES DE ENVIAR
+    const cleanCredentials: LoginRequest = {
+      usernameOrEmail: credentials.usernameOrEmail.trim(), // 👈 Solo trim, sin toLowerCase para usernames
+      password: credentials.password // Password no se modifica
+    };
+
+    // 🔍 DEBUG DETALLADO
+    /*
+    console.log('🔍 LOGIN DEBUG - Original:', credentials);
+    console.log('🔍 LOGIN DEBUG - Cleaned:', cleanCredentials);
+    console.log('🔍 LOGIN DEBUG - Comparison:', {
+      originalLength: credentials.usernameOrEmail.length,
+      cleanedLength: cleanCredentials.usernameOrEmail.length,
+      hasSpaces: credentials.usernameOrEmail !== credentials.usernameOrEmail.trim(),
+      originalBytes: Array.from(credentials.usernameOrEmail).map(c => c.charCodeAt(0)),
+      cleanedBytes: Array.from(cleanCredentials.usernameOrEmail).map(c => c.charCodeAt(0))
+    });
+    */
+
     this.updateAuthState({ isLoading: true, error: null });
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials)
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, cleanCredentials)
       .pipe(
         tap(response => {
+//          console.log('✅ Login successful:', response);
           // Almacenar tokens y datos del usuario
           this.storeAuthData(response);
           
@@ -189,7 +209,10 @@ export class AuthStore {
             registrationPending: null // Limpiar estado de registro
           });
         }),
-        catchError(error => this.handleError(error))
+        catchError(error => {
+ //         console.error('❌ Login error:', error);
+          return this.handleError(error);
+        })
       );
   }
 

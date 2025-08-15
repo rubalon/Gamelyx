@@ -93,25 +93,61 @@ public class AuthService {
      */
     public AuthResponse login(LoginRequest request) {
         try {
+            // 🔍 DEBUG MEJORADO: Inspección detallada del input
+              String usernameOrEmail = request.usernameOrEmail();
+              String password = request.password();
+//
+//            System.out.println("=== LOGIN DEBUG DETALLADO ===");
+//            System.out.println("Original input: '" + usernameOrEmail + "'");
+//            System.out.println("Length: " + usernameOrEmail.length());
+//            System.out.println("Bytes: " + java.util.Arrays.toString(usernameOrEmail.getBytes()));
+//            System.out.println("Chars: " + usernameOrEmail.chars()
+//                    .mapToObj(c -> String.format("%c(%d)", c, c))
+//                    .collect(java.util.stream.Collectors.joining(", ")));
+//
+//            // 🧹 APLICAR TRIM (pero mantener case original para usernames)
+              String cleanInput = usernameOrEmail.trim();
+//            System.out.println("Cleaned input: '" + cleanInput + "'");
+//            System.out.println("Cleaned length: " + cleanInput.length());
+//            System.out.println("Original == Cleaned: " + usernameOrEmail.equals(cleanInput));
+
             // Buscar usuario ANTES de autenticar para verificar email
-            User user = userRepository.findByEmailOrUsername(request.usernameOrEmail())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            User user = userRepository.findByEmailOrUsername(cleanInput)
+                    .orElseThrow(() -> {
+//                        System.out.println("❌ Usuario no encontrado para input: '" + cleanInput + "'");
+//
+//                        // 🔍 DEBUG ADICIONAL: Listar todos los usuarios para comparar
+//                        System.out.println("=== USUARIOS EN BD ===");
+//                        userRepository.findAll().forEach(u -> {
+//                            System.out.println("- Username: '" + u.getUsername() + "' | Email: '" + u.getEmail() + "'");
+//                            System.out.println("  Username bytes: " + java.util.Arrays.toString(u.getUsername().getBytes()));
+//                            System.out.println("  Email bytes: " + java.util.Arrays.toString(u.getEmail().getBytes()));
+//                        });
+
+                        return new RuntimeException("Usuario no encontrado");
+                    });
+
+            System.out.println("✅ Usuario encontrado: " + user.getUsername() + " (" + user.getEmail() + ")");
 
             // Verificar que el email esté verificado
             if (!user.getEmailVerified()) {
+                System.out.println("❌ Email no verificado para usuario: " + user.getUsername());
                 throw new RuntimeException("Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.");
             }
 
-            // Autenticar usando Spring Security
+            System.out.println("✅ Email verificado, procediendo con autenticación...");
+
+            // Autenticar usando Spring Security (usar input limpio)
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.usernameOrEmail(),
-                            request.password()
+                            cleanInput, // 👈 Usar input limpio
+                            password
                     )
             );
 
             // Si llegamos aquí, la autenticación fue exitosa
             String username = authentication.getName();
+            System.out.println("✅ Autenticación exitosa para: " + username);
 
             // Generar tokens JWT (email verificado)
             String accessToken = jwtUtil.generateToken(username);
@@ -131,7 +167,12 @@ public class AuthService {
             );
 
         } catch (AuthenticationException e) {
+            System.out.println("❌ AuthenticationException: " + e.getMessage());
             throw new BadCredentialsException("Credenciales inválidas");
+        } catch (Exception e) {
+            System.out.println("❌ Exception en login: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 
