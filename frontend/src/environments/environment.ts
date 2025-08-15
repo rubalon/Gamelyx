@@ -1,7 +1,16 @@
-// src/environments/environment.ts (Development - Restaurado)
+// src/environments/environment.ts
+const getApiUrl = () => {
+  // Si estamos en localhost, usar localhost
+  // Si estamos en otra IP, usar esa IP
+  const hostname = window.location.hostname;
+  return hostname === 'localhost' || hostname === '127.0.0.1' 
+    ? 'http://localhost:8080/api'
+    : `http://${hostname}:8080/api`;
+};
+
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api', // 👈 Vuelve a localhost para desarrollo
+  apiUrl: getApiUrl(), // 👈 Se adapta automáticamente
   version: '1.0.0',
   features: {
     enableGoogleAuth: false,
