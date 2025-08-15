@@ -137,11 +137,16 @@ export class GameReviewsSection {
     }
   }
 
-  /**
+/**
    * 🎨 Obtener clases CSS para el estado del juego
    */
-  getStatusClasses(status: string): string {
+  getStatusClasses(status: string | null | undefined): string {
     const baseClasses = 'text-xs px-2 py-1 rounded-full border font-medium';
+    
+    // ✅ SOLUCIÓN: Guard clause para null/undefined
+    if (!status) {
+      return `${baseClasses} text-gray-400 border-gray-400 bg-gray-400/10`;
+    }
     
     switch (status.toLowerCase()) {
       case 'completed':
@@ -158,22 +163,14 @@ export class GameReviewsSection {
   }
 
   /**
-   * 🎨 Obtener color del estado del juego
-   */
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'COMPLETED': return 'text-green-400';
-      case 'PLAYING': return 'text-blue-400';
-      case 'WISHLIST': return 'text-purple-400';
-      case 'ARCHIVED': return 'text-gray-400';
-      default: return 'text-gray-400';
-    }
-  }
-
-  /**
    * 📖 Obtener texto legible del estado del juego
    */
-  getStatusText(status: string): string {
+  getStatusText(status: string | null | undefined): string {
+    // ✅ SOLUCIÓN: Manejar null/undefined antes de toUpperCase()
+    if (!status) {
+      return 'Sin estado';
+    }
+
     const statusMap: Record<string, string> = {
       'COMPLETED': 'Completado',
       'PLAYING': 'Jugando',
@@ -182,6 +179,24 @@ export class GameReviewsSection {
     };
     
     return statusMap[status.toUpperCase()] || status;
+  }
+
+  /**
+   * 🎨 Obtener color del estado del juego
+   */
+  getStatusColor(status: string | null | undefined): string {
+    // ✅ SOLUCIÓN: También corregir este método por consistencia
+    if (!status) {
+      return 'text-gray-400';
+    }
+
+    switch (status.toUpperCase()) {
+      case 'COMPLETED': return 'text-green-400';
+      case 'PLAYING': return 'text-blue-400';
+      case 'WISHLIST': return 'text-purple-400';
+      case 'ARCHIVED': return 'text-gray-400';
+      default: return 'text-gray-400';
+    }
   }
 
   /**

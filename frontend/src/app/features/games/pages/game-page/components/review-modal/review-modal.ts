@@ -1,5 +1,5 @@
 // src/app/features/games/pages/game-page/components/review-modal/review-modal.ts
-import { Component, inject, signal, computed, input, output, effect, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GameApiService, GameUserStatus, UpdateReviewRequest, UpdateReviewResponse } from '@core/services/game-api';
@@ -13,13 +13,13 @@ import { finalize, catchError, of } from 'rxjs';
   templateUrl: './review-modal.html',
   styleUrl: './review-modal.scss'
 })
-export class ReviewModal implements OnInit {
+export class ReviewModal {
   // 📡 Inputs/Outputs
   isOpen = input.required<boolean>();
   gameIdentifier = input.required<string>();
   existingReview = input<GameUserStatus | null>(null);
   modalClosed = output<void>();
-  reviewSubmitted = output<UpdateReviewResponse>(); // 🆕 CAMBIO: Ahora envía datos
+  reviewSubmitted = output<UpdateReviewResponse>();
 
   // 🏪 Dependencies
   private fb = inject(FormBuilder);
@@ -40,18 +40,20 @@ export class ReviewModal implements OnInit {
     this.isEditMode() ? 'Editar tu review' : 'Escribir review'
   );
 
-  ngOnInit(): void {
-    this.initializeForm();
-    
-    // 🔄 Effect para resetear form cuando se abre/cierra o cambia review
-    effect(() => {
-      if (this.isOpen()) {
-        this.setupFormForCurrentReview();
-      } else {
-        this.resetForm();
-      }
-    });
-  }
+  // ✅ SOLUCIÓN: Effect como propiedad de clase
+  private modalStateEffect = effect(() => {
+    // Inicializar formulario si aún no existe
+    if (!this.reviewForm) {
+      this.initializeForm();
+    }
+
+    // Manejar cambios de estado del modal
+    if (this.isOpen()) {
+      this.setupFormForCurrentReview();
+    } else {
+      this.resetForm();
+    }
+  });
 
   /**
    * 🏗️ Inicializar formulario reactivo
@@ -93,6 +95,8 @@ export class ReviewModal implements OnInit {
    * 🧹 Resetear formulario
    */
   private resetForm(): void {
+    if (!this.reviewForm) return; // Protección adicional
+    
     this.reviewForm.reset({
       reviewText: '',
       rating: 0
@@ -183,7 +187,6 @@ export class ReviewModal implements OnInit {
       )
       .subscribe(response => {
         if (response) {
-          // 🆕 CAMBIO: Emitir los datos del backend en lugar de void
           this.reviewSubmitted.emit(response);
         }
       });
