@@ -54,7 +54,7 @@
           <!-- Texto de la review -->
           @if (myReview()?.reviewText) {
             <div class="text-gray-300 leading-relaxed mb-3">
-              <p class="text-sm sm:text-base">{{ myReview()?.reviewText }}</p>
+              <p class="text-sm sm:text-base break-words hyphens-auto">{{ myReview()?.reviewText }}</p>
             </div>
           }
           
@@ -159,7 +159,7 @@
             <!-- Texto de la review -->
             @if (review.reviewText) {
               <div class="text-gray-300 leading-relaxed">
-                <p class="text-sm sm:text-base">{{ truncateText(review.reviewText, 150) }}</p>
+                <p class="text-sm sm:text-base break-words hyphens-auto">{{ review.reviewText}}</p>
               </div>
             }
           </div>

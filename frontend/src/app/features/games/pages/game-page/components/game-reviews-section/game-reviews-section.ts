@@ -199,22 +199,6 @@ export class GameReviewsSection {
     }
   }
 
-  /**
-   * ✂️ Truncar texto de review con puntos suspensivos inteligentes
-   */
-  truncateText(text: string, maxLength: number = 200): string {
-    if (!text || text.length <= maxLength) return text;
-    
-    // Buscar el último espacio antes del límite para no cortar palabras
-    const truncated = text.substring(0, maxLength);
-    const lastSpaceIndex = truncated.lastIndexOf(' ');
-    
-    if (lastSpaceIndex > maxLength * 0.8) {
-      return truncated.substring(0, lastSpaceIndex).trim() + '...';
-    }
-    
-    return truncated.trim() + '...';
-  }
 
   /**
    * 🎭 Generar avatar inicial del usuario
