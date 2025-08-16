@@ -1,8 +1,9 @@
 // src/app/features/games/pages/game-page/components/game-status-selector/game-status-selector.ts
-import { Component, Input, Output, EventEmitter, signal, computed, inject } from '@angular/core';
+import { Component, inject, signal, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { GameDetails, GameApiService, UpdateReviewRequest, UpdateReviewResponse } from '@core/services/game-api';
+import { finalize, catchError, of } from 'rxjs';
 
 export type GameStatus = 'WISHLIST' | 'PLAYING' | 'COMPLETED' | 'ARCHIVED' | null;
 
@@ -22,21 +23,27 @@ interface StatusOption {
   styleUrl: './game-status-selector.scss'
 })
 export class GameStatusSelector {
-  @Input({ required: true }) gameDetails!: GameDetails;
-  @Output() statusUpdated = new EventEmitter<UpdateReviewResponse>();
-  
-  private translate = inject(TranslateService);
+  // 📡 Signal-based inputs/outputs (MODERNIZADO)
+  gameDetails = input.required<GameDetails>();
+  statusUpdated = output<UpdateReviewResponse>();
+
+  // 🏪 Dependencies
   private gameApiService = inject(GameApiService);
-  
-  // Estado de carga para deshabilitar botones durante la actualización
+
+  // 🎯 Component state con Signals
   isUpdating = signal(false);
-  
-  // Estado actual seleccionado
+  updateError = signal<string | null>(null);
+
+  // 💫 Computed values
   selectedStatus = computed(() => {
-    return this.gameDetails?.myStatus?.status || null;
+    return this.gameDetails()?.myStatus?.status || null;
   });
-  
-  // Definición de los estados disponibles
+
+  gameSlug = computed(() => {
+    return this.gameDetails()?.slug || '';
+  });
+
+  // 📋 Definición de los estados disponibles
   statusOptions: StatusOption[] = [
     {
       value: 'WISHLIST',
@@ -67,95 +74,105 @@ export class GameStatusSelector {
       inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
     }
   ];
-  
+
   /**
-   * Manejar el cambio de estado
+   * 🎯 Manejar el cambio de estado
    */
   onStatusClick(status: GameStatus): void {
     // Evitar múltiples clicks mientras se procesa
     if (this.isUpdating()) return;
-    
+
     const currentStatus = this.selectedStatus();
     let newStatus: GameStatus = null;
-    
-    // Si ya está seleccionado, lo deseleccionamos
+
+    // Toggle: Si ya está seleccionado, lo deseleccionamos
     if (currentStatus === status) {
       newStatus = null;
     } else {
-      // Si no, seleccionamos el nuevo estado
       newStatus = status;
     }
-    
-    // Llamar a la API para actualizar
+
     this.updateGameStatus(newStatus);
   }
-  
+
   /**
-   * Actualizar el estado del juego en el backend
+   * 💾 Actualizar el estado del juego en el backend
    */
   private updateGameStatus(newStatus: GameStatus): void {
     console.log('Actualizando estado a:', newStatus);
-    
+
     // Preparar los datos para actualizar
     const updateData: UpdateReviewRequest = {};
-    
+
     if (newStatus) {
       updateData.status = newStatus;
     }
-    
-    // Mantener los valores existentes si los hay
-    if (this.gameDetails.myStatus?.rating) {
-      updateData.rating = this.gameDetails.myStatus.rating;
+
+    // Mantener los valores existentes si los hay (como en tu code original)
+    const currentUserStatus = this.gameDetails().myStatus;
+    if (currentUserStatus?.rating) {
+      updateData.rating = currentUserStatus.rating;
     }
-    if (this.gameDetails.myStatus?.reviewText) {
-      updateData.reviewText = this.gameDetails.myStatus.reviewText;
+    if (currentUserStatus?.reviewText) {
+      updateData.reviewText = currentUserStatus.reviewText;
     }
-    
+
     // Indicar que estamos actualizando
     this.isUpdating.set(true);
-    
-    // Llamar al servicio
-    this.gameApiService.updateMyReview(this.gameDetails.slug, updateData)
-      .subscribe({
-        next: (response) => {
+    this.updateError.set(null);
+
+    // Llamar al servicio con manejo de errores mejorado
+    this.gameApiService.updateMyReview(this.gameSlug(), updateData)
+      .pipe(
+        catchError(error => {
+          console.error('Error al actualizar el estado:', error);
+
+          // Manejo de errores específicos (como en tu ReviewModal)
+          if (error.status === 401) {
+            this.updateError.set('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+          } else if (error.status === 404) {
+            this.updateError.set('El juego no fue encontrado.');
+          } else if (error.status >= 500) {
+            this.updateError.set('Error del servidor. Por favor, intenta de nuevo más tarde.');
+          } else {
+            this.updateError.set('Error al actualizar el estado. Por favor, intenta de nuevo.');
+          }
+
+          return of(null);
+        }),
+        finalize(() => this.isUpdating.set(false))
+      )
+      .subscribe(response => {
+        if (response) {
           console.log('Estado actualizado exitosamente:', response);
           
-          // Emitir el evento con la respuesta del backend
+          // 🆕 CAMBIO: Emitir usando signal output
           this.statusUpdated.emit(response);
           
-          // Resetear el estado de carga
-          this.isUpdating.set(false);
-        },
-        error: (error) => {
-          console.error('Error al actualizar el estado:', error);
-          
-          // Resetear el estado de carga
-          this.isUpdating.set(false);
-          
-          // Aquí podrías emitir un evento de error si lo necesitas
-          // o mostrar una notificación de error
+          // Limpiar error si todo fue bien
+          this.updateError.set(null);
         }
       });
   }
-  
+
   /**
-   * Obtener las clases CSS para un botón de estado
+   * 🎨 Obtener las clases CSS para un botón de estado
    */
   getStatusButtonClass(status: GameStatus): string {
     const option = this.statusOptions.find(opt => opt.value === status);
     if (!option) return '';
-    
+
     const isSelected = this.selectedStatus() === status;
     return isSelected ? option.activeClass : option.inactiveClass;
   }
-  
+
   /**
-   * Obtener el color del texto del label basado en el estado
+   * 🎨 Obtener el color del texto del label basado en el estado
    */
   getLabelColor(status: GameStatus): string {
     const isSelected = this.selectedStatus() === status;
     if (!isSelected) return 'text-gray-400';
-    
+
     switch (status) {
       case 'WISHLIST': return 'text-purple-400';
       case 'PLAYING': return 'text-blue-400';
@@ -164,6 +181,10 @@ export class GameStatusSelector {
       default: return 'text-gray-400';
     }
   }
+
+  /**
+   * 🎯 Obtener path del icono SVG
+   */
   getIconPath(icon: string): string {
     const icons: Record<string, string> = {
       bookmark: 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z',
@@ -171,7 +192,46 @@ export class GameStatusSelector {
       check: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
       archive: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4'
     };
-    
+
     return icons[icon] || '';
+  }
+
+  /**
+   * 🛡️ Verificar si un botón debe estar deshabilitado
+   */
+  isButtonDisabled(): boolean {
+    return this.isUpdating();
+  }
+
+  /**
+   * 📋 Obtener clases CSS para botones deshabilitados
+   */
+  getDisabledClasses(): string {
+    return this.isUpdating() ? 'opacity-50 cursor-not-allowed' : '';
+  }
+
+  /**
+   * 🎨 Obtener clases CSS para el estado de error
+   */
+  getErrorClasses(): string {
+    return 'text-red-400 text-sm mt-2';
+  }
+
+  /**
+   * 🔄 Obtener texto del estado de carga
+   */
+  getLoadingText(): string {
+    return 'Actualizando...';
+  }
+
+  /**
+   * 📊 Obtener estado actual legible para debugging
+   */
+  getCurrentStatusInfo(): string {
+    const status = this.selectedStatus();
+    if (!status) return 'Sin estado';
+    
+    const option = this.statusOptions.find(opt => opt.value === status);
+    return option ? option.labelKey : status;
   }
 }
