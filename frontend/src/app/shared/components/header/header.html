@@ -15,16 +15,54 @@
       <!-- Desktop: Selector de idioma y botones (oculto en móvil) -->
       <div class="hidden md:flex items-center space-x-4">
         
-        <!-- Selector de idioma -->
+        <!-- Selector de idioma personalizado con imágenes -->
         <div class="relative">
-          <select 
-            [value]="getCurrentLanguage()"
-            (change)="changeLanguage($event)"
-            class="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+          <button 
+            (click)="toggleLanguageDropdown()"
+            class="flex items-center space-x-2 bg-gray-800 rounded-lg px-3 py-1.5 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer transition-all duration-200"
+            aria-label="Select language"
           >
-            <option value="es">🇪🇸 Español</option>
-            <option value="en">🇺🇸 English</option>
-          </select>
+            <img 
+              [src]="getCurrentLanguage() === 'es' ? 'assets/flags/es.svg' : 'assets/flags/gb.svg'"
+              [alt]="getCurrentLanguage() === 'es' ? 'Español' : 'English'"
+              class="w-6 h-4 object-cover rounded-sm"
+            >
+            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" 
+                 [class.rotate-180]="isLanguageDropdownOpen"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dropdown de idiomas -->
+          @if (isLanguageDropdownOpen) {
+            <div class="absolute right-0 mt-2 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 overflow-hidden min-w-[140px]">
+              <button 
+                (click)="selectLanguage('es')"
+                class="flex items-center space-x-3 w-full px-4 py-2.5 hover:bg-gray-700 transition-colors duration-150"
+                [class.bg-gray-700]="getCurrentLanguage() === 'es'"
+              >
+                <img 
+                  src="assets/flags/es.svg"
+                  alt="Español"
+                  class="w-6 h-4 object-cover rounded-sm"
+                >
+                <span class="text-sm text-white">Español</span>
+              </button>
+              <button 
+                (click)="selectLanguage('en')"
+                class="flex items-center space-x-3 w-full px-4 py-2.5 hover:bg-gray-700 transition-colors duration-150"
+                [class.bg-gray-700]="getCurrentLanguage() === 'en'"
+              >
+                <img 
+                  src="assets/flags/gb.svg"
+                  alt="English"
+                  class="w-6 h-4 object-cover rounded-sm"
+                >
+                <span class="text-sm text-white">English</span>
+              </button>
+            </div>
+          }
         </div>
         
         <!-- Botones de autenticación -->
@@ -100,17 +138,41 @@
     @if (isMobileMenuOpen) {
       <div class="md:hidden border-t border-gray-800 py-4 space-y-3 animate-slideDown">
         
-        <!-- Selector de idioma móvil -->
+        <!-- Selector de idioma móvil con banderas -->
         <div class="px-2">
-          <label class="block text-xs text-gray-400 mb-1">{{ 'header.language' | translate }}</label>
-          <select 
-            [value]="getCurrentLanguage()"
-            (change)="changeLanguage($event); closeMobileMenu()"
-            class="w-full bg-gray-800 text-white text-sm rounded-lg px-3 py-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
-          >
-            <option value="es">🇪🇸 Español</option>
-            <option value="en">🇺🇸 English</option>
-          </select>
+          <label class="block text-xs text-gray-400 mb-2">{{ 'header.language' | translate }}</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button 
+              (click)="selectLanguage('es'); closeMobileMenu()"
+              class="flex items-center justify-center space-x-2 px-3 py-2.5 rounded-lg border transition-all duration-200"
+              [class.bg-gray-700]="getCurrentLanguage() === 'es'"
+              [class.border-purple-500]="getCurrentLanguage() === 'es'"
+              [class.border-gray-600]="getCurrentLanguage() !== 'es'"
+              [class.hover:bg-gray-800]="getCurrentLanguage() !== 'es'"
+            >
+              <img 
+                src="assets/flags/es.svg"
+                alt="Español"
+                class="w-6 h-4 object-cover rounded-sm"
+              >
+              <span class="text-sm text-white">ES</span>
+            </button>
+            <button 
+              (click)="selectLanguage('en'); closeMobileMenu()"
+              class="flex items-center justify-center space-x-2 px-3 py-2.5 rounded-lg border transition-all duration-200"
+              [class.bg-gray-700]="getCurrentLanguage() === 'en'"
+              [class.border-purple-500]="getCurrentLanguage() === 'en'"
+              [class.border-gray-600]="getCurrentLanguage() !== 'en'"
+              [class.hover:bg-gray-800]="getCurrentLanguage() !== 'en'"
+            >
+              <img 
+                src="assets/flags/gb.svg"
+                alt="English"
+                class="w-6 h-4 object-cover rounded-sm"
+              >
+              <span class="text-sm text-white">EN</span>
+            </button>
+          </div>
         </div>
 
         <!-- Divider -->

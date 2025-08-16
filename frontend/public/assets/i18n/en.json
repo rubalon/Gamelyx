@@ -1,7 +1,9 @@
 {
   "header": {
-    "login": "log In",
-    "logout": "log Out"
+    "language": "Language",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "welcome": "Welcome,"
   },
   "hero": {
     "subtitle": "Your gaming experience elevated to the next level",

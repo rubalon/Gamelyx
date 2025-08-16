@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TranslationService } from '@core/services/translations';
@@ -21,6 +21,9 @@ export class Header {
 
   // Estado del menú móvil
   isMobileMenuOpen = false;
+  
+  // Estado del dropdown de idiomas
+  isLanguageDropdownOpen = false;
 
   // Getters para acceder al estado de autenticación desde el template
   get isAuthenticated() {
@@ -34,11 +37,24 @@ export class Header {
   // Toggle del menú móvil
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    // Cerrar dropdown de idiomas si está abierto
+    this.isLanguageDropdownOpen = false;
   }
 
   // Cerrar menú móvil
   closeMobileMenu(): void {
     this.isMobileMenuOpen = false;
+  }
+  
+  // Toggle del dropdown de idiomas
+  toggleLanguageDropdown(): void {
+    this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
+  }
+  
+  // Seleccionar idioma desde el dropdown personalizado
+  selectLanguage(language: string): void {
+    this.translationService.changeLanguage(language);
+    this.isLanguageDropdownOpen = false;
   }
 
   onLoginClick(): void {
@@ -60,5 +76,16 @@ export class Header {
 
   getCurrentLanguage(): string {
     return this.translationService.getCurrentLanguage();
+  }
+  
+  // Cerrar dropdowns al hacer clic fuera
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    // Si el clic no es en el dropdown de idiomas, cerrarlo
+    if (!target.closest('.relative') && this.isLanguageDropdownOpen) {
+      this.isLanguageDropdownOpen = false;
+    }
   }
 }

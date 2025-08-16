@@ -1,7 +1,9 @@
 {
   "header": {
+    "language": "Idioma",
     "login": "Iniciar Sesión",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "welcome": "Bienvenido,"
   },
   "hero": {
     "subtitle": "Tu experiencia gaming elevada al siguiente nivel",
