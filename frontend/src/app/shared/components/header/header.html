@@ -12,20 +12,20 @@
         </h1>
       </div>
       
-      <!-- Desktop: Selector de idioma y botones (oculto en móvil) -->
+      <!-- Desktop: Selector de idioma y botones (vista pc) -->
       <div class="hidden md:flex items-center space-x-4">
         
         <!-- Selector de idioma personalizado con imágenes -->
         <div class="relative">
           <button 
             (click)="toggleLanguageDropdown()"
-            class="flex items-center space-x-2 bg-gray-800 rounded-lg px-3 py-1.5 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer transition-all duration-200"
+            class="flex items-center space-x-2 bg-gray-800/50 rounded-lg px-3 py-2 border border-gray-700/50 hover:bg-gray-700/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer transition-all duration-200 h-[50px]"
             aria-label="Select language"
           >
             <img 
               [src]="getCurrentLanguage() === 'es' ? 'assets/flags/es.svg' : 'assets/flags/gb.svg'"
               [alt]="getCurrentLanguage() === 'es' ? 'Español' : 'English'"
-              class="w-6 h-4 object-cover rounded-sm"
+              class="w-8 h-6 object-cover rounded-sm"
             >
             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" 
                  [class.rotate-180]="isLanguageDropdownOpen"
