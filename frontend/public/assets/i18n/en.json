@@ -51,6 +51,16 @@
       "error": "Error searching games"
     }
   },
+  "games": {
+    "status": {
+      "title": "Status:",
+      "wishlist": "wishlist",
+      "playing": "Currently playing",
+      "completed": "Completed",
+      "archived": "Archived",
+      "selectHint": "Select a status for this game"
+    }
+  },
   "auth": {
     "welcome": "Welcome to Gamelyx!",
     "subtitle": "Join the biggest gaming community",

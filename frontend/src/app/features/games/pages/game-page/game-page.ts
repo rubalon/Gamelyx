@@ -9,6 +9,7 @@ import { Header } from '../../../../shared/components/header/header';
 import { GameApiService, GameDetails as GameDetailsInterface, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '../../../../core/stores/auth-store';
 import { GameReviewsSection } from './components/game-reviews-section/game-reviews-section';
+import { GameStatusSelector } from './components/game-status-selector/game-status-selector';
 
 @Component({
   selector: 'app-game-page',
@@ -17,7 +18,8 @@ import { GameReviewsSection } from './components/game-reviews-section/game-revie
     CommonModule,
     TranslateModule,
     Header,
-    GameReviewsSection
+    GameReviewsSection,
+    GameStatusSelector
   ],
   templateUrl: './game-page.html',
   styleUrl: './game-page.scss'
@@ -228,7 +230,6 @@ export class GamePage implements OnInit, OnDestroy {
    * 🔄 Manejar actualización de review - ACTUALIZACIÓN DIRECTA CON DATOS DEL BACKEND
    */
   onReviewUpdated(reviewData: UpdateReviewResponse): void {
-    console.log('Review actualizada con datos del backend:', reviewData);
     
     const currentGame = this.gameDetails();
     if (!currentGame) return;
@@ -248,9 +249,9 @@ export class GamePage implements OnInit, OnDestroy {
 
     // 💫 Actualización instantánea del estado
     this.gameDetails.set(updatedGame);
-    
-    console.log('✅ Estado actualizado instantáneamente - NO más doble llamada al backend!');
+
   }
+  
 
   // 🎯 Getters para template
   get isAuthenticated() {

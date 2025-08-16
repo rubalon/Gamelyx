@@ -1,0 +1,17 @@
+// src/app/features/games/pages/game-page/components/game-status-selector/game-status-selector.scss
+
+// Animación suave para los cambios de estado
+:host {
+  display: block;
+}
+
+// Efecto de escala en hover para los botones (solo desktop)
+@media (min-width: 640px) {
+  button:hover {
+    transform: scale(1.05);
+  }
+  
+  button:active {
+    transform: scale(0.98);
+  }
+}
