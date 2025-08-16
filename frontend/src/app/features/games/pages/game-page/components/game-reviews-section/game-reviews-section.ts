@@ -156,7 +156,7 @@ export class GameReviewsSection {
       case 'wishlist':
         return `${baseClasses} text-purple-400 border-purple-400 bg-purple-400/10`;
       case 'archived':
-        return `${baseClasses} text-gray-400 border-gray-400 bg-gray-400/10`;
+        return `${baseClasses} text-yellow-600 border-yellow-700 bg-yellow-700/10`;
       default:
         return `${baseClasses} text-gray-400 border-gray-400 bg-gray-400/10`;
     }
@@ -194,7 +194,7 @@ export class GameReviewsSection {
       case 'COMPLETED': return 'text-green-400';
       case 'PLAYING': return 'text-blue-400';
       case 'WISHLIST': return 'text-purple-400';
-      case 'ARCHIVED': return 'text-gray-400';
+      case 'ARCHIVED': return 'text-yellow-600';
       default: return 'text-gray-400';
     }
   }

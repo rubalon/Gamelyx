@@ -70,8 +70,8 @@ export class GameStatusSelector {
       value: 'ARCHIVED',
       labelKey: 'games.status.archived',
       icon: 'archive',
-      activeClass: 'bg-gray-500/20 text-gray-400 border-gray-500',
-      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
+      activeClass: 'bg-yellow-700/20 text-yellow-600 border-yellow-700', // 🎨 CAMBIO: Marrón más oscuro
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-yellow-700/15' // 🎨 CAMBIO: Hover marrón sutil
     }
   ];
 
@@ -177,7 +177,7 @@ export class GameStatusSelector {
       case 'WISHLIST': return 'text-purple-400';
       case 'PLAYING': return 'text-blue-400';
       case 'COMPLETED': return 'text-green-400';
-      case 'ARCHIVED': return 'text-gray-400';
+      case 'ARCHIVED': return 'text-yellow-600'; // 🎨 CAMBIO: Marrón más oscuro para archivado
       default: return 'text-gray-400';
     }
   }
