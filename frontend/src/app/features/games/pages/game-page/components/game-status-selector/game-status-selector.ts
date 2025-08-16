@@ -42,29 +42,29 @@ export class GameStatusSelector {
       value: 'WISHLIST',
       labelKey: 'games.status.wishlist',
       icon: 'bookmark',
-      activeClass: 'bg-blue-600 text-white border-blue-500',
-      inactiveClass: 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+      activeClass: 'bg-purple-500/20 text-purple-400 border-purple-500',
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
     },
     {
       value: 'PLAYING',
       labelKey: 'games.status.playing',
       icon: 'play',
-      activeClass: 'bg-green-600 text-white border-green-500',
-      inactiveClass: 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+      activeClass: 'bg-blue-500/20 text-blue-400 border-blue-500',
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
     },
     {
       value: 'COMPLETED',
       labelKey: 'games.status.completed',
       icon: 'check',
-      activeClass: 'bg-purple-600 text-white border-purple-500',
-      inactiveClass: 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+      activeClass: 'bg-green-500/20 text-green-400 border-green-500',
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
     },
     {
       value: 'ARCHIVED',
       labelKey: 'games.status.archived',
       icon: 'archive',
-      activeClass: 'bg-gray-600 text-white border-gray-500',
-      inactiveClass: 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+      activeClass: 'bg-gray-500/20 text-gray-400 border-gray-500',
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
     }
   ];
   
@@ -150,8 +150,20 @@ export class GameStatusSelector {
   }
   
   /**
-   * Obtener el path SVG para cada icono
+   * Obtener el color del texto del label basado en el estado
    */
+  getLabelColor(status: GameStatus): string {
+    const isSelected = this.selectedStatus() === status;
+    if (!isSelected) return 'text-gray-400';
+    
+    switch (status) {
+      case 'WISHLIST': return 'text-purple-400';
+      case 'PLAYING': return 'text-blue-400';
+      case 'COMPLETED': return 'text-green-400';
+      case 'ARCHIVED': return 'text-gray-400';
+      default: return 'text-gray-400';
+    }
+  }
   getIconPath(icon: string): string {
     const icons: Record<string, string> = {
       bookmark: 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z',
