@@ -125,6 +125,8 @@ public class SecurityConfig {
             origins.add("http://192.168.*:*");    // Red local más común
             origins.add("http://10.*:*");         // Otra red privada común
             origins.add("http://172.16.*:*");     // Red Docker/privada
+            origins.add("https://*.devtunnels.ms");
+            origins.add("http://*.devtunnels.ms");
         }
 
         configuration.setAllowedOriginPatterns(origins);
