@@ -1,11 +1,20 @@
-header {
-  // Este archivo está para customizaciones específicas usando SCSS
-  
-  .logo-container {
-    // Futuras customizaciones del logo
+// Animación para el menú desplegable móvil
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  
-  .login-button {
-    // Futuras customizaciones del botón
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.1s ease-out;
+}
+
+// Transición suave para el botón activo en móvil
+.active\:scale-95:active {
+  transform: scale(0.95);
 }

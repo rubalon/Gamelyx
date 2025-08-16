@@ -12,8 +12,8 @@
         </h1>
       </div>
       
-      <!-- Selector de idioma y botones de autenticación -->
-      <div class="flex items-center space-x-4">
+      <!-- Desktop: Selector de idioma y botones (oculto en móvil) -->
+      <div class="hidden md:flex items-center space-x-4">
         
         <!-- Selector de idioma -->
         <div class="relative">
@@ -27,9 +27,9 @@
           </select>
         </div>
         
-        <!-- 👈 CONDICIONAL: Mostrar botón según estado de autenticación -->
+        <!-- Botones de autenticación -->
         @if (!isAuthenticated) {
-          <!-- Botón de Iniciar Sesión (cuando NO está logueado) -->
+          <!-- Botón de Iniciar Sesión -->
           <button 
             (click)="onLoginClick()"
             class="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
@@ -40,10 +40,27 @@
             <span>{{ 'header.login' | translate }}</span>
           </button>
         } @else {
-          <!-- Sección de usuario logueado (cuando SÍ está logueado) -->
+          <!-- Sección de usuario logueado -->
           <div class="flex items-center space-x-3">
             
-  
+            <!-- Info del usuario en desktop -->
+            @if (currentUser) {
+              <div class="flex items-center space-x-3 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:bg-gray-800/70 transition-all duration-200">
+                <!-- Avatar -->
+                <div class="w-9 h-9 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span class="text-white font-bold text-sm">{{ currentUser.username[0]?.toUpperCase() }}</span>
+                </div>
+                <!-- Nombre y email -->
+                <div class="hidden lg:block">
+                  <p class="text-white font-medium text-sm">{{ currentUser.username }}</p>
+                  <p class="text-gray-400 text-xs">{{ currentUser.email }}</p>
+                </div>
+              </div>
+              
+              <!-- Separador vertical -->
+              <div class="h-8 w-px bg-gray-700"></div>
+            }
+            
             <!-- Botón de Cerrar Sesión -->
             <button 
               (click)="onLogoutClick()"
@@ -56,8 +73,92 @@
             </button>
           </div>
         }
-        
       </div>
+
+      <!-- Mobile: Botón de menú hamburguesa (visible solo en móvil) -->
+      <button 
+        (click)="toggleMobileMenu()"
+        class="md:hidden flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
+        [attr.aria-expanded]="isMobileMenuOpen"
+        aria-label="Toggle menu"
+      >
+        @if (!isMobileMenuOpen) {
+          <!-- Icono hamburguesa -->
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        } @else {
+          <!-- Icono X (cerrar) -->
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        }
+      </button>
     </div>
+
+    <!-- Mobile Menu Dropdown (se muestra/oculta según isMobileMenuOpen) -->
+    @if (isMobileMenuOpen) {
+      <div class="md:hidden border-t border-gray-800 py-4 space-y-3 animate-slideDown">
+        
+        <!-- Selector de idioma móvil -->
+        <div class="px-2">
+          <label class="block text-xs text-gray-400 mb-1">{{ 'header.language' | translate }}</label>
+          <select 
+            [value]="getCurrentLanguage()"
+            (change)="changeLanguage($event); closeMobileMenu()"
+            class="w-full bg-gray-800 text-white text-sm rounded-lg px-3 py-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+          >
+            <option value="es">🇪🇸 Español</option>
+            <option value="en">🇺🇸 English</option>
+          </select>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-800 mx-2"></div>
+
+        <!-- Botones de autenticación móvil -->
+        <div class="px-2">
+          @if (!isAuthenticated) {
+            <!-- Botón de Iniciar Sesión móvil -->
+            <button 
+              (click)="onLoginClick(); closeMobileMenu()"
+              class="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg active:scale-95"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+              </svg>
+              <span>{{ 'header.login' | translate }}</span>
+            </button>
+          } @else {
+            <!-- Información del usuario y botón de cerrar sesión móvil -->
+            <div class="space-y-3">
+              <!-- Info del usuario -->
+              @if (currentUser) {
+                <div class="flex items-center space-x-3 px-3 py-2 bg-gray-800 rounded-lg">
+                  <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold text-lg">{{ currentUser.username[0]?.toUpperCase() }}</span>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-white font-medium">{{ currentUser.username }}</p>
+                    <p class="text-gray-400 text-xs">{{ currentUser.email }}</p>
+                  </div>
+                </div>
+              }
+              
+              <!-- Botón de Cerrar Sesión móvil -->
+              <button 
+                (click)="onLogoutClick(); closeMobileMenu()"
+                class="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-700 to-red-900 hover:from-purple-800 hover:to-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg active:scale-95"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span>{{ 'header.logout' | translate }}</span>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
   </div>
 </header>

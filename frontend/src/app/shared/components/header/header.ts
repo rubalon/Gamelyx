@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TranslationService } from '@core/services/translations';
 import { ModalService } from '@shared/services/modal';
-import { AuthStore } from '@core/stores/auth-store'; // 👈 NUEVO: Import AuthStore
+import { AuthStore } from '@core/stores/auth-store';
 
 @Component({
   selector: 'app-header',
@@ -17,9 +17,12 @@ export class Header {
   private router = inject(Router);
   private translationService = inject(TranslationService);
   private modalService = inject(ModalService);
-  private authStore = inject(AuthStore); // 👈 NUEVO: Inyectar AuthStore
+  private authStore = inject(AuthStore);
 
-  // 👈 NUEVO: Getters para acceder al estado de autenticación desde el template
+  // Estado del menú móvil
+  isMobileMenuOpen = false;
+
+  // Getters para acceder al estado de autenticación desde el template
   get isAuthenticated() {
     return this.authStore.isAuthenticated();
   }
@@ -28,14 +31,23 @@ export class Header {
     return this.authStore.user();
   }
 
+  // Toggle del menú móvil
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  // Cerrar menú móvil
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
+  }
+
   onLoginClick(): void {
-    // 👈 ACTUALIZADO: Solo abrir modal si NO está logueado
+    // Solo abrir modal si NO está logueado
     if (!this.isAuthenticated) {
       this.modalService.openAuthModal('login');
     }
   }
 
-  // 👈 NUEVO: Método para cerrar sesión
   onLogoutClick(): void {
     this.authStore.logout();
     // El logout ya redirige a '/landing' desde el AuthStore
