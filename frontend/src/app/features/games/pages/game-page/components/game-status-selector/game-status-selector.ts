@@ -50,28 +50,28 @@ export class GameStatusSelector {
       labelKey: 'games.status.wishlist',
       icon: 'bookmark',
       activeClass: 'bg-purple-500/20 text-purple-400 border-purple-500',
-      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-purple-400/15'
     },
     {
       value: 'PLAYING',
       labelKey: 'games.status.playing',
       icon: 'play',
       activeClass: 'bg-blue-500/20 text-blue-400 border-blue-500',
-      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-blue-400/15'
     },
     {
       value: 'COMPLETED',
       labelKey: 'games.status.completed',
       icon: 'check',
       activeClass: 'bg-green-500/20 text-green-400 border-green-500',
-      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-gray-600'
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-green-400/15'
     },
     {
       value: 'ARCHIVED',
       labelKey: 'games.status.archived',
       icon: 'archive',
-      activeClass: 'bg-yellow-700/20 text-yellow-600 border-yellow-700', // 🎨 CAMBIO: Marrón más oscuro
-      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-yellow-700/15' // 🎨 CAMBIO: Hover marrón sutil
+      activeClass: 'bg-yellow-700/20 text-yellow-600 border-yellow-700', 
+      inactiveClass: 'bg-gray-700 text-gray-400 border-gray-600 hover:bg-yellow-700/15' 
     }
   ];
 

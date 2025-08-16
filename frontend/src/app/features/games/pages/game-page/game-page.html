@@ -199,9 +199,9 @@
                 <section class="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
                   <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Descripción</h2>
                   <div class="text-gray-300 leading-relaxed text-sm sm:text-base">
-                    <div [class]="!showFullDescription() ? 'line-clamp-3 sm:line-clamp-4' : ''" [innerHTML]="gameDetails()!.description"></div>
+                    <div class="whitespace-pre-line">{{ getDisplayDescriptionText() }}</div>
                     
-                    @if (gameDetails()!.descriptionRaw.length > 300) {
+                    @if (shouldShowToggleButton()) {
                       <button 
                         (click)="toggleDescription()" 
                         class="text-purple-400 hover:text-purple-300 font-medium mt-3 flex items-center transition-colors text-sm"

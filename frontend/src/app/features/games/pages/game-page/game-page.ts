@@ -41,6 +41,57 @@ export class GamePage implements OnInit, OnDestroy {
   activeScreenshot = signal(0);
   showFullDescription = signal(false);
 
+  private isMobile(): boolean {
+  return window.innerWidth < 640; // Tailwind SM breakpoint 
+  }
+
+  /**
+   * 📏 Obtener límite de caracteres según dispositivo
+   */
+  private getDescriptionLimit(): number {
+    return this.isMobile() ? 250 : 1500;
+  }
+
+  /**
+   * ✂️ Obtener descripción truncada del texto RAW
+   */
+  getDisplayDescriptionText(): string {
+    const game = this.gameDetails();
+    if (!game?.descriptionRaw) return '';
+    
+    const limit = this.getDescriptionLimit();
+    const rawText = game.descriptionRaw;
+    
+    // Si está expandido o el texto es corto, mostrar completo
+    if (this.showFullDescription() || rawText.length <= limit) {
+      return rawText;
+    }
+    
+    // Truncar en la última palabra completa antes del límite
+    const truncated = rawText.substring(0, limit);
+    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    const cleanCut = lastSpaceIndex > 0 ? truncated.substring(0, lastSpaceIndex) : truncated;
+    
+    return cleanCut + '...';
+  }
+  /**
+   * 🔍 Verificar si necesita botón "Leer más"
+   */
+  shouldShowToggleButton(): boolean {
+    const game = this.gameDetails();
+    if (!game?.descriptionRaw) return false;
+    
+    const limit = this.getDescriptionLimit();
+    return game.descriptionRaw.length > limit;
+  }
+
+  /**
+   * 📝 Toggle descripción completa (método actualizado)
+   */
+  toggleDescription(): void {
+    this.showFullDescription.set(!this.showFullDescription());
+  }
+
   ngOnInit(): void {
     // 📡 Escuchar cambios en el parámetro de ruta
     this.route.params
@@ -134,12 +185,6 @@ export class GamePage implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * 📝 Toggle descripción completa
-   */
-  toggleDescription(): void {
-    this.showFullDescription.set(!this.showFullDescription());
-  }
 
   /**
    * 📅 Formatear fecha de lanzamiento
