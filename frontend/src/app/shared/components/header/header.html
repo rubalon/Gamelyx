@@ -86,7 +86,7 @@
               <div class="flex items-center space-x-3 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:bg-gray-800/70 transition-all duration-200">
                 <!-- Avatar -->
                 <div class="w-9 h-9 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                  <span class="text-white font-bold text-sm">{{ currentUser.username[0]?.toUpperCase() }}</span>
+                  <span class="text-white font-bold text-sm">{{ currentUser.username[0].toUpperCase() }}</span>
                 </div>
                 <!-- Nombre y email -->
                 <div class=" lg:block">
@@ -198,7 +198,7 @@
               @if (currentUser) {
                 <div class="flex items-center space-x-3 px-3 py-2 bg-gray-800 rounded-lg">
                   <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                    <span class="text-white font-bold text-lg">{{ currentUser.username[0]?.toUpperCase() }}</span>
+                    <span class="text-white font-bold text-lg">{{ currentUser.username[0].toUpperCase() }}</span>
                   </div>
                   <div class="flex-1">
                     <p class="text-white font-medium">{{ currentUser.username }}</p>
