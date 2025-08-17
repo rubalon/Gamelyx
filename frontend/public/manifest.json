@@ -138,31 +138,5 @@
       "type": "image/png", 
       "purpose": "maskable"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Iniciar Sesión",
-      "short_name": "Login",
-      "description": "Accede rápidamente a tu cuenta",
-      "url": "/landing?action=login",
-      "icons": [
-        {
-          "src": "/assets/icons/shortcut-login.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Registrarse",
-      "short_name": "Registro", 
-      "description": "Crea tu cuenta nueva",
-      "url": "/landing?action=register",
-      "icons": [
-        {
-          "src": "/assets/icons/shortcut-register.png",
-          "sizes": "96x96"
-        }
-      ]
-    }
   ]
 }
