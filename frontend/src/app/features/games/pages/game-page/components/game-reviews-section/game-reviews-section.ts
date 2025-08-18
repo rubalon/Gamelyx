@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { GameDetails, GameReview, GameUserStatus, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
 import { ReviewModal } from '../review-modal/review-modal';
+import { StarRating } from '@shared/components/star-rating/star-rating';
 
 @Component({
   selector: 'app-game-reviews-section',
   standalone: true,
-  imports: [CommonModule, ReviewModal],
+  imports: [CommonModule, ReviewModal, StarRating],
   templateUrl: './game-reviews-section.html',
   styleUrl: './game-reviews-section.scss'
 })
@@ -76,22 +77,6 @@ export class GameReviewsSection {
 
   // 🛠️ MÉTODOS UTILITARIOS (mantenidos exactamente igual que tu código)
 
-  /**
-   * ⭐ Generar array de estrellas para mostrar rating
-   * Convierte rating de 10 a 5 estrellas con relleno parcial
-   */
-  getRatingStars(rating: number): { filled: number }[] {
-    const stars = [];
-    const maxStars = 5;
-    const ratingOutOf5 = rating / 2; // Convertir de 10 a 5 estrellas
-    
-    for (let i = 0; i < maxStars; i++) {
-      const starValue = Math.max(0, Math.min(1, ratingOutOf5 - i));
-      stars.push({ filled: starValue });
-    }
-    
-    return stars;
-  }
 
   /**
    * 📅 Formatear fecha de review de manera inteligente
