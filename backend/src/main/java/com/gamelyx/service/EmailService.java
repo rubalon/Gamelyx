@@ -3,7 +3,6 @@ package com.gamelyx.service;
 import com.gamelyx.entity.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,11 +15,8 @@ import java.util.Locale;
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
-    private TemplateEngine templateEngine;
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     @Value("${app.email.from}")
     private String fromEmail;
@@ -30,6 +26,11 @@ public class EmailService {
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
+
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
 
     /**
      * Envía email de verificación a un usuario recién registrado
