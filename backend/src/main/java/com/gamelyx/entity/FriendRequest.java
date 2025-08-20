@@ -1,6 +1,8 @@
 package com.gamelyx.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Check;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
                 @Index(name = "idx_friend_requests_suggested_game", columnList = "suggested_game_id"),
                 @Index(name = "idx_friend_requests_created_at", columnList = "created_at")
         })
+@Check(constraints = "sender_id <> receiver_id")
 public class FriendRequest {
 
     @Id
@@ -249,18 +252,5 @@ public class FriendRequest {
         SEARCH,      // Desde buscador manual de usuarios (HU-16)
         SUGGESTION;  // Desde sugerencias automáticas (HU-20)
 
-        /**
-         * Verifica si la solicitud requiere información de juego sugerido
-         */
-        public boolean requiresSuggestedGame() {
-            return this == SUGGESTION;
-        }
-
-        /**
-         * Verifica si la solicitud es manual (no automática)
-         */
-        public boolean isManual() {
-            return this == SEARCH;
-        }
     }
 }

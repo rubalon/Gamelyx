@@ -1,6 +1,8 @@
 package com.gamelyx.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Check;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -24,6 +26,7 @@ import java.util.UUID;
                 @Index(name = "idx_friendships_user_friend", columnList = "user_id, friend_id"),
                 @Index(name = "idx_friendships_created_at", columnList = "created_at")
         })
+@Check(constraints = "user_id <> friend_id")
 public class Friendship {
 
     @Id
