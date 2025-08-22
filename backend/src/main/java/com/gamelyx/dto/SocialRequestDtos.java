@@ -26,19 +26,6 @@ public class SocialRequestDtos {
     ) {}
 
     // ================================================
-    // REQUEST PARA RESPONDER SOLICITUDES
-    // ================================================
-
-    /**
-     * Request para aceptar o rechazar una solicitud de amistad
-     */
-    public record RespondToFriendRequestDto(
-            UUID FriendRequestId,
-            FriendRequestAction action
-
-    ) {}
-
-    // ================================================
     // REQUEST PARA BÚSQUEDAS
     // ================================================
 

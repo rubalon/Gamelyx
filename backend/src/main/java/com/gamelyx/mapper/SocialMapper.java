@@ -64,6 +64,15 @@ public class SocialMapper {
         );
     }
 
+    /**
+     * Convierte User a ContactUserDto (para nuevo amigo tras aceptar solicitud).
+     */
+    public ContactUserDto toContactUserDto(User user) {
+        UserDto userDto = new UserDto(user.getId(), user.getUsername());
+
+        return new ContactUserDto(userDto, null, false);
+    }
+
     // ================================================
     // MAPPERS GENERALES
     // ================================================

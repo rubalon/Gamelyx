@@ -81,9 +81,19 @@ public class FriendRequest {
     @Column(name = "responded_at")
     private LocalDateTime respondedAt;
 
+    /**
+     * Indica si el sender ha sido notificado de la respuesta.
+     * - Para solicitudes ACCEPTED: no se usa (se eliminan directamente)
+     * - Para solicitudes REJECTED: true = ya notificado
+     * - Para solicitudes PENDING: siempre false
+     */
+    @Column(name = "is_sender_notified", nullable = false)
+    private Boolean isSenderNotified = false;
+
     // Constructors
     public FriendRequest() {
         this.createdAt = LocalDateTime.now();
+        this.isSenderNotified = false;
     }
 
     public FriendRequest(User sender, User receiver, RequestSource source) {
@@ -174,6 +184,14 @@ public class FriendRequest {
         this.respondedAt = respondedAt;
     }
 
+    public Boolean getIsSenderNotified() {
+        return isSenderNotified;
+    }
+
+    public void setIsSenderNotified(Boolean isSenderNotified) {
+        this.isSenderNotified = isSenderNotified;
+    }
+
     // Business Methods
 
     /**
@@ -190,6 +208,14 @@ public class FriendRequest {
     public void reject() {
         this.status = FriendRequestStatus.REJECTED;
         this.respondedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Marca que el sender ha sido notificado de la respuesta.
+     * Usado principalmente para solicitudes rechazadas.
+     */
+    public void markSenderAsNotified() {
+        this.isSenderNotified = true;
     }
 
     /**
@@ -214,6 +240,7 @@ public class FriendRequest {
                 ", receiver=" + (receiver != null ? receiver.getUsername() : null) +
                 ", status=" + status +
                 ", source=" + source +
+                ", isSenderNotified=" + isSenderNotified +
                 ", createdAt=" + createdAt +
                 '}';
     }
@@ -251,6 +278,5 @@ public class FriendRequest {
     public enum RequestSource {
         SEARCH,      // Desde buscador manual de usuarios (HU-16)
         SUGGESTION;  // Desde sugerencias automáticas (HU-20)
-
     }
 }

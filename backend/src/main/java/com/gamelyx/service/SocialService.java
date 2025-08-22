@@ -3,6 +3,7 @@ package com.gamelyx.service;
 import com.gamelyx.dto.SocialRequestDtos.*;
 import com.gamelyx.dto.SocialResponseDtos.*;
 import com.gamelyx.entity.FriendRequest;
+import com.gamelyx.entity.Friendship;
 import com.gamelyx.entity.Game;
 import com.gamelyx.entity.User;
 import com.gamelyx.mapper.SocialMapper;
@@ -187,27 +188,73 @@ public class SocialService {
 
     /**
      * Responde a una solicitud de amistad (acepta o rechaza).
-     * MOCK: Simula aceptación/rechazo exitoso.
+     * IMPLEMENTACIÓN REAL: Usa validator y mapper para lógica limpia.
      */
     public FriendRequestResponseDto respondToFriendRequest(
             String currentUsername,
             String requestId,
-            RespondToFriendRequestDto request) {
+            FriendRequestAction action) {
 
-        if (request.action() == FriendRequestAction.ACCEPT) {
-            // Simular aceptación exitosa
-            ContactUserDto newFriend = new ContactUserDto(
-                    new UserDto(UUID.randomUUID(), "NuevoAmigo"),
-                    UUID.randomUUID(), // chatId creado
-                    false
-            );
+        // 1. Validar la operación usando el validator
+        SocialValidator.ValidationResult validation = socialValidator.validateRespondToFriendRequest(
+                currentUsername,
+                requestId,
+                action
+        );
 
+        // 2. Obtener la solicitud validada
+        FriendRequest friendRequest = validation.getFriendRequest();
+
+        // 3. Procesar según la acción
+        if (action == FriendRequestAction.ACCEPT) {
+            // Aceptar: cambiar status y crear amistad bidireccional
+            friendRequest.accept();
+            friendRequestRepository.save(friendRequest);
+
+            // Crear amistad bidireccional
+            Friendship friendship1 = new Friendship(friendRequest.getReceiver(), friendRequest.getSender());
+            Friendship friendship2 = new Friendship(friendRequest.getSender(), friendRequest.getReceiver());
+            friendshipRepository.saveAll(List.of(friendship1, friendship2));
+
+            // Retornar nuevo amigo
+            ContactUserDto newFriend = socialMapper.toContactUserDto(friendRequest.getSender());
             return new FriendRequestResponseDto(true, newFriend);
+
         } else {
-            // Simular rechazo exitoso
-            return new FriendRequestResponseDto(false, null);
+            // Rechazar: cambiar status solamente
+            friendRequest.reject();
+            friendRequestRepository.save(friendRequest);
+
+            return new FriendRequestResponseDto(true, null);
         }
     }
+
+    /**
+     * Marca una solicitud como notificada al sender.
+     * Solo el sender puede marcar su propia solicitud como notificada.
+     */
+    public void markFriendRequestAsNotified(String senderUsername, String requestId) {
+        // 1. Validar usando el validator
+        SocialValidator.ValidationResult validation = socialValidator.validateMarkAsNotified(
+                senderUsername,
+                requestId
+        );
+
+        // 2. Obtener la solicitud validada
+        FriendRequest friendRequest = validation.getFriendRequest();
+
+        // 3. Procesar según el estado
+        if (friendRequest.getStatus() == FriendRequest.FriendRequestStatus.ACCEPTED) {
+            // Las solicitudes aceptadas se eliminan directamente
+            friendRequestRepository.delete(friendRequest);
+        } else if (friendRequest.getStatus() == FriendRequest.FriendRequestStatus.REJECTED) {
+            // Las solicitudes rechazadas se marcan como notificadas
+            friendRequest.markSenderAsNotified();
+            friendRequestRepository.save(friendRequest);
+        }
+    }
+
+
 
     // ================================================
     // BÚSQUEDA DE USUARIOS HU-16

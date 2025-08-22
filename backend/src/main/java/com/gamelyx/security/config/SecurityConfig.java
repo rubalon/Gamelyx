@@ -94,6 +94,8 @@ public class SecurityConfig {
                         //Enpoints de social ( necesitan autentificacion)
                         .requestMatchers("GET","/api/social/search/users").authenticated()
                         .requestMatchers("POST","/api/social/friend-requests").authenticated()
+                        .requestMatchers("PUT","/api/social/friend-requests/*/respond").authenticated()
+                        .requestMatchers("PUT","/api/social/friend-requests/*/mark-notified").authenticated()
 
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

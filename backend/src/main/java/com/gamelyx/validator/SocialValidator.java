@@ -1,5 +1,6 @@
 package com.gamelyx.validator;
 
+import com.gamelyx.dto.SocialRequestDtos.FriendRequestAction;
 import com.gamelyx.dto.SocialRequestDtos.SendFriendRequestDto;
 import com.gamelyx.entity.FriendRequest;
 import com.gamelyx.entity.Game;
@@ -142,25 +143,97 @@ public class SocialValidator {
     // ================================================
 
     /**
-     * Valida que una solicitud puede ser respondida por el usuario.
+     * Valida la respuesta a una solicitud de amistad.
      */
-    public FriendRequest validateCanRespondToRequest(String username, UUID requestId) {
-        User user = validateUserExists(username);
+    public ValidationResult validateRespondToFriendRequest(
+            String currentUsername,
+            String requestId,
+            FriendRequestAction action) {
 
-        FriendRequest request = friendRequestRepository.findById(requestId)
+        ValidationResult result = new ValidationResult();
+
+        // 1. Validar que el usuario actual existe
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // 2. Validar formato del requestId
+        UUID requestUUID;
+        try {
+            requestUUID = UUID.fromString(requestId);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("ID de solicitud inválido");
+        }
+
+        // 3. Buscar la solicitud
+        FriendRequest friendRequest = friendRequestRepository.findById(requestUUID)
                 .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
 
-        // Verificar que el usuario es el receptor de la solicitud
-        if (!request.getReceiver().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("No tienes permisos para responder esta solicitud");
+        // 4. Validar que la solicitud es para el usuario actual (es el receiver)
+        if (!friendRequest.getReceiver().getId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("No puedes responder a esta solicitud");
         }
 
-        // Verificar que la solicitud está pendiente
-        if (!request.isPending()) {
-            throw new IllegalStateException("La solicitud ya fue respondida");
+        // 5. Validar que la solicitud está pendiente
+        if (!friendRequest.isPending()) {
+            throw new IllegalArgumentException("Esta solicitud ya fue respondida");
         }
 
-        return request;
+        // 6. Validar que no son ya amigos
+        boolean areAlreadyFriends = friendshipRepository.areUsersFriends(
+                currentUser.getId(),
+                friendRequest.getSender().getId()
+        );
+        if (areAlreadyFriends) {
+            throw new IllegalStateException("Error de consistencia: Los usuarios ya son amigos pero existe una solicitud pendiente");
+        }
+
+        result.setReceiver(currentUser);
+        result.setSender(friendRequest.getSender());
+        result.setFriendRequest(friendRequest);
+
+        return result;
+    }
+
+    /**
+     * Valida que se puede marcar una solicitud como notificada.
+     */
+    public ValidationResult validateMarkAsNotified(String senderUsername, String requestId) {
+        ValidationResult result = new ValidationResult();
+
+        // 1. Validar que el usuario existe
+        User sender = validateUserExists(senderUsername);
+
+        // 2. Validar formato del requestId
+        UUID requestUUID;
+        try {
+            requestUUID = UUID.fromString(requestId);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("ID de solicitud inválido");
+        }
+
+        // 3. Buscar la solicitud
+        FriendRequest friendRequest = friendRequestRepository.findById(requestUUID)
+                .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
+
+        // 4. Validar que es el sender de la solicitud
+        if (!friendRequest.getSender().getId().equals(sender.getId())) {
+            throw new IllegalArgumentException("Solo puedes marcar tus propias solicitudes como notificadas");
+        }
+
+        // 5. Validar que la solicitud está resuelta (no PENDING)
+        if (friendRequest.isPending()) {
+            throw new IllegalArgumentException("No se puede marcar como notificada una solicitud pendiente");
+        }
+
+        // 6. Validar que no está ya notificada
+        if (friendRequest.getIsSenderNotified()) {
+            throw new IllegalArgumentException("Esta solicitud ya está marcada como notificada");
+        }
+
+        result.setSender(sender);
+        result.setFriendRequest(friendRequest);
+
+        return result;
     }
 
     // ================================================
@@ -228,19 +301,34 @@ public class SocialValidator {
      * Resultado de una validación exitosa con datos necesarios.
      */
     public static class ValidationResult {
-        private final User sender;
-        private final User receiver;
-        private final Game suggestedGame;
+        private User sender;
+        private User receiver;
+        private Game suggestedGame;
+        private FriendRequest friendRequest; // ✅ NUEVO CAMPO
 
+        // Constructor original (mantener compatibilidad)
         public ValidationResult(User sender, User receiver, Game suggestedGame) {
             this.sender = sender;
             this.receiver = receiver;
             this.suggestedGame = suggestedGame;
         }
 
+        // ✅ NUEVO: Constructor vacío
+        public ValidationResult() {}
+
+        // Getters existentes
         public User getSender() { return sender; }
         public User getReceiver() { return receiver; }
         public Game getSuggestedGame() { return suggestedGame; }
+
+        // ✅ NUEVOS: Setters
+        public void setSender(User sender) { this.sender = sender; }
+        public void setReceiver(User receiver) { this.receiver = receiver; }
+        public void setSuggestedGame(Game suggestedGame) { this.suggestedGame = suggestedGame; }
+
+        // ✅ NUEVO: Getter/Setter para FriendRequest
+        public FriendRequest getFriendRequest() { return friendRequest; }
+        public void setFriendRequest(FriendRequest friendRequest) { this.friendRequest = friendRequest; }
     }
 
     // ================================================

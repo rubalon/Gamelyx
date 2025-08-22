@@ -74,15 +74,30 @@ public class SocialController {
     public ResponseEntity<FriendRequestResponseDto> respondToFriendRequest(
             @AuthenticationPrincipal String username,
             @PathVariable String requestId,
-            @RequestBody RespondToFriendRequestDto request) {
+            @RequestParam FriendRequestAction action) {
 
         FriendRequestResponseDto response = socialService.respondToFriendRequest(
                 username,
                 requestId,
-                request
+                action
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Marca una solicitud específica como notificada al sender.
+     * Se usa después de mostrar la notificación al usuario que envió la solicitud.
+     *
+     * PUT /api/social/friend-requests/{requestId}/mark-notified
+     */
+    @PutMapping("/friend-requests/{requestId}/mark-notified")
+    public ResponseEntity<Void> markFriendRequestAsNotified(
+            @AuthenticationPrincipal String username,
+            @PathVariable String requestId) {
+
+        socialService.markFriendRequestAsNotified(username, requestId);
+        return ResponseEntity.ok().build();
     }
 
     // ================================================
@@ -97,7 +112,7 @@ public class SocialController {
      */
     @GetMapping("/search/users")
     public ResponseEntity<UserSearchResultDto> searchUsers(
-            @AuthenticationPrincipal String username,  // ✅ Directamente String
+            @AuthenticationPrincipal String username,
             @RequestParam String q,
             @RequestParam(defaultValue = "10") int limit) {
 
