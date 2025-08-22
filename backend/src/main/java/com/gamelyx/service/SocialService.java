@@ -4,7 +4,6 @@ import com.gamelyx.dto.SocialRequestDtos.*;
 import com.gamelyx.dto.SocialResponseDtos.*;
 import com.gamelyx.entity.FriendRequest;
 import com.gamelyx.entity.Friendship;
-import com.gamelyx.entity.Game;
 import com.gamelyx.entity.User;
 import com.gamelyx.mapper.SocialMapper;
 import com.gamelyx.repository.FriendRequestRepository;
@@ -15,6 +14,7 @@ import com.gamelyx.validator.SocialValidator;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -170,8 +170,8 @@ public class SocialService {
 
         // 2. Crear la solicitud (validación ya pasada)
         FriendRequest friendRequest = new FriendRequest(
-                validation.getSender(),
-                validation.getReceiver(),
+                validation.getCallerUser(),
+                validation.getTargetUser(),
                 request.source()
         );
 
@@ -383,15 +383,39 @@ public class SocialService {
 
     /**
      * Elimina un amigo de la lista.
-     * MOCK: Simula eliminación exitosa.
+     * IMPLEMENTACIÓN REAL: Usa validator para validaciones limpias.
      */
-    public DeleteFriendResponseDto deleteFriend(String currentUsername, String friendUsername) {
-        // Simular eliminación exitosa
-        return new DeleteFriendResponseDto(
-                true,
-                friendUsername,
-                UUID.randomUUID() // ID del amigo eliminado
+    @Transactional
+    public DeleteFriendResponseDto deleteFriend(String currentUsername, UUID friendId) {
+        // 1. Validar todo usando el validator
+        SocialValidator.ValidationResult validation = socialValidator.validateDeleteFriend(currentUsername, friendId);
+
+        // 2. Eliminar amistad bidireccional (validación ya pasada)
+        friendshipRepository.deleteBidirectionalFriendship(
+                validation.getCallerUser().getId(),
+                friendId
         );
+
+        // 3. Opcional: Limpiar solicitudes relacionadas (pendientes entre estos usuarios)
+        cleanupRelatedFriendRequests(validation.getCallerUser().getId(), friendId);
+
+        // 4. Convertir a DTO usando el mapper
+        return socialMapper.toDeleteFriendResponseDto(validation.getTargetUser(), true);
+    }
+
+    /**
+     * Limpia solicitudes de amistad relacionadas entre dos usuarios.
+     * Elimina solicitudes PENDIENTES en ambas direcciones.
+     */
+    private void cleanupRelatedFriendRequests(UUID userId1, UUID userId2) {
+        // Buscar solicitudes pendientes en ambas direcciones
+        List<FriendRequest> pendingRequests = friendRequestRepository
+                .findPendingRequestsBetweenUsers(userId1, userId2);
+
+        // Eliminar directamente las solicitudes pendientes
+        if (!pendingRequests.isEmpty()) {
+            friendRequestRepository.deleteAll(pendingRequests);
+        }
     }
 
     // ================================================

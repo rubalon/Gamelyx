@@ -133,18 +133,16 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, UU
                                     @Param("receiverId") UUID receiverId,
                                     @Param("gameId") UUID gameId);
 
-    // ================================================
-    // CONSULTAS PARA MANTENIMIENTO
-    // ================================================
-
     /**
-     * Busca solicitudes rechazadas antiguas para limpieza.
-     * Para job de mantenimiento que elimine datos obsoletos.
+     * Busca solicitudes PENDIENTES entre dos usuarios (en ambas direcciones).
+     * Para limpieza al eliminar amistad.
      */
     @Query("SELECT fr FROM FriendRequest fr " +
-            "WHERE fr.status = 'REJECTED' " +
-            "AND fr.respondedAt < :cutoffDate")
-    List<FriendRequest> findOldRejectedRequests(@Param("cutoffDate") LocalDateTime cutoffDate);
+            "WHERE fr.status = 'PENDING' " +
+            "AND ((fr.sender.id = :userId1 AND fr.receiver.id = :userId2) " +
+            "     OR (fr.sender.id = :userId2 AND fr.receiver.id = :userId1))")
+    List<FriendRequest> findPendingRequestsBetweenUsers(@Param("userId1") UUID userId1,
+                                                        @Param("userId2") UUID userId2);
 
     /**
      * Elimina solicitudes rechazadas más antiguas que una fecha.

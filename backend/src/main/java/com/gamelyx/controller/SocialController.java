@@ -9,6 +9,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Controller para manejar todas las funcionalidades sociales:
  * - Gestión de amigos y solicitudes
@@ -44,7 +46,7 @@ public class SocialController {
     }
 
     // ================================================
-    // GESTIÓN DE SOLICITUDES DE AMISTAD
+    // GESTIÓN DE AMISTADES HU-17 , HU-19
     // ================================================
 
     /**
@@ -98,6 +100,30 @@ public class SocialController {
 
         socialService.markFriendRequestAsNotified(username, requestId);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Elimina a un usuario de la lista de amigos.
+     * Elimina la amistad bidireccional completa.
+     * Elimina las solicitudes de amistad relacionadas si existen
+     *
+     * DELETE /api/social/friends/{friendUsername}
+     */
+    @DeleteMapping("/friends/{friendId}")
+    public ResponseEntity<DeleteFriendResponseDto> deleteFriend(
+            @AuthenticationPrincipal String username,
+            @PathVariable UUID friendId) {
+
+        DeleteFriendResponseDto response = socialService.deleteFriend(
+                username,
+                friendId
+        );
+
+        if (response.success()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     // ================================================
@@ -155,32 +181,6 @@ public class SocialController {
         }
     }
 
-    // ================================================
-    // GESTIÓN DE AMISTADES hu -17
-    // ================================================
-
-    /**
-     * Elimina a un usuario de la lista de amigos.
-     * Elimina la amistad bidireccional completa.
-     *
-     * DELETE /api/social/friends/{friendUsername}
-     */
-    @DeleteMapping("/friends/{friendUsername}")
-    public ResponseEntity<DeleteFriendResponseDto> deleteFriend(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable String friendUsername) {
-
-        DeleteFriendResponseDto response = socialService.deleteFriend(
-                userDetails.getUsername(),
-                friendUsername
-        );
-
-        if (response.success()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
 
     // ================================================
     // SUGERENCIAS AUTOMÁTICAS (HU-20)

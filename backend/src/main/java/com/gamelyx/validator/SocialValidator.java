@@ -187,8 +187,8 @@ public class SocialValidator {
             throw new IllegalStateException("Error de consistencia: Los usuarios ya son amigos pero existe una solicitud pendiente");
         }
 
-        result.setReceiver(currentUser);
-        result.setSender(friendRequest.getSender());
+        result.setTargetUser(currentUser);
+        result.setCallerUser(friendRequest.getSender());
         result.setFriendRequest(friendRequest);
 
         return result;
@@ -230,7 +230,7 @@ public class SocialValidator {
             throw new IllegalArgumentException("Esta solicitud ya está marcada como notificada");
         }
 
-        result.setSender(sender);
+        result.setCallerUser(sender);
         result.setFriendRequest(friendRequest);
 
         return result;
@@ -241,18 +241,32 @@ public class SocialValidator {
     // ================================================
 
     /**
-     * Valida que se puede eliminar una amistad.
+     * Valida la eliminación de un amigo.
      */
-    public ValidationResult validateDeleteFriend(String username, String friendUsername) {
-        User user = validateUserExists(username);
-        User friend = validateUserExists(friendUsername);
+    public ValidationResult validateDeleteFriend(String currentUsername, UUID friendId) {
+        ValidationResult result = new ValidationResult();
 
-        // Verificar que son amigos
-        if (!friendshipRepository.areUsersFriends(user.getId(), friend.getId())) {
-            throw new IllegalArgumentException("No sois amigos");
+        // 1. Validar usuario actual
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario actual no encontrado"));
+        result.setCallerUser(currentUser);
+
+        // 2. Validar que el amigo existe
+        User friendUser = userRepository.findById(friendId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario amigo no encontrado"));
+        result.setTargetUser(friendUser);
+
+        // 3. Validar que no intenta eliminarse a sí mismo
+        if (currentUser.getId().equals(friendId)) {
+            throw new IllegalArgumentException("No puedes eliminarte a ti mismo de la lista de amigos");
         }
 
-        return new ValidationResult(user, friend, null);
+        // 4. Validar que realmente son amigos
+        if (!friendshipRepository.areUsersFriends(currentUser.getId(), friendId)) {
+            throw new IllegalArgumentException("No puedes eliminar a alguien que no es tu amigo");
+        }
+
+        return result;
     }
 
     // ================================================
@@ -301,15 +315,15 @@ public class SocialValidator {
      * Resultado de una validación exitosa con datos necesarios.
      */
     public static class ValidationResult {
-        private User sender;
-        private User receiver;
+        private User callerUser;
+        private User targetUser;
         private Game suggestedGame;
         private FriendRequest friendRequest; // ✅ NUEVO CAMPO
 
         // Constructor original (mantener compatibilidad)
-        public ValidationResult(User sender, User receiver, Game suggestedGame) {
-            this.sender = sender;
-            this.receiver = receiver;
+        public ValidationResult(User callerUser, User targetUser, Game suggestedGame) {
+            this.callerUser = callerUser;
+            this.targetUser = targetUser;
             this.suggestedGame = suggestedGame;
         }
 
@@ -317,13 +331,13 @@ public class SocialValidator {
         public ValidationResult() {}
 
         // Getters existentes
-        public User getSender() { return sender; }
-        public User getReceiver() { return receiver; }
+        public User getCallerUser() { return callerUser; }
+        public User getTargetUser() { return targetUser; }
         public Game getSuggestedGame() { return suggestedGame; }
 
         // ✅ NUEVOS: Setters
-        public void setSender(User sender) { this.sender = sender; }
-        public void setReceiver(User receiver) { this.receiver = receiver; }
+        public void setCallerUser(User callerUser) { this.callerUser = callerUser; }
+        public void setTargetUser(User targetUser) { this.targetUser = targetUser; }
         public void setSuggestedGame(Game suggestedGame) { this.suggestedGame = suggestedGame; }
 
         // ✅ NUEVO: Getter/Setter para FriendRequest
