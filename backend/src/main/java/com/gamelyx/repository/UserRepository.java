@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,6 +45,47 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // Query personalizada - contar usuarios verificados
     @Query("SELECT COUNT(u) FROM User u WHERE u.emailVerified = true")
     long countVerifiedUsers();
+
+    // ================================================
+    // BÚSQUEDA DE USUARIOS HU-16
+    // ================================================
+
+
+    /**
+     * Busca coincidencias exactas de username.
+     * Case-insensitive, excluye al usuario actual.
+     *
+     * @param query Texto exacto a buscar
+     * @param currentUsername Usuario actual a excluir
+     * @return Lista de usuarios con coincidencia exacta (máximo 1)
+     */
+    @Query(value = "SELECT * FROM users u " +
+            "WHERE LOWER(u.username) = LOWER(:query) " +
+            "AND u.username != :currentUsername " +
+            "LIMIT 1",
+            nativeQuery = true)
+    List<User> findUsernameExactMatch(@Param("query") String query,
+                                      @Param("currentUsername") String currentUsername);
+
+    /**
+     * Busca usuarios por nombre de usuario usando coincidencias parciales.
+     * Case-insensitive, excluye al usuario actual y coincidencias exactas.
+     * SIN ORDER BY para que PostgreSQL pare al alcanzar el limit.
+     *
+     * @param query Texto a buscar en el username
+     * @param currentUsername Usuario actual a excluir
+     * @param limit Máximo número de resultados
+     * @return Lista de usuarios que coinciden parcialmente
+     */
+    @Query(value = "SELECT * FROM users u " +
+            "WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "AND LOWER(u.username) != LOWER(:query) " +
+            "AND u.username != :currentUsername " +
+            "LIMIT :limit",
+            nativeQuery = true)
+    List<User> searchUsersByUsername(@Param("query") String query,
+                                     @Param("currentUsername") String currentUsername,
+                                     @Param("limit") int limit);
 
 
 

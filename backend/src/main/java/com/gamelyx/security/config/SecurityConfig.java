@@ -91,6 +91,10 @@ public class SecurityConfig {
                         .requestMatchers("PUT", "/api/games/game/*/my-game-details").authenticated()
                         .requestMatchers("GET","/api/games/my-reviews").authenticated()
 
+                        //Enpoints de social ( necesitan autentificacion)
+                        .requestMatchers("GET","/api/social/search/users").authenticated()
+                        .requestMatchers("POST","/api/social/friend-requests").authenticated()
+
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 

@@ -101,20 +101,20 @@ public class SocialResponseDtos {
             UUID deletedFriendId
     ) {}
 
-    // ================================================
-    // DTOs PARA BÚSQUEDAS
-    // ================================================
-
-    // ================================================
-// DTOs PARA BÚSQUEDAS
-// ================================================
 
     /**
      * Resultado de búsqueda de usuarios por nombre
      */
     public record UserSearchResultDto(
             String query,
-            List<UserDto> users
+            List<SearchedUserDto> users
+    ) {}
+
+    public record SearchedUserDto(
+            UserDto user,
+            Boolean isFriend,
+            Boolean hasPendingRequest,
+            Boolean hasRejectedRequest
     ) {}
 
     // ================================================

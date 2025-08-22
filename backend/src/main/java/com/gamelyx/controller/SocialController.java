@@ -3,6 +3,7 @@ package com.gamelyx.controller;
 import com.gamelyx.dto.SocialRequestDtos.*;
 import com.gamelyx.dto.SocialResponseDtos.*;
 import com.gamelyx.service.SocialService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,7 +35,7 @@ public class SocialController {
      *
      * GET /api/social/home-data
      */
-    @GetMapping("/home-data")
+    @GetMapping("/home-social-data")
     public ResponseEntity<HomeSocialDataDto> getHomeSocialData(
             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -52,11 +53,16 @@ public class SocialController {
      *
      * POST /api/social/friend-requests
      */
-    @PostMapping
-    public ResponseEntity<OutgoingRequestDto> sendFriendRequest(@RequestBody SendFriendRequestDto request) {
-        // adaptar
+    @PostMapping("/friend-requests")
+    public ResponseEntity<OutgoingRequestDto> sendFriendRequest(
+            @AuthenticationPrincipal String username,
+            @RequestBody SendFriendRequestDto request) {
 
-        return null;
+        OutgoingRequestDto response = socialService.sendFriendRequest(
+                username,
+                request
+        );
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -66,12 +72,12 @@ public class SocialController {
      */
     @PutMapping("/friend-requests/{requestId}/respond")
     public ResponseEntity<FriendRequestResponseDto> respondToFriendRequest(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal String username,
             @PathVariable String requestId,
             @RequestBody RespondToFriendRequestDto request) {
 
         FriendRequestResponseDto response = socialService.respondToFriendRequest(
-                userDetails.getUsername(),
+                username,
                 requestId,
                 request
         );
@@ -80,7 +86,7 @@ public class SocialController {
     }
 
     // ================================================
-    // BÚSQUEDA DE USUARIOS
+    // BÚSQUEDA DE USUARIOS HU-16
     // ================================================
 
     /**
@@ -91,24 +97,17 @@ public class SocialController {
      */
     @GetMapping("/search/users")
     public ResponseEntity<UserSearchResultDto> searchUsers(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam String query,
+            @AuthenticationPrincipal String username,  // ✅ Directamente String
+            @RequestParam String q,
             @RequestParam(defaultValue = "10") int limit) {
 
-        try {
-            UserSearchRequestDto searchRequest = new UserSearchRequestDto(query, limit);
+        //Construimos el DTO
+        UserSearchRequestDto searchRequest = new UserSearchRequestDto(q, limit);
 
-            UserSearchResultDto results = socialService.searchUsersByName(
-                    userDetails.getUsername(),
-                    searchRequest
-            );
+        //Buscamos el usuario
+        UserSearchResultDto results = socialService.searchUsersByName(username, searchRequest);
 
-            return ResponseEntity.ok(results);
-
-        } catch (IllegalArgumentException e) {
-            // Query muy corto o límite inválido
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(results);
     }
 
     /**
@@ -142,7 +141,7 @@ public class SocialController {
     }
 
     // ================================================
-    // GESTIÓN DE AMISTADES
+    // GESTIÓN DE AMISTADES hu -17
     // ================================================
 
     /**

@@ -89,6 +89,30 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja IllegalStateException
+     * Ejemplo: solicitudes duplicadas, conflictos de estado
+     * Devuelve: 409 Conflict
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(
+            IllegalStateException ex) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", 409);
+        response.put("error", "Conflict");
+
+        // Mostrar mensaje detallado solo en desarrollo
+        if (isDevEnvironment()) {
+            response.put("message", ex.getMessage());
+        } else {
+            response.put("message", "Conflicto con el estado actual");
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
      * Maneja errores generales de acceso a datos
      * Ejemplo: conexión perdida con BD, query mal formada
      * Devuelve: 500 Internal Server Error

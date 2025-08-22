@@ -35,15 +35,7 @@ import java.util.UUID;
         })
 public class UserGameDetails {
 
-    /**
-     * Estados posibles para un juego en la biblioteca del usuario
-     */
-    public enum GameStatus {
-        WISHLIST,
-        PLAYING,
-        COMPLETED,
-        ARCHIVED
-    }
+
 
     // ===== ID Y RELACIONES =====
 
@@ -199,5 +191,15 @@ public class UserGameDetails {
                 rating,
                 hasReview()
         );
+    }
+
+    /**
+     * Estados posibles para un juego en la biblioteca del usuario
+     */
+    public enum GameStatus {
+        WISHLIST,
+        PLAYING,
+        COMPLETED,
+        ARCHIVED
     }
 }

@@ -3,9 +3,20 @@ package com.gamelyx.service;
 import com.gamelyx.dto.SocialRequestDtos.*;
 import com.gamelyx.dto.SocialResponseDtos.*;
 import com.gamelyx.entity.FriendRequest;
+import com.gamelyx.entity.Game;
+import com.gamelyx.entity.User;
+import com.gamelyx.mapper.SocialMapper;
+import com.gamelyx.repository.FriendRequestRepository;
+import com.gamelyx.repository.FriendshipRepository;
+import com.gamelyx.repository.GameRepository;
+import com.gamelyx.repository.UserRepository;
+import com.gamelyx.validator.SocialValidator;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +27,31 @@ import java.util.UUID;
  */
 @Service
 public class SocialService {
+
+    private final UserRepository userRepository;
+    private final FriendshipRepository friendshipRepository;
+    private final FriendRequestRepository friendRequestRepository;
+    private final GameRepository gameRepository;
+    private final SocialMapper socialMapper;
+    private final SocialValidator socialValidator;
+    private final Logger logger = LoggerFactory.getLogger(SocialService.class);
+
+    // Constructor actualizado:
+    public SocialService(
+            UserRepository userRepository,
+            FriendshipRepository friendshipRepository,
+            FriendRequestRepository friendRequestRepository,
+            GameRepository gameRepository,
+            SocialMapper socialMapper,
+            SocialValidator socialValidator) {
+
+        this.userRepository = userRepository;
+        this.friendshipRepository = friendshipRepository;
+        this.friendRequestRepository = friendRequestRepository;
+        this.gameRepository = gameRepository;
+        this.socialMapper = socialMapper;
+        this.socialValidator = socialValidator;
+    }
 
     // ================================================
     // ENDPOINT PRINCIPAL PARA HOME SOCIAL
@@ -120,27 +156,33 @@ public class SocialService {
     }
 
     // ================================================
-    // GESTIÓN DE SOLICITUDES DE AMISTAD
+    // GESTIÓN DE SOLICITUDES DE AMISTAD HU-17
     // ================================================
 
     /**
      * Envía una solicitud de amistad.
-     * MOCK: Simula el envío exitoso.
+     * IMPLEMENTACIÓN REAL: Usa validator para validaciones limpias.
      */
     public OutgoingRequestDto sendFriendRequest(String senderUsername, SendFriendRequestDto request) {
-        // Simular creación de solicitud
-        return new OutgoingRequestDto(
-                UUID.randomUUID(), // requestId generado
-                new ContactUserDto(
-                        new UserDto(request.targetUserId(), "UsuarioMock"),
-                        null,
-                        false
-                ),
-                request.source(),
-                FriendRequest.FriendRequestStatus.PENDING,
-                request.gameSlug(),
-                LocalDateTime.now()
+        // 1. Validar todo usando el validator
+        SocialValidator.ValidationResult validation = socialValidator.validateSendFriendRequest(senderUsername, request);
+
+        // 2. Crear la solicitud (validación ya pasada)
+        FriendRequest friendRequest = new FriendRequest(
+                validation.getSender(),
+                validation.getReceiver(),
+                request.source()
         );
+
+        if (validation.getSuggestedGame() != null) {
+            friendRequest.setSuggestedGame(validation.getSuggestedGame());
+        }
+
+        // 3. Guardar en BD
+        FriendRequest savedRequest = friendRequestRepository.save(friendRequest);
+
+        // 4. Convertir a DTO usando el mapper
+        return socialMapper.toOutgoingRequestDto(savedRequest);
     }
 
     /**
@@ -168,32 +210,83 @@ public class SocialService {
     }
 
     // ================================================
-    // BÚSQUEDA DE USUARIOS
+    // BÚSQUEDA DE USUARIOS HU-16
     // ================================================
 
     /**
-     * Busca usuarios por nombre.
-     * MOCK: Retorna resultados simulados basados en la query.
+     * Busca usuarios por nombre (coincidencias parciales, case-insensitive).
+     * Implementa HU-16: Excluye usuario actual, amigos existentes y solicitudes pendientes.
      */
     public UserSearchResultDto searchUsersByName(String currentUsername, UserSearchRequestDto searchRequest) {
-        // Validación básica
-        if (searchRequest.query().length() < 2) {
-            throw new IllegalArgumentException("Query debe tener al menos 2 caracteres");
-        }
 
-        // Datos mock que simulan coincidencias
-        List<UserDto> mockResults = List.of(
-                new UserDto(UUID.randomUUID(), searchRequest.query() + "Fan"),
-                new UserDto(UUID.randomUUID(), "Pro" + searchRequest.query()),
-                new UserDto(UUID.randomUUID(), searchRequest.query() + "Master")
+        //Validaciones
+        socialValidator.validateUserSearch(searchRequest.query(), searchRequest.limit());
+
+        String cleanQuery = searchRequest.query().trim();
+        int limit = searchRequest.limit();
+
+        try {
+            List<User> foundUsers = new ArrayList<>();
+
+            // 1. Buscar coincidencias exactas primero (máximo 1)
+            List<User> exactMatches = userRepository.findUsernameExactMatch(cleanQuery, currentUsername);
+            foundUsers.addAll(exactMatches);
+
+            // 2. Si no tenemos suficientes, buscar coincidencias parciales
+            if (foundUsers.size() < limit) {
+                int remainingLimit = limit - foundUsers.size(); // Restar exactas encontradas
+                List<User> partialMatches = userRepository.searchUsersByUsername(
+                        cleanQuery,
+                        currentUsername,
+                        remainingLimit
+                );
+                foundUsers.addAll(partialMatches);
+            }
+
+            UUID currentUserId = getUserByUsername(currentUsername).getId();
+
+            // 3. Enriquecer cada usuario con información de relación
+            List<SearchedUserDto> searchedUsers = foundUsers.stream()
+                    .map(user -> enrichUserWithRelationshipInfo(user, currentUserId))
+                    .toList();
+
+            // 4. Convertir a DTO final
+            return socialMapper.toUserSearchResultDto(cleanQuery, searchedUsers);
+
+        } catch (Exception e) {
+            logger.error("Error searching users with query '{}' for user '{}': {}",
+                    cleanQuery, currentUsername, e.getMessage());
+            throw new IllegalArgumentException("Error en la búsqueda de usuarios");
+        }
+    }
+
+    /**
+     * Enriquece un usuario con información de su relación con el usuario actual
+     */
+    private SearchedUserDto enrichUserWithRelationshipInfo(User user, UUID currentUserId) {
+        // Verificar si son amigos
+        boolean isFriend = friendshipRepository.areUsersFriends(currentUserId, user.getId());
+
+        // Verificar si hay solicitud pendiente (en cualquier dirección)
+        boolean hasPendingRequest = friendRequestRepository.existsPendingRequestBetween(currentUserId, user.getId());
+
+        // Verificar si ya hay una solicitud rechazada
+        boolean hasRejectedRequest = friendRequestRepository.existsBySenderIdAndReceiverIdAndStatus(
+                currentUserId,
+                user.getId(),
+                FriendRequest.FriendRequestStatus.REJECTED
         );
 
-        // Limitar resultados según el parámetro
-        List<UserDto> limitedResults = mockResults.stream()
-                .limit(searchRequest.limit())
-                .toList();
+        return socialMapper.toSearchedUserDto(user, isFriend, hasPendingRequest, hasRejectedRequest);
+    }
 
-        return new UserSearchResultDto(searchRequest.query(), limitedResults);
+
+    /**
+     * Obtiene User entity por username - método auxiliar
+     */
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + username));
     }
 
     /**
