@@ -97,6 +97,8 @@ public class SecurityConfig {
                         .requestMatchers("PUT","/api/social/friend-requests/*/respond").authenticated()
                         .requestMatchers("PUT","/api/social/friend-requests/*/mark-notified").authenticated()
                         .requestMatchers("DELETE","/api/social/friends/*").authenticated()
+                        .requestMatchers("GET","/api/social/friend-suggestion/by-game").authenticated()
+                        .requestMatchers("POST","/api/social/friend-suggestion/reject").authenticated()
 
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

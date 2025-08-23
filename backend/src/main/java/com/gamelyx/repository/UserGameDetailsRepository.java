@@ -180,7 +180,7 @@ public interface UserGameDetailsRepository extends JpaRepository<UserGameDetails
      * Encuentra juegos completados recientemente por un usuario
      */
     @Query("SELECT ugd FROM UserGameDetails ugd JOIN FETCH ugd.game g " +
-            "WHERE ugd.user.id = :userId AND ugd.status = 'COMPLETED' " )
+            "WHERE ugd.user.id = :userId AND ugd.status = 'COMPLETED' ")
     List<UserGameDetails> findRecentlyCompletedGames(@Param("userId") UUID userId, Pageable pageable);
 
     /**
@@ -194,4 +194,41 @@ public interface UserGameDetailsRepository extends JpaRepository<UserGameDetails
                                              @Param("minRating") Integer minRating,
                                              @Param("minTextLength") Integer minTextLength,
                                              Pageable pageable);
+
+    /**
+     * QUERY OPTIMIZADA: Una sola consulta que hace todo:
+     * - Busca usuarios en rango min-max
+     * - Excluye usuario actual
+     * - Excluye amigos existentes
+     * - Excluye usuarios con solicitudes pendientes
+     * - Incluye JOIN FETCH para evitar N+1
+     * - Ordena por rating DESC para mejor performance en búsqueda progresiva
+     */
+    @Query("SELECT ugd FROM UserGameDetails ugd " +
+            "JOIN FETCH ugd.user u " +
+            "WHERE ugd.game.id = :gameId " +
+            "AND ugd.user.id != :currentUserId " +
+            "AND ugd.rating BETWEEN :minRating AND :maxRating " +
+            "AND NOT EXISTS (" +
+            "    SELECT 1 FROM Friendship f " +
+            "    WHERE (f.user.id = :currentUserId AND f.friend.id = u.id)" +
+            ") " +
+            "AND NOT EXISTS (" +
+            "    SELECT 1 FROM FriendRequest fr " +
+            "    WHERE fr.status = 'PENDING' " +
+            "    AND ((fr.sender.id = :currentUserId AND fr.receiver.id = u.id) " +
+            "         OR (fr.sender.id = u.id AND fr.receiver.id = :currentUserId))" +
+            ") " +
+            "AND NOT EXISTS (" +
+            "    SELECT 1 FROM SuggestionRejection sr " +
+            "    WHERE sr.user.id = :currentUserId " +
+            "    AND sr.rejectedUser.id = u.id " +
+            "    AND sr.game.id = :gameId" +
+            ") " +
+            "ORDER BY ugd.rating DESC")
+    List<UserGameDetails> findAvailableCandidatesForSuggestion(
+            @Param("currentUserId") UUID currentUserId,
+            @Param("gameId") UUID gameId,
+            @Param("minRating") int minRating,
+            @Param("maxRating") int maxRating);
 }

@@ -5,10 +5,9 @@ import com.gamelyx.dto.SocialRequestDtos.SendFriendRequestDto;
 import com.gamelyx.entity.FriendRequest;
 import com.gamelyx.entity.Game;
 import com.gamelyx.entity.User;
-import com.gamelyx.repository.FriendRequestRepository;
-import com.gamelyx.repository.FriendshipRepository;
-import com.gamelyx.repository.GameRepository;
-import com.gamelyx.repository.UserRepository;
+import com.gamelyx.entity.UserGameDetails;
+import com.gamelyx.repository.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -24,16 +23,18 @@ public class SocialValidator {
     private final FriendRequestRepository friendRequestRepository;
     private final FriendshipRepository friendshipRepository;
     private final GameRepository gameRepository;
+    private final UserGameDetailsRepository userGameDetailsRepository;
 
     public SocialValidator(
             UserRepository userRepository,
             FriendRequestRepository friendRequestRepository,
             FriendshipRepository friendshipRepository,
-            GameRepository gameRepository) {
+            GameRepository gameRepository, UserGameDetailsRepository userGameDetailsRepository) {
         this.userRepository = userRepository;
         this.friendRequestRepository = friendRequestRepository;
         this.friendshipRepository = friendshipRepository;
         this.gameRepository = gameRepository;
+        this.userGameDetailsRepository = userGameDetailsRepository;
     }
 
     // ================================================
@@ -270,7 +271,7 @@ public class SocialValidator {
     }
 
     // ================================================
-    // VALIDACIONES PARA BÚSQUEDAS
+    // VALIDACIONES PARA BÚSQUEDAS HU-16
     // ================================================
 
     /**
@@ -286,25 +287,68 @@ public class SocialValidator {
         }
     }
 
+    // ================================================
+    // VALIDACIONES PARA RECOMENDACIONES DE USUARIOS POR JUEGO HU-20
+    // ================================================
+
     /**
-     * Valida parámetros de búsqueda por juego.
+     * Valida una solicitud de sugerencia de amigo basada en juego.
+     * Validaciones específicas para el algoritmo de sugerencias.
      */
-    public void validateGameBasedSearch(String gameSlug, int userRating, int maxResults) {
-        if (gameSlug == null || gameSlug.trim().isEmpty()) {
-            throw new IllegalArgumentException("El slug del juego es obligatorio");
-        }
+    public ValidationResult validateFriendSuggestionByGame(String currentUsername, String gameSlug, int userRating) {
+        ValidationResult result = new ValidationResult();
 
-        if (userRating < 1 || userRating > 10) {
-            throw new IllegalArgumentException("El rating debe estar entre 1 y 10");
-        }
+        // 1. Validar usuario actual existe
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + currentUsername));
+        result.setCallerUser(currentUser);
 
-        if (maxResults < 1 || maxResults > 20) {
-            throw new IllegalArgumentException("Los resultados máximos deben estar entre 1 y 20");
-        }
-
-        // Verificar que el juego existe
-        gameRepository.findBySlug(gameSlug)
+        // 2. Validar que el juego existe
+        Game game = gameRepository.findBySlug(gameSlug)
                 .orElseThrow(() -> new IllegalArgumentException("Juego no encontrado: " + gameSlug));
+        result.setGame(game);
+
+        // 3. Validar rating en rango válido general (1-10)
+        if (userRating < 1 || userRating > 10) {
+            throw new IllegalArgumentException("Rating debe estar entre 1 y 10, recibido: " + userRating);
+        }
+
+        // 4. Validar rating mínimo para sugerencias (>= 7)
+        if (userRating < 7) {
+            throw new IllegalArgumentException("Rating debe ser 7 o superior para generar sugerencias (rating actual: " + userRating + ")");
+        }
+
+        return result;
+    }
+
+    // En SocialValidator
+    /**
+     * Valida una solicitud de rechazo de sugerencia
+     */
+    public ValidationResult validateRejectSuggestion(String currentUsername, UUID rejectedUserId, String gameSlug) {
+        ValidationResult result = new ValidationResult();
+
+        // 1. Validar usuario actual existe
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + currentUsername));
+        result.setCallerUser(currentUser);
+
+        // 2. Validar que el usuario rechazado existe
+        User rejectedUser = userRepository.findById(rejectedUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario rechazado no encontrado: " + rejectedUserId));
+        result.setTargetUser(rejectedUser);
+
+        // 3. Validar que el juego existe
+        Game game = gameRepository.findBySlug(gameSlug)
+                .orElseThrow(() -> new IllegalArgumentException("Juego no encontrado: " + gameSlug));
+        result.setGame(game);
+
+        // 4. Validar que no se está rechazando a sí mismo
+        if (currentUser.getId().equals(rejectedUser.getId())) {
+            throw new IllegalArgumentException("No puedes rechazarte a ti mismo como sugerencia");
+        }
+
+        return result;
     }
 
     // ================================================
@@ -317,14 +361,14 @@ public class SocialValidator {
     public static class ValidationResult {
         private User callerUser;
         private User targetUser;
-        private Game suggestedGame;
+        private Game game;
         private FriendRequest friendRequest; // ✅ NUEVO CAMPO
 
         // Constructor original (mantener compatibilidad)
-        public ValidationResult(User callerUser, User targetUser, Game suggestedGame) {
+        public ValidationResult(User callerUser, User targetUser, Game game) {
             this.callerUser = callerUser;
             this.targetUser = targetUser;
-            this.suggestedGame = suggestedGame;
+            this.game = game;
         }
 
         // ✅ NUEVO: Constructor vacío
@@ -333,47 +377,17 @@ public class SocialValidator {
         // Getters existentes
         public User getCallerUser() { return callerUser; }
         public User getTargetUser() { return targetUser; }
-        public Game getSuggestedGame() { return suggestedGame; }
+        public Game getGame() { return game; }
 
         // ✅ NUEVOS: Setters
         public void setCallerUser(User callerUser) { this.callerUser = callerUser; }
         public void setTargetUser(User targetUser) { this.targetUser = targetUser; }
-        public void setSuggestedGame(Game suggestedGame) { this.suggestedGame = suggestedGame; }
+        public void setGame(Game game) { this.game = game; }
 
         // ✅ NUEVO: Getter/Setter para FriendRequest
         public FriendRequest getFriendRequest() { return friendRequest; }
         public void setFriendRequest(FriendRequest friendRequest) { this.friendRequest = friendRequest; }
     }
 
-    // ================================================
-    // VALIDACIONES AUXILIARES
-    // ================================================
 
-    /**
-     * Valida que un UUID es válido.
-     */
-    public void validateUUID(String uuidString, String fieldName) {
-        try {
-            UUID.fromString(uuidString);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(fieldName + " no es un UUID válido");
-        }
-    }
-
-    /**
-     * Valida que un username tiene formato válido.
-     */
-    public void validateUsernameFormat(String username) {
-        if (username == null || username.trim().length() < 3) {
-            throw new IllegalArgumentException("El username debe tener al menos 3 caracteres");
-        }
-
-        if (username.length() > 20) {
-            throw new IllegalArgumentException("El username no puede tener más de 20 caracteres");
-        }
-
-        if (!username.matches("^[a-zA-Z0-9_]+$")) {
-            throw new IllegalArgumentException("El username solo puede contener letras, números y guiones bajos");
-        }
-    }
 }

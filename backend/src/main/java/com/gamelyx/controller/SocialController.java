@@ -151,86 +151,57 @@ public class SocialController {
         return ResponseEntity.ok(results);
     }
 
-    /**
-     * Busca usuarios por juego en común y nota similar.
-     * Para sugerencias automáticas basadas en gustos.
-     *
-     * GET /api/social/search/by-game?gameSlug=string&userRating=8&maxResults=5&tolerance=2
-     */
-    @GetMapping("/search/by-game")
-    public ResponseEntity<GameBasedSuggestionDto> searchUsersByGamePreference(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam String gameSlug,
-            @RequestParam int userRating,
-            @RequestParam(defaultValue = "5") int maxResults ){
-
-        try {
-            GameBasedSearchRequestDto searchRequest = new GameBasedSearchRequestDto(
-                    gameSlug, userRating, maxResults
-            );
-
-            GameBasedSuggestionDto suggestions = socialService.searchUsersByGamePreference(
-                    userDetails.getUsername(),
-                    searchRequest
-            );
-
-            return ResponseEntity.ok(suggestions);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
 
     // ================================================
     // SUGERENCIAS AUTOMÁTICAS (HU-20)
     // ================================================
 
     /**
-     * Obtiene UNA sugerencia de amigo basada en juegos en común.
-     * Analiza los juegos mejor valorados del usuario actual.
+    * Obtiene UNA sugerencia de usuario basada en un juego específico y rating.
+    * Busca usuarios con rating similar
      *
-     * GET /api/social/suggestions/next
+     * GET /api/social/friend-suggestion/by-game?gameSlug=zelda-breath-of-the-wild&userRating=9
      */
-    @GetMapping("/suggestions/next")
-    public ResponseEntity<SuggestedUserDto> getNextFriendSuggestion(
-            @AuthenticationPrincipal UserDetails userDetails) {
-    /*
-        SuggestedUserDto suggestion = socialService.getNextFriendSuggestion(
-                userDetails.getUsername()
+    @GetMapping("/friend-suggestion/by-game")
+    public ResponseEntity<SuggestedUserDto> getFriendSuggestionByGame(
+            @AuthenticationPrincipal String username,
+            @RequestParam String gameSlug,
+            @RequestParam int userRating) {
+
+
+        SuggestedUserDto suggestion = socialService.getFriendSuggestionByGame(
+                username,
+                gameSlug,
+                userRating
         );
 
         if (suggestion == null) {
-            return ResponseEntity.noContent().build(); // 204 - No hay más sugerencias
+            return ResponseEntity.noContent().build(); // 204 - No hay sugerencias
         }
 
         return ResponseEntity.ok(suggestion);
-
-     */
-        return null;
     }
 
     /**
      * Rechaza una sugerencia específica para que no vuelva a aparecer.
+     * Marca al usuario como rechazado para el juego específico.
      *
-     * POST /api/social/suggestions/reject
+     * POST /api/social/friend-suggestion/reject?rejectedUserId=uuid&gameSlug=zelda
      */
-    /*
-    @PostMapping("/suggestions/reject")
-    public ResponseEntity<Void> rejectSuggestion(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody RejectSuggestionDto request) {
+    @PostMapping("/friend-suggestion/reject")
+    public ResponseEntity<Void> rejectFriendSuggestion(
+            @AuthenticationPrincipal String username,
+            @RequestParam UUID rejectedUserId,
+            @RequestParam String gameSlug) {
 
-        socialService.rejectSuggestion(
-                userDetails.getUsername(),
-                request.rejectedUsername(),
-                request.gameSlug()
+        socialService.rejectFriendSuggestion(
+                username,
+                rejectedUserId,
+                gameSlug
         );
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build(); // 200 OK sin contenido
     }
-
-     */
 
 
 }

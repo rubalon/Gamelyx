@@ -2,14 +2,9 @@ package com.gamelyx.service;
 
 import com.gamelyx.dto.SocialRequestDtos.*;
 import com.gamelyx.dto.SocialResponseDtos.*;
-import com.gamelyx.entity.FriendRequest;
-import com.gamelyx.entity.Friendship;
-import com.gamelyx.entity.User;
+import com.gamelyx.entity.*;
 import com.gamelyx.mapper.SocialMapper;
-import com.gamelyx.repository.FriendRequestRepository;
-import com.gamelyx.repository.FriendshipRepository;
-import com.gamelyx.repository.GameRepository;
-import com.gamelyx.repository.UserRepository;
+import com.gamelyx.repository.*;
 import com.gamelyx.validator.SocialValidator;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -19,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service mock para funcionalidades sociales.
@@ -33,6 +30,8 @@ public class SocialService {
     private final FriendshipRepository friendshipRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final GameRepository gameRepository;
+    private final UserGameDetailsRepository userGameDetailsRepository;
+    private final SuggestionRejectionRepository suggestionRejectionRepository;
     private final SocialMapper socialMapper;
     private final SocialValidator socialValidator;
     private final Logger logger = LoggerFactory.getLogger(SocialService.class);
@@ -42,7 +41,7 @@ public class SocialService {
             UserRepository userRepository,
             FriendshipRepository friendshipRepository,
             FriendRequestRepository friendRequestRepository,
-            GameRepository gameRepository,
+            GameRepository gameRepository, UserGameDetailsRepository userGameDetailsRepository, SuggestionRejectionRepository suggestionRejectionRepository,
             SocialMapper socialMapper,
             SocialValidator socialValidator) {
 
@@ -50,6 +49,8 @@ public class SocialService {
         this.friendshipRepository = friendshipRepository;
         this.friendRequestRepository = friendRequestRepository;
         this.gameRepository = gameRepository;
+        this.userGameDetailsRepository = userGameDetailsRepository;
+        this.suggestionRejectionRepository = suggestionRejectionRepository;
         this.socialMapper = socialMapper;
         this.socialValidator = socialValidator;
     }
@@ -63,97 +64,8 @@ public class SocialService {
      * MOCK: Retorna datos de ejemplo hardcodeados.
      */
     public HomeSocialDataDto getHomeSocialData(String currentUsername) {
-        // Datos mock de amigos
-        List<ContactUserDto> friends = List.of(
-                new ContactUserDto(
-                        new UserDto(UUID.randomUUID(), "SofiaQueen"),
-                        UUID.randomUUID(), // chatId
-                        true // newMessages
-                ),
-                new ContactUserDto(
-                        new UserDto(UUID.randomUUID(), "CarlosRPG"),
-                        UUID.randomUUID(),
-                        false
-                ),
-                new ContactUserDto(
-                        new UserDto(UUID.randomUUID(), "AnaShooter"),
-                        UUID.randomUUID(),
-                        false
-                )
-        );
 
-        // Datos mock de solicitudes entrantes
-        List<IncomingRequestDto> incomingRequests = List.of(
-                new IncomingRequestDto(
-                        UUID.randomUUID(),
-                        new ContactUserDto(
-                                new UserDto(UUID.randomUUID(), "AlexGamer"),
-                                null,
-                                false
-                        ),
-                        FriendRequest.RequestSource.SEARCH,
-                        null, // No hay juego sugerido para búsqueda manual
-                        LocalDateTime.now().minusHours(2)
-                ),
-                new IncomingRequestDto(
-                        UUID.randomUUID(),
-                        new ContactUserDto(
-                                new UserDto(UUID.randomUUID(), "MariaPro"),
-                                null,
-                                false
-                        ),
-                        FriendRequest.RequestSource.SUGGESTION,
-                        new SuggestedGameInfoDto(
-                                "zelda-breath-of-the-wild",
-                                "The Legend of Zelda: Breath of the Wild",
-                                9, // Tu rating
-                                8  // Su rating
-                        ),
-                        LocalDateTime.now().minusMinutes(30)
-                )
-        );
-
-        // Datos mock de solicitudes salientes
-        List<OutgoingRequestDto> outgoingRequests = List.of(
-                new OutgoingRequestDto(
-                        UUID.randomUUID(),
-                        new ContactUserDto(
-                                new UserDto(UUID.randomUUID(), "LuisArcade"),
-                                null,
-                                false
-                        ),
-                        FriendRequest.RequestSource.SEARCH,
-                        FriendRequest.FriendRequestStatus.PENDING,
-                        null, // Sin juego para búsqueda manual
-                        LocalDateTime.now().minusHours(1)
-                )
-        );
-
-        // Datos mock de juegos preferidos
-        List<PreferredGameDto> preferredGames = List.of(
-                new PreferredGameDto(
-                        "zelda-breath-of-the-wild",
-                        "The Legend of Zelda: Breath of the Wild",
-                        9
-                ),
-                new PreferredGameDto(
-                        "elden-ring",
-                        "Elden Ring",
-                        8
-                ),
-                new PreferredGameDto(
-                        "minecraft",
-                        "Minecraft",
-                        7
-                )
-        );
-
-        return new HomeSocialDataDto(
-                friends,
-                incomingRequests,
-                outgoingRequests,
-                preferredGames
-        );
+        return null;
     }
 
     // ================================================
@@ -175,8 +87,8 @@ public class SocialService {
                 request.source()
         );
 
-        if (validation.getSuggestedGame() != null) {
-            friendRequest.setSuggestedGame(validation.getSuggestedGame());
+        if (validation.getGame() != null) {
+            friendRequest.setSuggestedGame(validation.getGame());
         }
 
         // 3. Guardar en BD
@@ -336,49 +248,10 @@ public class SocialService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + username));
     }
 
-    /**
-     * Busca usuarios por preferencias de juego.
-     * MOCK: Retorna sugerencias simuladas.
-     */
-    public GameBasedSuggestionDto searchUsersByGamePreference(
-            String currentUsername,
-            GameBasedSearchRequestDto searchRequest) {
 
-        // Validación básica
-        if (searchRequest.userRating() < 1 || searchRequest.userRating() > 10) {
-            throw new IllegalArgumentException("Rating debe estar entre 1 y 10");
-        }
-
-        // Datos mock de usuarios con gustos similares
-        List<SuggestedUserDto> mockSuggestions = List.of(
-                new SuggestedUserDto(
-                        new UserDto(UUID.randomUUID(), "GamerCompatible1"),
-                        searchRequest.gameSlug(),
-                        searchRequest.userRating(),
-                        searchRequest.userRating() + 1 // Rating similar
-                ),
-                new SuggestedUserDto(
-                        new UserDto(UUID.randomUUID(), "GamerCompatible2"),
-                        searchRequest.gameSlug(),
-                        searchRequest.userRating(),
-                        searchRequest.userRating() - 1 // Rating similar
-                )
-        );
-
-        // Limitar resultados
-        List<SuggestedUserDto> limitedSuggestions = mockSuggestions.stream()
-                .limit(searchRequest.maxResults())
-                .toList();
-
-        return new GameBasedSuggestionDto(
-                searchRequest.gameSlug(),
-                searchRequest.userRating(),
-                limitedSuggestions
-        );
-    }
 
     // ================================================
-    // GESTIÓN DE AMISTADES
+    // GESTIÓN DE AMISTADES HU-19
     // ================================================
 
     /**
@@ -423,26 +296,107 @@ public class SocialService {
     // ================================================
 
     /**
-     * Obtiene la siguiente sugerencia de amigo.
-     * MOCK: Retorna una sugerencia simulada.
+     * Obtiene UNA sugerencia de amigo basada en juego y rating.
+     * VERSIÓN OPTIMIZADA: Una sola query + búsqueda progresiva en memoria.
      */
-    public SuggestedUserDto getNextFriendSuggestion(String currentUsername) {
-        // Simular que siempre hay una sugerencia disponible
-        return new SuggestedUserDto(
-                new UserDto(UUID.randomUUID(), "SugerenciaAutomatica"),
-                "zelda-breath-of-the-wild",
-                9, // Tu rating
-                8  // Su rating
-        );
+    public SuggestedUserDto getFriendSuggestionByGame(String currentUsername, String gameSlug, int userRating) {
+        // 1. Validaciones esenciales únicamente
+        SocialValidator.ValidationResult validation = socialValidator.validateFriendSuggestionByGame(
+                currentUsername, gameSlug, userRating);
+
+        // 2. Query única optimizada con exclusiones en BD (más eficiente)
+        List<UserGameDetails> availableCandidates = userGameDetailsRepository
+                .findAvailableCandidatesForSuggestion(
+                        validation.getCallerUser().getId(),
+                        validation.getGame().getId(),
+                        7,
+                        10
+                );
+
+        // 3. Early return si no hay candidatos
+        if (availableCandidates.isEmpty()) {
+            return null; // 204 No Content - comportamiento natural
+        }
+
+        // 4. Búsqueda progresiva optimizada en memoria
+        UserGameDetails bestMatch = findBestMatchWithProgression(availableCandidates, userRating);
+
+        if (bestMatch == null) {
+            return null; // No hay matches en rango 7-10
+        }
+
+        // 5. Conversión a DTO con mapper optimizado
+        return socialMapper.toSuggestedUserDto(bestMatch, gameSlug, userRating);
     }
 
     /**
-     * Rechaza una sugerencia específica.
-     * MOCK: Simula rechazo de sugerencia.
+     * Busca el mejor candidato usando búsqueda progresiva.
+     * Algoritmo: Busca rating exacto → ±1 → ±2 → ±3
      */
-    public void rejectSuggestion(String currentUsername, String rejectedUsername, String gameSlug) {
-        // Mock: No hace nada, pero evita errores de compilación
-        System.out.println("Sugerencia rechazada: " + rejectedUsername + " por juego: " + gameSlug);
+    private UserGameDetails findBestMatchWithProgression(List<UserGameDetails> candidates, int targetRating) {
+        if (candidates.isEmpty()) {
+            return null;
+        }
+
+        Map<Integer, List<UserGameDetails>> usersByRating = groupByRating(candidates);
+
+        // Búsqueda exacta primero
+        List<UserGameDetails> exactMatch = usersByRating.get(targetRating);
+        if (exactMatch != null && !exactMatch.isEmpty()) {
+            return exactMatch.get(0);
+        }
+
+        // Búsqueda progresiva con tolerancia
+        for (int tolerance = 1; tolerance <= 3; tolerance++) {
+            int higherRating = targetRating + tolerance;
+            int lowerRating = targetRating - tolerance;
+
+            // Buscar rating mayor si está en rango válido
+            if (higherRating <= 10) {
+                List<UserGameDetails> higherMatch = usersByRating.get(higherRating);
+                if (higherMatch != null && !higherMatch.isEmpty()) {
+                    return higherMatch.get(0);
+                }
+            }
+
+            // Buscar rating menor si está en rango válido
+            if (lowerRating >= 7) {
+                List<UserGameDetails> lowerMatch = usersByRating.get(lowerRating);
+                if (lowerMatch != null && !lowerMatch.isEmpty()) {
+                    return lowerMatch.get(0);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Agrupa usuarios por su rating para búsqueda más eficiente
+     */
+    private Map<Integer, List<UserGameDetails>> groupByRating(List<UserGameDetails> candidates) {
+        return candidates.stream()
+                .collect(Collectors.groupingBy(UserGameDetails::getRating));
+    }
+
+    /**
+     * Rechaza una sugerencia de amigo para un juego específico.
+     * IMPLEMENTACIÓN REAL: Usa validator para validaciones limpias.
+     */
+    public void rejectFriendSuggestion(String currentUsername, UUID rejectedUserId, String gameSlug) {
+        // 1. Validar usando el validator
+        SocialValidator.ValidationResult validation = socialValidator.validateRejectSuggestion(
+                currentUsername, rejectedUserId, gameSlug);
+
+        // 2. Crear el registro de rechazo
+        SuggestionRejection rejection = new SuggestionRejection(
+                validation.getCallerUser(),
+                validation.getTargetUser(),
+                validation.getGame()
+        );
+
+        // 3. Guardar en BD (el unique constraint previene duplicados)
+        suggestionRejectionRepository.save(rejection);
     }
 
     // ================================================

@@ -3,6 +3,7 @@ package com.gamelyx.mapper;
 import com.gamelyx.dto.SocialResponseDtos.*;
 import com.gamelyx.entity.FriendRequest;
 import com.gamelyx.entity.User;
+import com.gamelyx.entity.UserGameDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -81,6 +82,25 @@ public class SocialMapper {
                 success,
                 deletedFriend.getUsername(),
                 deletedFriend.getId()
+        );
+    }
+
+    // ================================================
+    // MAPPERS SUGERENCIA DE USUARIOS HU-20
+    // ================================================
+    /**
+     * Convierte UserGameDetails a SuggestedUserDto para respuesta de sugerencias
+     */
+    public SuggestedUserDto toSuggestedUserDto(UserGameDetails userGameDetails, String gameSlug, int yourRating) {
+        return new SuggestedUserDto(
+                // Información básica del usuario sugerido
+                new UserDto(
+                        userGameDetails.getUser().getId(),
+                        userGameDetails.getUser().getUsername()
+                ),
+                gameSlug,                           // Slug del juego en común
+                yourRating,                         // Tu rating del juego
+                userGameDetails.getRating()         // Su rating del juego
         );
     }
 
