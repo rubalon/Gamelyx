@@ -123,15 +123,6 @@ public class SocialResponseDtos {
     // ================================================
 
     /**
-     * Sugerencias basadas en juego específico
-     */
-    public record GameBasedSuggestionDto(
-            String gameSlug,
-            int userRating,
-            List<SuggestedUserDto> suggestedUsers
-    ) {}
-
-    /**
      * Usuario sugerido basado en juego
      */
     public record SuggestedUserDto(
@@ -143,17 +134,6 @@ public class SocialResponseDtos {
 
     // ================================================
     // DTOs PARA SUGERENCIAS AUTOMÁTICAS (HU-20)
-    // ================================================
-
-    /**
-     * Sugerencias automáticas de amigos
-     */
-    public record FriendSuggestionsDto(
-            List<SuggestedUserDto> suggestions
-    ) {}
-
-    // ================================================
-    // Dto base para usuarios
     // ================================================
 
     /**

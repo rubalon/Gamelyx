@@ -37,15 +37,6 @@ public class SocialRequestDtos {
             int limit
     ) {}
 
-    /**
-     * Parámetros para búsqueda de usuarios por juego en común
-     */
-    public record GameBasedSearchRequestDto(
-            String gameSlug,
-            int userRating,
-            int maxResults
-    ) {}
-
 
     // ================================================
     // ENUMS PARA REQUESTS
