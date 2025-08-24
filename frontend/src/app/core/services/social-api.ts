@@ -1,7 +1,8 @@
 // src/app/core/services/social-api.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 // 🏷️ Enums (replicados del backend para type safety)
@@ -103,12 +104,26 @@ export class SocialApiService {
   // URL base del backend desde environment centralizado
   private readonly API_URL = `${environment.apiUrl}/social`;
 
+  // 🎭 Flag para activar/desactivar mock data
+  private readonly USE_MOCK_DATA = true; // Cambiar a false para usar backend real
+
   /**
    * 🏠 Obtener todos los datos sociales para el home
    * GET /api/social/home-social-data
    * Requiere autenticación JWT
+   * 
+   * 🎭 TEMPORAL: Usando mock data desde JSON local
    */
   getHomeSocialData(): Observable<HomeSocialDataDto> {
+    if (this.USE_MOCK_DATA) {
+      // 📁 Cargar datos mock desde JSON local
+      return this.http.get<HomeSocialDataDto>('/assets/json/home-mock-data.json')
+        .pipe(
+          delay(500) // 🕐 Simular latencia de red para testing realista
+        );
+    }
+
+    // 🌐 Llamada real al backend (cuando USE_MOCK_DATA = false)
     return this.http.get<HomeSocialDataDto>(`${this.API_URL}/home-social-data`);
   }
 
