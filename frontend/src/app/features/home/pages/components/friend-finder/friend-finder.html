@@ -2,9 +2,8 @@
 <div class="friend-finder-container">
   
   <!-- Header -->
-  <div class="text-center mb-6">
-    <h2 class="text-xl font-bold text-white mb-2">🔍 Buscar Amigos</h2>
-    <p class="text-gray-400 text-sm">Encuentra personas que compartan tus gustos</p>
+  <div class="text-left mb-6">
+    <h2 class="text-xl font-bold text-white">🔍 Buscar Amigos</h2>
   </div>
 
   <!-- Main Content -->
@@ -32,19 +31,20 @@
       <div class="ready-state">
         
         <!-- Layout Horizontal: Botón + Flecha + Placeholder -->
-        <div class="flex flex-col lg:flex-row items-center gap-6">
+        <div class="flex flex-col lg:flex-row items-center gap-6 min-h-[120px]">
           
           <!-- Columna Izquierda: Botón Principal -->
-          <div class="w-full lg:w-1/2 flex-shrink-0">
+          <div class="w-full lg:w-2/5 flex-shrink-0 flex flex-col justify-center">
             <button 
               (click)="onFindFriends()"
-              class="find-friends-btn w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg shadow-lg">
-              🔍 Buscar amigos que compartan mis gustos
+              class="find-friends-btn w-full px-6 py-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg shadow-lg text-center leading-tight">
+              <span class="block">🔍 Buscar amigos que</span>
+              <span class="block">compartan mis gustos</span>
             </button>
           </div>
 
           <!-- Flecha Separadora -->
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 flex items-center justify-center ">
             <div class="text-4xl text-purple-400 animate-pulse hidden lg:block">
               ➡️
             </div>
@@ -54,7 +54,7 @@
           </div>
 
           <!-- Columna Derecha: Placeholder para Sugerencia -->
-          <div class="w-full lg:w-1/2 flex-grow">
+          <div class="w-full lg:w-3/5 flex-grow">
             @if (currentSuggestion) {
               <!-- Sugerencia Actual (reemplaza el placeholder) -->
               <div class="current-suggestion bg-gradient-to-r from-green-900 to-blue-900 rounded-lg p-4 border border-green-600">

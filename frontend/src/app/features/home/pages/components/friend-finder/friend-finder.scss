@@ -48,7 +48,9 @@
     
     /* Template placeholder mejorado */
     .suggestion-template {
-      min-height: 140px; /* Altura mínima consistente */
+      min-height: 140px;
+      max-width: 86%; 
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       justify-content: center;
