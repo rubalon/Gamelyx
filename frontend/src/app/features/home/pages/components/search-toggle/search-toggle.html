@@ -1,23 +1,25 @@
 <!-- src/app/features/home/components/search-toggle/search-toggle.html -->
 <div class="search-toggle-container bg-gray-800 rounded-lg p-6">
   
-  <!-- Toggle Tabs -->
-  <div class="flex mb-6">
+  <!-- Toggle Tabs - Versión compacta y moderna -->
+  <div class="flex mb-6 bg-gray-700 rounded-lg p-1 w-fit">
     <button
       (click)="searchType.set('games')"
       [class]="searchType() === 'games' 
-        ? 'bg-purple-600 text-white' 
-        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
-      class="flex-1 px-4 py-2 rounded-l-lg font-medium transition-colors">
-      🎮 Buscar Juegos
+        ? 'bg-purple-600 text-white shadow-lg' 
+        : 'text-gray-300 hover:text-white hover:bg-gray-600'"
+      class="px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm flex items-center space-x-2">
+      <span>🎮</span>
+      <span>Buscar Juegos</span>
     </button>
     <button
       (click)="searchType.set('users')"
       [class]="searchType() === 'users' 
-        ? 'bg-purple-600 text-white' 
-        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
-      class="flex-1 px-4 py-2 rounded-r-lg font-medium transition-colors">
-      👥 Buscar Personas
+        ? 'bg-purple-600 text-white shadow-lg' 
+        : 'text-gray-300 hover:text-white hover:bg-gray-600'"
+      class="px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm flex items-center space-x-2">
+      <span>👥</span>
+      <span>Buscar Personas</span>
     </button>
   </div>
 
@@ -66,7 +68,7 @@
                 <div class="flex items-center justify-between p-3 hover:bg-gray-600 transition-colors">
                   <div class="flex items-center space-x-3">
                         <!-- Avatar placeholder -->
-                        <div class="w-8 h-8 bg-linear-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                           {{ userResult.user.username.charAt(0).toUpperCase() }}
                         </div>
                     <div>
