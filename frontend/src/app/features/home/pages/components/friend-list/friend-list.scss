@@ -1,0 +1,87 @@
+/* src/app/features/home/components/friend-list/friend-list.scss */
+
+.friend-list-container {
+  width: 100%;
+  max-width: 350px;
+  height: fit-content;
+}
+
+.friends-list {
+  /* Custom scrollbar */
+  .max-h-80 {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      @apply bg-gray-800;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      @apply bg-gray-600 rounded-full;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      @apply bg-gray-500;
+    }
+  }
+}
+
+.friend-item {
+  /* Hover effect */
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    .chat-btn {
+      transform: scale(1.05);
+    }
+    
+    .delete-btn {
+      transform: scale(1.05);
+    }
+  }
+  
+  /* Button hover effects */
+  .chat-btn, .delete-btn {
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+/* Loading skeleton animation */
+.friend-item-skeleton {
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Empty state animation */
+.empty-state {
+  .text-6xl {
+    animation: bounce 2s infinite;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -10px, 0);
+  }
+  70% {
+    transform: translate3d(0, -5px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}

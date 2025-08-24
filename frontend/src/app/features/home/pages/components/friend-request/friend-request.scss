@@ -1,0 +1,113 @@
+/* src/app/features/home/components/friend-request/friend-request.scss */
+
+.friend-request-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.requests-content {
+  /* Custom scrollbar */
+  .max-h-64 {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      @apply bg-gray-800;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      @apply bg-gray-600 rounded-full;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      @apply bg-gray-500;
+    }
+  }
+}
+
+.request-item {
+  /* Hover effect */
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Button hover effects */
+  .accept-btn, .reject-btn, .cancel-btn {
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  /* Specific button colors */
+  .accept-btn {
+    &:hover {
+      background-color: #16a34a;
+    }
+  }
+  
+  .reject-btn {
+    &:hover {
+      background-color: #dc2626;
+    }
+  }
+  
+  .cancel-btn {
+    &:hover {
+      background-color: #4b5563;
+    }
+  }
+}
+
+/* Badge notification animation */
+.relative span {
+  animation: pulse-notification 2s infinite;
+}
+
+@keyframes pulse-notification {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Loading skeleton animation */
+.request-item-skeleton {
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Empty state animation */
+.empty-state {
+  .text-6xl {
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Shared game info styling */
+.bg-gray-600 {
+  border-left: 3px solid #8b5cf6;
+}

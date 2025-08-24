@@ -3,8 +3,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { Header } from '../../../../shared/components/header/header';
-import { GameSearchBar } from '../../../../shared/components/game-search-bar/game-search-bar';
 import { SocialStore } from '../../../../core/stores/social-store';
+// 🆕 Importar los 4 nuevos componentes
+import { SearchToggleComponent } from '../components/search-toggle/search-toggle';
+import { FriendListComponent } from '../components/friend-list/friend-list';
+import { FriendRequestComponent } from '../components/friend-request/friend-request';
+import { FriendFinderComponent } from '../components/friend-finder/friend-finder';
 
 @Component({
   selector: 'app-home-page',
@@ -12,8 +16,11 @@ import { SocialStore } from '../../../../core/stores/social-store';
   imports: [
     Header, 
     TranslateModule,
-    CommonModule,        // Para @if, @for
-    GameSearchBar        // Componente existente de búsqueda de juegos
+    CommonModule,
+    SearchToggleComponent,
+    FriendListComponent, 
+    FriendRequestComponent,
+    FriendFinderComponent
   ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss'

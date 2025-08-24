@@ -1,0 +1,32 @@
+/* src/app/features/home/components/search-toggle/search-toggle.scss */
+
+.search-toggle-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Hover effects for better UX */
+.user-search {
+  .search-result-item:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Custom scrollbar for search results */
+.max-h-60 {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
