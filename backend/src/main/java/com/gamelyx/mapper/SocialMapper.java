@@ -4,10 +4,10 @@ import com.gamelyx.dto.SocialResponseDtos.*;
 import com.gamelyx.entity.FriendRequest;
 import com.gamelyx.entity.User;
 import com.gamelyx.entity.UserGameDetails;
+import com.gamelyx.repository.FriendRequestRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Mapper para convertir entidades del sistema social a DTOs.
@@ -15,6 +15,99 @@ import java.util.UUID;
  */
 @Component
 public class SocialMapper {
+
+    // ================================================
+    // MAPPERS PARA LISTAS - HOME SOCIAL
+    // ================================================
+
+    /**
+     * Convierte lista de Users a lista de ContactUserDto
+     */
+    public List<ContactUserDto> toContactUserDtoList(List<User> users) {
+        return users.stream()
+                .map(this::toContactUserDto)
+                .toList();
+    }
+
+    /**
+     * Convierte lista de FriendRequests a DTOs
+     */
+    public List<FriendRequestDto> toFriendRequestDtoList(List<FriendRequestRepository.FriendRequestProjection> projections) {
+        return projections.stream()
+                .map(this::toFriendRequestDto)
+                .toList();
+    }
+
+    /**
+     * Convierte lista de UserGameDetails a PreferredGameDto
+     */
+    public List<PreferredGameDto> toPreferredGameDtoList(List<UserGameDetails> gameDetails) {
+        return gameDetails.stream()
+                .map(this::toPreferredGameDto)
+                .toList();
+    }
+
+// ================================================
+// MAPPERS INDIVIDUALES QUE NECESITARÁS
+// ================================================
+
+    /**
+     * Convierte FriendRequest a IncomingRequestDto
+     */
+    public FriendRequestDto toFriendRequestDto(FriendRequestRepository.FriendRequestProjection projection) {
+
+        // 1. Crear ContactUserDto del sender usando los datos de la projection
+        UserDto senderUserDto = new UserDto(
+                projection.getContactId(),
+                projection.getContactUsername()
+        );
+        ContactUserDto senderDto = new ContactUserDto(
+                senderUserDto,
+                null,
+                false
+        );
+
+        // 2. Crear SharedGameInfoDto solo si hay juego sugerido
+        SharedGameInfoDto gameInfo = getSharedGameInfoDto(projection);
+
+
+        // 4. Construir el DTO final
+        return new FriendRequestDto(
+                projection.getRequestId(),          //  Desde projection
+                senderDto,                          //  Contact User
+                projection.getRequestSource(),      //  Source
+                projection.getStatus(),             //  Status
+                gameInfo,                           //  Con ratings reales o null
+                projection.getReceivedAt()          //  Desde projection
+        );
+    }
+
+    private SharedGameInfoDto getSharedGameInfoDto(FriendRequestRepository.FriendRequestProjection projection) {
+        SharedGameInfoDto gameInfo = null;
+
+        if (FriendRequest.RequestSource.SUGGESTION.equals(projection.getRequestSource()) &&
+                projection.getGameSlug() != null) {
+
+            gameInfo = new SharedGameInfoDto(
+                    projection.getGameSlug(),
+                    projection.getGameName(),
+                    projection.getYourRating() != null ? projection.getYourRating() : 0,
+                    projection.getTheirRating() != null ? projection.getTheirRating() : 0
+            );
+        }
+        return gameInfo;
+    }
+
+    /**
+     * Convierte UserGameDetails a PreferredGameDto
+     */
+    public PreferredGameDto toPreferredGameDto(UserGameDetails gameDetails) {
+        return new PreferredGameDto(
+                gameDetails.getGame().getSlug(),
+                gameDetails.getGame().getName(),
+                gameDetails.getRating()
+        );
+    }
 
     // ================================================
     // MAPPERS PARA BÚSQUEDA DE USUARIOS HU-16
@@ -60,7 +153,7 @@ public class SocialMapper {
                 ),
                 friendRequest.getSource(),
                 friendRequest.getStatus(),
-                friendRequest.getSuggestedGame() != null ? friendRequest.getSuggestedGame().getSlug() : null,
+                friendRequest.getSharedGame() != null ? friendRequest.getSharedGame().getSlug() : null,
                 friendRequest.getCreatedAt()
         );
     }

@@ -59,8 +59,8 @@ public class FriendRequest {
      * Este campo será null para solicitudes originadas desde búsqueda manual
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "suggested_game_id")
-    private Game suggestedGame;
+    @JoinColumn(name = "shared_game_id")
+    private Game sharedGame;
 
     /**
      * ID del chat asociado a esta solicitud (para funcionalidad futura HU-21)
@@ -103,9 +103,9 @@ public class FriendRequest {
         this.source = source;
     }
 
-    public FriendRequest(User sender, User receiver, RequestSource source, Game suggestedGame) {
+    public FriendRequest(User sender, User receiver, RequestSource source, Game sharedGame) {
         this(sender, receiver, source);
-        this.suggestedGame = suggestedGame;
+        this.sharedGame = sharedGame;
     }
 
     // Getters and Setters
@@ -152,12 +152,12 @@ public class FriendRequest {
         this.source = source;
     }
 
-    public Game getSuggestedGame() {
-        return suggestedGame;
+    public Game getSharedGame() {
+        return sharedGame;
     }
 
-    public void setSuggestedGame(Game suggestedGame) {
-        this.suggestedGame = suggestedGame;
+    public void setSharedGame(Game sharedGame) {
+        this.sharedGame = sharedGame;
     }
 
     public UUID getChatId() {

@@ -5,7 +5,6 @@ import com.gamelyx.dto.SocialRequestDtos.SendFriendRequestDto;
 import com.gamelyx.entity.FriendRequest;
 import com.gamelyx.entity.Game;
 import com.gamelyx.entity.User;
-import com.gamelyx.entity.UserGameDetails;
 import com.gamelyx.repository.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -66,9 +65,9 @@ public class SocialValidator {
         validateNoPendingRequest(sender.getId(), receiver.getId());
 
         // 5. Validar juego si es por sugerencia
-        Game suggestedGame = validateSuggestionGame(request, sender.getId(), receiver.getId());
+        Game sharedGame = validateSharedGame(request, sender.getId(), receiver.getId());
 
-        return new ValidationResult(sender, receiver, suggestedGame);
+        return new ValidationResult(sender, receiver, sharedGame);
     }
 
     /**
@@ -117,7 +116,7 @@ public class SocialValidator {
     /**
      * Valida el juego para solicitudes por sugerencia.
      */
-    public Game validateSuggestionGame(SendFriendRequestDto request, UUID senderId, UUID receiverId) {
+    public Game validateSharedGame(SendFriendRequestDto request, UUID senderId, UUID receiverId) {
         if (request.source() != FriendRequest.RequestSource.SUGGESTION) {
             return null; // No es necesario para búsquedas manuales
         }
@@ -362,7 +361,7 @@ public class SocialValidator {
         private User callerUser;
         private User targetUser;
         private Game game;
-        private FriendRequest friendRequest; // ✅ NUEVO CAMPO
+        private FriendRequest friendRequest;
 
         // Constructor original (mantener compatibilidad)
         public ValidationResult(User callerUser, User targetUser, Game game) {
@@ -371,20 +370,16 @@ public class SocialValidator {
             this.game = game;
         }
 
-        // ✅ NUEVO: Constructor vacío
         public ValidationResult() {}
 
-        // Getters existentes
         public User getCallerUser() { return callerUser; }
         public User getTargetUser() { return targetUser; }
         public Game getGame() { return game; }
 
-        // ✅ NUEVOS: Setters
         public void setCallerUser(User callerUser) { this.callerUser = callerUser; }
         public void setTargetUser(User targetUser) { this.targetUser = targetUser; }
         public void setGame(Game game) { this.game = game; }
 
-        // ✅ NUEVO: Getter/Setter para FriendRequest
         public FriendRequest getFriendRequest() { return friendRequest; }
         public void setFriendRequest(FriendRequest friendRequest) { this.friendRequest = friendRequest; }
     }

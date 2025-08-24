@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +62,45 @@ public class SocialService {
      * Obtiene toda la información social para el home.
      * MOCK: Retorna datos de ejemplo hardcodeados.
      */
-    public HomeSocialDataDto getHomeSocialData(String currentUsername) {
+    /**
+     * Obtiene toda la información social para el home.
+     * IMPLEMENTACIÓN REAL: Carga amigos, solicitudes y juegos preferidos del usuario.
+     */
+    public HomeSocialDataDto getHomeSocialData(String username) {
+        // 1. Validar usuario actual usando el validator
+        User callerUser = socialValidator.validateUserExists(username);
 
-        return null;
+
+        // 2. Obtener amigos con información de contacto
+        List<User> friendUsers = friendshipRepository.findFriendsByUserId(callerUser.getId());
+        List<ContactUserDto> friends = socialMapper.toContactUserDtoList(friendUsers);
+
+        // 3. Obtener solicitudes entrantes pendientes
+        List<FriendRequestRepository.FriendRequestProjection> incomingRequests = friendRequestRepository.findPendingRequestsReceivedBy(
+                callerUser.getId(),
+                FriendRequest.FriendRequestStatus.PENDING
+        );
+        List<FriendRequestDto> incomingRequestDtos = socialMapper.toFriendRequestDtoList(incomingRequests);
+
+        // 4. Obtener solicitudes salientes pendientes
+        List<FriendRequestRepository.FriendRequestProjection> outgoingRequests = friendRequestRepository.findRequestsSentBy(
+                callerUser.getId()
+        );
+        List<FriendRequestDto> outgoingRequestDtos = socialMapper.toFriendRequestDtoList(outgoingRequests);
+
+        // 5. Obtener juegos preferidos del usuario (rating >= 7)
+        List<UserGameDetails> preferredGames = userGameDetailsRepository.findPreferredGamesByUserId(
+                callerUser.getId()
+        );
+        List<PreferredGameDto> preferredGameDtos = socialMapper.toPreferredGameDtoList(preferredGames);
+
+        // 6. Construir respuesta completa
+        return new HomeSocialDataDto(
+                friends,
+                incomingRequestDtos,
+                outgoingRequestDtos,
+                preferredGameDtos
+        );
     }
 
     // ================================================
@@ -88,7 +123,7 @@ public class SocialService {
         );
 
         if (validation.getGame() != null) {
-            friendRequest.setSuggestedGame(validation.getGame());
+            friendRequest.setSharedGame(validation.getGame());
         }
 
         // 3. Guardar en BD

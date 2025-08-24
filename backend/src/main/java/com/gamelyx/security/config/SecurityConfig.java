@@ -91,7 +91,8 @@ public class SecurityConfig {
                         .requestMatchers("PUT", "/api/games/game/*/my-game-details").authenticated()
                         .requestMatchers("GET","/api/games/my-reviews").authenticated()
 
-                        //Enpoints de social ( necesitan autentificacion)
+                        //Enpoints de social ( necesitan autentificacion)ç
+                        .requestMatchers("GET","/api/social/home-social-data").authenticated()
                         .requestMatchers("GET","/api/social/search/users").authenticated()
                         .requestMatchers("POST","/api/social/friend-requests").authenticated()
                         .requestMatchers("PUT","/api/social/friend-requests/*/respond").authenticated()

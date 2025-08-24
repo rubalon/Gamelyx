@@ -27,9 +27,9 @@ public class SocialController {
         this.socialService = socialService;
     }
 
-    // ================================================
-    // ENDPOINT PRINCIPAL PARA HOME SOCIAL
-    // ================================================
+    // ========================================================================
+    // ENDPOINT PRINCIPAL PARA HOME SOCIAL HU-16 , HU-17 , HU-18 ,HU-19 Y HU20
+    // ========================================================================
 
     /**
      * Obtiene toda la información social necesaria para el home.
@@ -39,9 +39,8 @@ public class SocialController {
      */
     @GetMapping("/home-social-data")
     public ResponseEntity<HomeSocialDataDto> getHomeSocialData(
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        HomeSocialDataDto homeData = socialService.getHomeSocialData(userDetails.getUsername());
+            @AuthenticationPrincipal String username) {
+        HomeSocialDataDto homeData = socialService.getHomeSocialData(username);
         return ResponseEntity.ok(homeData);
     }
 

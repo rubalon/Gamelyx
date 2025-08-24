@@ -21,8 +21,8 @@ public class SocialResponseDtos {
      */
     public record HomeSocialDataDto(
             List<ContactUserDto> friends,
-            List<IncomingRequestDto> incomingRequests,
-            List<OutgoingRequestDto> outgoingRequests,
+            List<FriendRequestDto> incomingRequests,
+            List<FriendRequestDto> outgoingRequests,
             List<PreferredGameDto> preferredGames
     ) {}
 
@@ -33,18 +33,19 @@ public class SocialResponseDtos {
     /**
      * Solicitud de amistad entrante individual
      */
-    public record IncomingRequestDto(
+    public record FriendRequestDto(
             UUID requestId,
             ContactUserDto sender,
             FriendRequest.RequestSource source,
-            SuggestedGameInfoDto suggestedGame,
+            FriendRequest.FriendRequestStatus status,
+            SharedGameInfoDto sharedGame,
             LocalDateTime receivedAt
     ) {}
 
     /**
      * Información del juego sugerido (para solicitudes por sugerencia)
      */
-    public record SuggestedGameInfoDto(
+    public record SharedGameInfoDto(
             String gameSlug,
             String gameName,
             int yourRating,

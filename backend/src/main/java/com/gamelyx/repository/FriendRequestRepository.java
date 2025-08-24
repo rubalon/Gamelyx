@@ -24,31 +24,78 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, UU
     // CONSULTAS PARA EL HOME SOCIAL (Single Endpoint)
     // ================================================
 
-    /**
-     * Obtiene todas las solicitudes PENDIENTES recibidas por un usuario.
-     * Usado en el home para mostrar notificaciones.
-     */
-    @Query("SELECT fr FROM FriendRequest fr " +
-            "JOIN FETCH fr.sender " +
-            "LEFT JOIN FETCH fr.suggestedGame " +
+    interface FriendRequestProjection {
+        UUID getRequestId();
+        String getContactUsername();
+        UUID getContactId();
+        FriendRequest.RequestSource getRequestSource();
+        FriendRequest.FriendRequestStatus getStatus();
+        String getGameSlug();
+        String getGameName();
+        Integer getYourRating();
+        Integer getTheirRating();
+        LocalDateTime getReceivedAt();
+    }
+
+    // ================================================
+    // QUERYs QUE USAn LA INTERFACE
+    // ================================================
+
+    @Query("SELECT " +
+            "fr.id as requestId, " +
+            "fr.sender.username as contactUsername, " +
+            "fr.sender.id as contactId, " +
+            "fr.source as requestSource, " +
+            "fr.status as status, " +
+            "fr.sharedGame.slug as gameSlug, " +
+            "fr.sharedGame.name as gameName, " +
+            "receiverGameDetails.rating as yourRating, " +
+            "senderGameDetails.rating as theirRating, " +
+            "fr.createdAt as receivedAt " +
+            "FROM FriendRequest fr " +
+            "LEFT JOIN UserGameDetails receiverGameDetails ON " +
+            "    receiverGameDetails.user = fr.receiver " +
+            "    AND receiverGameDetails.game = fr.sharedGame " +
+            "LEFT JOIN UserGameDetails senderGameDetails ON " +
+            "    senderGameDetails.user = fr.sender " +
+            "    AND senderGameDetails.game = fr.sharedGame " +
             "WHERE fr.receiver.id = :userId " +
             "AND fr.status = :status " +
             "ORDER BY fr.createdAt DESC")
-    List<FriendRequest> findPendingRequestsReceivedBy(@Param("userId") UUID userId,
-                                                      @Param("status") FriendRequestStatus status);
+    List<FriendRequestProjection> findPendingRequestsReceivedBy(
+            @Param("userId") UUID userId,
+            @Param("status") FriendRequestStatus status);
 
     /**
-     * Obtiene todas las solicitudes PENDIENTES enviadas por un usuario.
-     * Usado en el home para mostrar solicitudes en curso.
+     * Obtiene solicitudes enviadas que necesitan atención del sender:
+     * - PENDING: Aún sin respuesta
+     * - ACCEPTED
+     * - REJECTED: Respondidas pero sender no notificado
      */
-    @Query("SELECT fr FROM FriendRequest fr " +
-            "JOIN FETCH fr.receiver " +
-            "LEFT JOIN FETCH fr.suggestedGame " +
+    @Query("SELECT " +
+            "fr.id as requestId, " +
+            "fr.receiver.username as contactUsername, " +
+            "fr.receiver.id as contactId, " +
+            "fr.source as requestSource, " +
+            "fr.status as status, " +
+            "fr.sharedGame.slug as gameSlug, " +
+            "fr.sharedGame.name as gameName, " +
+            "senderGameDetails.rating as yourRating, " +
+            "receiverGameDetails.rating as theirRating, " +
+            "fr.createdAt as receivedAt " +
+            "FROM FriendRequest fr " +
+            "LEFT JOIN UserGameDetails senderGameDetails ON " +
+            "    senderGameDetails.user = fr.sender " +
+            "    AND senderGameDetails.game = fr.sharedGame " +
+            "LEFT JOIN UserGameDetails receiverGameDetails ON " +
+            "    receiverGameDetails.user = fr.receiver " +
+            "    AND receiverGameDetails.game = fr.sharedGame " +
             "WHERE fr.sender.id = :userId " +
-            "AND fr.status = :status " +
+            "AND (fr.status IN ('PENDING', 'ACCEPTED') OR " +
+            "     (fr.status = 'REJECTED' AND " +
+            "      fr.isSenderNotified = false)) " +
             "ORDER BY fr.createdAt DESC")
-    List<FriendRequest> findPendingRequestsSentBy(@Param("userId") UUID userId,
-                                                  @Param("status") FriendRequestStatus status);
+    List<FriendRequestProjection> findRequestsSentBy(@Param("userId") UUID userId);
 
     // ================================================
     // CONSULTAS PARA VALIDACIONES DE NEGOCIO
@@ -115,7 +162,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, UU
     @Query("SELECT fr FROM FriendRequest fr " +
             "JOIN FETCH fr.sender " +
             "JOIN FETCH fr.receiver " +
-            "WHERE fr.suggestedGame.id = :gameId " +
+            "WHERE fr.sharedGame.id = :gameId " +
             "AND fr.source = 'SUGGESTION' " +
             "ORDER BY fr.createdAt DESC")
     List<FriendRequest> findSuggestionsByGame(@Param("gameId") UUID gameId);
@@ -127,7 +174,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, UU
     @Query("SELECT COUNT(fr) > 0 FROM FriendRequest fr " +
             "WHERE fr.sender.id = :senderId " +
             "AND fr.receiver.id = :receiverId " +
-            "AND fr.suggestedGame.id = :gameId " +
+            "AND fr.sharedGame.id = :gameId " +
             "AND fr.source = 'SUGGESTION'")
     boolean existsSuggestionForGame(@Param("senderId") UUID senderId,
                                     @Param("receiverId") UUID receiverId,
