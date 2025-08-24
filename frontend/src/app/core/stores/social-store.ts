@@ -1,5 +1,5 @@
 // src/app/core/stores/social-store.ts
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, Signal } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -41,7 +41,7 @@ export interface SocialState {
   // 💡 Estado de sugerencias
   currentSuggestion: SuggestedUserDto | null;
   
-  // 📈 Estadísticas rápidas
+  // 📈 Estadísticas rápidas (calculadas dinámicamente)
   totalFriends: number;
   totalIncomingRequests: number;
   totalOutgoingRequests: number;
@@ -75,36 +75,30 @@ export class SocialStore {
     totalOutgoingRequests: 0
   });
 
-  // 📖 Estado público readonly
-  public readonly socialState = this._socialState.asReadonly();
+  // 📖 Estado público readonly - ACCESO DIRECTO
+  public readonly state = this._socialState.asReadonly();
 
-  // 🧮 Computed signals para acceso fácil (como AuthStore)
-  public readonly friends = computed(() => this._socialState().friends);
-  public readonly incomingRequests = computed(() => this._socialState().incomingRequests);
-  public readonly outgoingRequests = computed(() => this._socialState().outgoingRequests);
-  public readonly preferredGames = computed(() => this._socialState().preferredGames);
-  
-  public readonly isLoadingHomeSocialData = computed(() => this._socialState().isLoadingHomeSocialData);
-  public readonly isLoadingSendRequest = computed(() => this._socialState().isLoadingSendRequest);
-  public readonly isLoadingSearchUsers = computed(() => this._socialState().isLoadingSearchUsers);
-  public readonly isLoadingRespondRequest = computed(() => this._socialState().isLoadingRespondRequest);
-  
-  public readonly error = computed(() => this._socialState().error);
-  public readonly searchResults = computed(() => this._socialState().searchResults);
-  public readonly currentSuggestion = computed(() => this._socialState().currentSuggestion);
-  
-  // 📊 Computed para estadísticas
-  public readonly totalFriends = computed(() => this._socialState().totalFriends);
-  public readonly totalIncomingRequests = computed(() => this._socialState().totalIncomingRequests);
-  public readonly totalOutgoingRequests = computed(() => this._socialState().totalOutgoingRequests);
+  /**
+   * 🎯 Selector dinámico para acceder a propiedades específicas
+   * Patrón recomendado: crear computed signals bajo demanda
+   */
+  public select<K extends keyof SocialState>(key: K): Signal<SocialState[K]> {
+    return computed(() => this._socialState()[key]);
+  }
 
-  // 🧮 Computed signals para filtros útiles
+  // 🧮 Solo computed signals que realmente TRANSFORMAN datos (patrón correcto)
   public readonly pendingIncomingRequests = computed(() => 
     this._socialState().incomingRequests.filter(req => req.status === FriendRequestStatus.PENDING)
   );
+  
   public readonly pendingOutgoingRequests = computed(() => 
     this._socialState().outgoingRequests.filter(req => req.status === FriendRequestStatus.PENDING)
   );
+
+  // 📊 Computed para estadísticas calculadas 
+  public readonly totalFriends = computed(() => this._socialState().friends.length);
+  public readonly totalPendingIncoming = computed(() => this.pendingIncomingRequests().length);
+  public readonly totalPendingOutgoing = computed(() => this.pendingOutgoingRequests().length);
 
   /**
    * 🔄 Actualiza el estado social
@@ -200,8 +194,6 @@ export class SocialStore {
             error: null
           });
           
-          // 🔄 Recargar datos para ver la nueva solicitud enviada
-          this.loadHomeSocialData().subscribe();
         }),
         catchError(error => {
           console.error('❌ Error sending friend request:', error);
@@ -213,6 +205,7 @@ export class SocialStore {
 
   /**
    * ✅❌ Responder a solicitud de amistad
+   * 🔧 CORREGIDO: No auto-refresh para evitar circular updates
    */
   respondToFriendRequest(requestId: string, action: 'ACCEPT' | 'REJECT'): Observable<FriendRequestResponseDto> {
     this.updateSocialState({ 
@@ -229,8 +222,7 @@ export class SocialStore {
             error: null
           });
           
-          // 🔄 Recargar datos para ver cambios
-          this.loadHomeSocialData().subscribe();
+
         }),
         catchError(error => {
           console.error(`❌ Error ${action.toLowerCase()}ing friend request:`, error);
@@ -276,8 +268,7 @@ export class SocialStore {
         tap(response => {
           console.log('✅ Friend deleted:', response);
           
-          // 🔄 Recargar datos para ver cambios
-          this.loadHomeSocialData().subscribe();
+
         }),
         catchError(error => {
           console.error('❌ Error deleting friend:', error);
