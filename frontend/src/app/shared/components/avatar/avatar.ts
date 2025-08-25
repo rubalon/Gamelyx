@@ -53,9 +53,10 @@ export class AvatarComponent {
       'from-cyan-400 to-blue-800',
       'from-sky-500 to-blue-600',
       'from-sky-500 to-red-600',
-      'from-sky-200 to-amber-600',
       
+    
       // Púrpuras y violetas
+      'from-purple-500 via-blue-400 to-green-600',
       'from-purple-500 to-indigo-600',
       'from-indigo-400 to-green-600',
       'from-violet-500 to-purple-600',
