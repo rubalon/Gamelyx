@@ -1,8 +1,8 @@
 <!-- src/app/features/home/components/friend-list/friend-list.html -->
-<div class="friend-list-container bg-gray-800 rounded-lg p-6">
+<div class="friend-list-container bg-gray-800 rounded-lg p-6 flex flex-col h-full">
   
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
+  <!-- Header (altura fija) -->
+  <div class="flex items-center justify-between mb-6 flex-shrink-0">
     <h2 class="text-xl font-bold text-white flex items-center">
       👥 Amigos
       @if (!isLoading) {
@@ -16,20 +16,20 @@
     }
   </div>
 
-  <!-- Friends List -->
-  <div class="friends-list">
+  <!-- Friends List (ocupa todo el espacio restante) -->
+  <div class="friends-list flex-1 flex flex-col min-h-0">
     @if (isLoading) {
       <!-- Loading State -->
-      <div class="space-y-3">
-        @for (item of [1,2,3]; track $index) {
+      <div class="space-y-3 flex-1">
+        @for (item of [1,2,3,4,5,6]; track $index) {
           <div class="friend-item-skeleton">
             <div class="flex items-center space-x-3 p-3 bg-gray-700 rounded-lg animate-pulse">
-              <div class="w-10 h-10 bg-gray-600 rounded-full"></div>
-              <div class="flex-1">
+              <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
                 <div class="h-4 bg-gray-600 rounded w-24 mb-2"></div>
                 <div class="h-3 bg-gray-600 rounded w-16"></div>
               </div>
-              <div class="flex space-x-2">
+              <div class="flex space-x-2 flex-shrink-0">
                 <div class="w-8 h-8 bg-gray-600 rounded"></div>
                 <div class="w-8 h-8 bg-gray-600 rounded"></div>
               </div>
@@ -38,33 +38,33 @@
         }
       </div>
     } @else if (friends.length > 0) {
-      <!-- Friends List -->
-      <div class="space-y-2 max-h-80 overflow-y-auto">
+      <!-- Friends List - Ocupa todo el espacio disponible -->
+      <div class="space-y-2 overflow-y-auto flex-1 pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-500">
         @for (friend of friends; track friend.user.userId) {
-          <div class="friend-item bg-gray-700 rounded-lg p-3 hover:bg-gray-600 transition-all duration-200">
+          <div class="friend-item bg-gray-700 rounded-lg p-3 hover:bg-gray-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
             <div class="flex items-center justify-between">
               
               <!-- Friend Info -->
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center space-x-3 flex-1 min-w-0">
                 <!-- Avatar -->
-                <div [class]="'w-10 h-10 bg-gradient-to-br rounded-full flex items-center justify-center text-white font-bold ' + getAvatarColor(friend.user.username)">
+                <div [class]="'w-10 h-10 bg-gradient-to-br rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 ' + getAvatarColor(friend.user.username)">
                   {{ getAvatarInitial(friend.user.username) }}
                 </div>
                 
                 <!-- Name and Status -->
-                <div>
-                  <p class="text-white font-medium">{{ friend.user.username }}</p>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white font-medium truncate">{{ friend.user.username }}</p>
                   <div class="flex items-center space-x-2 text-xs">
                     <!-- Online Status (mock) -->
                     <span class="flex items-center text-green-400">
-                      <span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span>
-                      En línea
+                      <span class="w-2 h-2 bg-green-400 rounded-full mr-1 flex-shrink-0"></span>
+                      <span class="truncate">En línea</span>
                     </span>
                     
                     <!-- New Messages Indicator -->
                     @if (friend.newMessages) {
-                      <span class="bg-red-500 text-white px-2 py-0.5 rounded-full text-xs">
-                        Nuevos mensajes
+                      <span class="bg-red-500 text-white px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
+                        Nuevos
                       </span>
                     }
                   </div>
@@ -72,11 +72,11 @@
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex space-x-2">
+              <div class="flex space-x-2 flex-shrink-0 ml-2">
                 <!-- Chat Button -->
                 <button
                   (click)="onOpenChat(friend.user.userId, friend.user.username)"
-                  class="chat-btn p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  class="chat-btn p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
                   title="Abrir chat">
                   💬
                 </button>
@@ -84,7 +84,7 @@
                 <!-- Delete Button -->
                 <button
                   (click)="onDeleteFriend(friend.user.userId, friend.user.username)"
-                  class="delete-btn p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                  class="delete-btn p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
                   title="Eliminar amigo">
                   🗑️
                 </button>
@@ -94,9 +94,9 @@
         }
       </div>
     } @else {
-      <!-- Empty State -->
-      <div class="empty-state text-center py-8">
-        <div class="text-6xl mb-4">👥</div>
+      <!-- Empty State - Centrado en el espacio disponible -->
+      <div class="empty-state text-center py-8 flex-1 flex flex-col items-center justify-center">
+        <div class="text-6xl mb-4 animate-bounce">👥</div>
         <p class="text-gray-400 mb-2">No tienes amigos aún</p>
         <p class="text-gray-500 text-sm">¡Busca personas con gustos similares!</p>
       </div>
