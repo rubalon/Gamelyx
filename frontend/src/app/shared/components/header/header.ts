@@ -93,4 +93,9 @@ export class Header {
       this.isLanguageDropdownOpen = false;
     }
   }
+
+  navigateToHome(): void {
+    this.router.navigate(['/']); 
+    this.isMobileMenuOpen = false;
+  }
 }
