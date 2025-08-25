@@ -17,4 +17,12 @@ export class FooterComponent {
   getCurrentYear(): number {
     return new Date().getFullYear();
   }
+
+  openLinkedIn(): void {
+    window.open('https://www.linkedin.com/in/ruben-alonso-cruz/', '_blank');
+  }
+  
+  openRAWG(): void {
+    window.open('https://rawg.io/apidocs', '_blank');
+  }
 }

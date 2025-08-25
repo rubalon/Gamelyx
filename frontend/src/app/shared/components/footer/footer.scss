@@ -1,78 +1,229 @@
-/* src/app/shared/components/footer/footer.scss */
-
-// Animación sutil para el gradiente de la barra final
-.footer-gradient-bar {
-  background: linear-gradient(-45deg, #8B5CF6, #3B82F6, #6366F1, #8B5CF6);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-// Efectos hover mejorados para los enlaces
-.footer-link {
+// footer.scss
+.footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-top: 1px solid rgba(139, 69, 255, 0.2);
   position: relative;
+  overflow: hidden;
   
-  &::after {
+  &::before {
     content: '';
     position: absolute;
-    bottom: -2px;
+    top: 0;
     left: 0;
-    width: 0;
+    right: 0;
     height: 1px;
-    background: linear-gradient(90deg, #A855F7, #3B82F6);
-    transition: width 0.3s ease;
-  }
-  
-  &:hover::after {
-    width: 100%;
+    background: linear-gradient(90deg, transparent, #8b45ff, transparent);
   }
 }
 
-// Animación suave para el icono de LinkedIn
-.linkedin-icon {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  &:hover {
-    filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));
-  }
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
-// Responsividad mejorada
-@media (max-width: 640px) {
-  .footer-content {
+// Sección principal - layout horizontal
+.footer-main {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
     text-align: center;
   }
-  
-  .footer-attribution {
-    flex-direction: column;
+}
+
+// Información del proyecto - compacta
+.project-info {
+  .project-badge {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: #8b45ff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+  
+  .author {
+    color: #a0a0a0;
+    font-size: 0.8rem;
+    margin: 0;
+    
+    strong {
+      color: #e0e0e0;
+      font-weight: 600;
+    }
   }
 }
 
-// Animación para elementos que entran en vista
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+// Tech stack - badges inline
+.tech-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .built-with {
+    color: #a0a0a0;
+    font-size: 0.8rem;
+    font-weight: 500;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .tech-badges {
+    display: flex;
+    gap: 0.75rem;
+    
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+  
+  .tech-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: rgba(139, 69, 255, 0.1);
+    border: 1px solid rgba(139, 69, 255, 0.3);
+    border-radius: 20px;
+    color: #e0e0e0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(139, 69, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    .tech-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
   }
 }
 
-.fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+// Enlaces - botones compactos
+.footer-links {
+  display: flex;
+  gap: 1rem;
+  justify-self: end;
+  
+  @media (max-width: 768px) {
+    justify-self: center;
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+// Botón LinkedIn compacto
+.linkedin-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, #0077b5, #005885);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 119, 181, 0.3);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 119, 181, 0.4);
+  }
+  
+  .fab {
+    font-size: 1.1rem;
+  }
+  
+  .fa-external-link-alt {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+}
+
+// Botón RAWG compacto
+.rawg-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 25px;
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(139, 69, 255, 0.4);
+    color: #8b45ff;
+    transform: translateY(-2px);
+  }
+  
+  .rawg-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .fa-external-link-alt {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+}
+
+// Footer bottom - línea simple
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+  text-align: center;
+  
+  p {
+    color: #a0a0a0;
+    font-size: 0.8rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// Responsivo mobile
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 1rem;
+  }
+  
+  .project-info .project-badge {
+    justify-content: center;
+  }
+  
+  .linkedin-btn,
+  .rawg-link {
+    padding: 0.75rem 1.25rem;
+    width: 100%;
+    justify-content: center;
+  }
 }
