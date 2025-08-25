@@ -6,14 +6,15 @@
   
   /* Template placeholder mejorado */
   .suggestion-template {
-    min-height: 8.75rem; /* 140px → 8.75rem */
-    max-width: 86%; 
+    min-height: 10.75rem; 
+    max-height: 13rem;
+    max-width: 90%; 
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     border-color: #4b5563;
-    background-color: #374151;
+    background-color: #37415198;
     transition: all 0.2s ease;
     
     &:hover {
