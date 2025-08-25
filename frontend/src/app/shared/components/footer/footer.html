@@ -1,16 +1,17 @@
 <!-- footer.html -->
-<footer class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 border-t border-gray-700">
+<footer class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800/80 to-blue-900/80 border-t border-gray-700">
   <!-- Gradiente superior -->
   <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-purple-400/40 via-purple-300/60 to-purple-400/40"></div>
   
   <div class="px-6 py-6">
-    <!-- Layout principal con FLEXBOX -->
-    <div class="flex items-center gap-8 justify-between
-                md:flex-row md:gap-6
-                sm:flex-col sm:gap-4 sm:text-center sm:justify-center">
+    <!-- Layout principal con GRID responsivo mejorado -->
+    <div class="grid grid-cols-1 gap-4  items-center
+                lg:grid-cols-4 lg:gap-4 
+                md:grid-cols-2 md:gap-4 md:justify-between
+                sm:grid-cols-1 sm:gap-4 sm:justify-items-center w-full">
       
-      <!-- Info del proyecto - PEGADO A LA IZQUIERDA -->
-      <div class="flex flex-col gap-1 flex-shrink-0 lg:mx-28  md:mx-2">
+      <!-- Info del proyecto - COLUMNA 1 -->
+      <div class="flex flex-col gap-1 items-center">
         <div class="flex items-center gap-2 text-purple-400 text-sm font-semibold
                     sm:justify-center">
           <i class="fas fa-graduation-cap text-base"></i>
@@ -21,10 +22,11 @@
         </p>
       </div>
       
-      <!-- Tech stack - CENTRO IZQUIERDA con espacio automático -->
-      <div class="flex flex-col gap-2 lg:mx-24 md:mx-2">
+      <!-- Tech stack - COLUMNA 2 (solo en lg) -->
+      <div class="flex flex-col gap-2 justify-self-center
+                  lg:block">
         <span class="text-gray-400 text-xs font-medium text-center">Construido con</span>
-        <div class="flex gap-3 justify-center">
+        <div class="flex gap-3 justify-center flex-wrap">
           <div class="flex items-center gap-2 px-3 py-2 
                       bg-purple-500/10 border border-purple-500/30 
                       rounded-full text-gray-200 text-xs font-medium 
@@ -46,10 +48,11 @@
         </div>
       </div>
       
-      <!-- Attribution y Copyright - CENTRO DERECHA con espacio automático -->
-      <div class="flex flex-col gap-1 text-xs flex-shrink-0 sm:text-center lg:mx-28 md:mx-2">
+      <!-- Attribution y Copyright - COLUMNA 3 (solo en lg) -->
+      <div class="flex flex-col gap-1 text-xs justify-self-center flex-shrink-0
+                  lg:block sm">
         <!-- Attribution -->
-        <div class="flex items-center gap-2 text-gray-400 sm:justify-center">
+        <div class="flex items-center  text-gray-400 sm:justify-center flex-wrap justify-center">
           <span>Datos proporcionados por</span>
           <a href="https://rawg.io" 
              target="_blank" 
@@ -64,17 +67,16 @@
         </div>
         
         <!-- Copyright -->
-        <div class="text-gray-400">
+        <div class="text-gray-400 text-center">
           <span>&copy; {{getCurrentYear()}} Gamelyx. Todos los derechos reservados.</span>
         </div>
       </div>
       
-      <!-- LinkedIn - PEGADO A LA DERECHA -->
-      <div class="flex-shrink-0 flex flex-col gap-2 items-center lg:mx-28 md:mx-2">
-
-        <span class="text-emerald-400 text-xs font-semibold animate-pulse">
-            ¡Contactame!
-          </span>
+      <!-- LinkedIn - COLUMNA 4 -->
+      <div class="flex flex-col gap-2 items-center  ">
+        <span class="text-emerald-400 text-xs font-semibold animate-pulse items-center">
+          ¡Contactame!
+        </span>
         <!-- Botón LinkedIn -->
         <a href="https://linkedin.com/in/ruben-alonso-cruz" 
            target="_blank" 
@@ -85,7 +87,7 @@
                   hover:bg-blue-600/30 hover:text-blue-200 
                   hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/20
                   transition-all duration-300 hover:-translate-y-px 
-                  group">
+                  group items-center">
           <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" 
                alt="LinkedIn" 
                class="w-5 h-5 filter brightness-0 invert opacity-80 
@@ -94,9 +96,6 @@
           <span class="whitespace-nowrap">Ver perfil</span>
           <i class="fas fa-external-link-alt text-xs opacity-70 group-hover:opacity-100 transition-opacity duration-300"></i>
         </a>
-
-        <div class="flex flex-col items-center gap-1">
-        </div>
       </div>
 
     </div>
