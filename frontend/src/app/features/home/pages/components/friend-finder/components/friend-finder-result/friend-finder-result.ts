@@ -2,6 +2,7 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { AvatarComponent } from '@shared/components/avatar/avatar';
 
 export interface FriendSuggestion {
   user: {
@@ -18,7 +19,8 @@ export interface FriendSuggestion {
   standalone: true,
   imports: [
     CommonModule,
-    TranslateModule
+    TranslateModule,
+    AvatarComponent  // 👈 Importamos nuestro Avatar
   ],
   templateUrl: './friend-finder-result.html',
   styleUrl: './friend-finder-result.scss'
@@ -59,31 +61,5 @@ export class FriendFinderResultComponent {
     }
   }
 
-  /**
-   * 🎨 Generar avatar con iniciales
-   */
-  getAvatarInitial(username: string): string {
-    return username.charAt(0).toUpperCase();
-  }
 
-  /**
-   * 🌈 Generar color de avatar basado en username
-   */
-  getAvatarColor(username: string): string {
-    const colors = [
-      'from-purple-400 to-blue-500',
-      'from-pink-400 to-purple-500', 
-      'from-blue-400 to-cyan-500',
-      'from-green-400 to-blue-500',
-      'from-yellow-400 to-orange-500',
-      'from-red-400 to-pink-500'
-    ];
-    
-    const hash = username.split('').reduce((a, b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0);
-      return a & a;
-    }, 0);
-    
-    return colors[Math.abs(hash) % colors.length];
-  }
 }

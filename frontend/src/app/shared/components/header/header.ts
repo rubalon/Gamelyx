@@ -1,14 +1,19 @@
+// src/app/shared/components/header/header.ts
 import { Component, inject, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TranslationService } from '@core/services/translations';
 import { ModalService } from '@shared/services/modal';
 import { AuthStore } from '@core/stores/auth-store';
+import { AvatarComponent } from '@shared/components/avatar/avatar';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [TranslateModule],
+  imports: [
+    TranslateModule,
+    AvatarComponent  // 👈 Importamos nuestro Avatar
+  ],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })

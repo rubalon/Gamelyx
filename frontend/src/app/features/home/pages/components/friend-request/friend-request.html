@@ -68,10 +68,11 @@
               
               <!-- Request Info -->
               <div class="flex items-center space-x-3">
-                <!-- Avatar -->
-                <div [class]="'w-12 h-12 bg-gradient-to-br rounded-full flex items-center justify-center text-white font-bold text-lg ' + getAvatarColor(request.sender.user.username)">
-                  {{ getAvatarInitial(request.sender.user.username) }}
-                </div>
+                <!-- Avatar using shared component -->
+                <app-avatar 
+                  [username]="request.sender.user.username" 
+                  sizeClasses="w-12 h-12 text-lg">
+                </app-avatar>
                 
                 <!-- Request Details -->
                 <div>

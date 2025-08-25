@@ -5,11 +5,17 @@ import { GameDetails, GameReview, GameUserStatus, UpdateReviewResponse } from '@
 import { AuthStore } from '@core/stores/auth-store';
 import { ReviewModal } from '../review-modal/review-modal';
 import { StarRating } from '@shared/components/star-rating/star-rating';
+import { AvatarComponent } from '@shared/components/avatar/avatar';  
 
 @Component({
   selector: 'app-game-reviews-section',
   standalone: true,
-  imports: [CommonModule, ReviewModal, StarRating],
+  imports: [
+    CommonModule, 
+    ReviewModal, 
+    StarRating,
+    AvatarComponent  
+  ],
   templateUrl: './game-reviews-section.html',
   styleUrl: './game-reviews-section.scss'
 })
@@ -77,7 +83,6 @@ export class GameReviewsSection {
 
   // 🛠️ MÉTODOS UTILITARIOS (mantenidos exactamente igual que tu código)
 
-
   /**
    * 📅 Formatear fecha de review de manera inteligente
    */
@@ -122,7 +127,7 @@ export class GameReviewsSection {
     }
   }
 
-/**
+  /**
    * 🎨 Obtener clases CSS para el estado del juego
    */
   getStatusClasses(status: string | null | undefined): string {
@@ -184,27 +189,9 @@ export class GameReviewsSection {
     }
   }
 
-
-  /**
-   * 🎭 Generar avatar inicial del usuario
-   */
-  getUserInitial(username: string): string {
-    if (!username) return '?';
-    return username.charAt(0).toUpperCase();
-  }
-
-  /**
-   * 🎯 Obtener clases CSS para el avatar
-   */
-  getAvatarClasses(isCurrentUser: boolean = false): string {
-    const baseClasses = 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold';
-    
-    if (isCurrentUser) {
-      return `${baseClasses} bg-gradient-to-br from-purple-600 to-blue-600 text-white`;
-    }
-    
-    return `${baseClasses} bg-gradient-to-br from-gray-600 to-gray-700 text-white`;
-  }
+  // ❌ REMOVIDO - Lógica de avatar duplicada (sustituida por AvatarComponent)
+  // getUserInitial(username: string): string { ... }
+  // getAvatarClasses(isCurrentUser: boolean = false): string { ... }
 
   /**
    * 🔢 Formatear número de reviews

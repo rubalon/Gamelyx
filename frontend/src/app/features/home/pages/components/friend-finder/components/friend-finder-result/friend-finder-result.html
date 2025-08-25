@@ -9,9 +9,10 @@
       <div class="flex items-center justify-between">
         <!-- Usuario Sugerido -->
         <div class="flex items-center space-x-3">
-          <div [class]="'w-12 h-12 bg-gradient-to-br rounded-full flex items-center justify-center text-white font-bold text-lg ' + getAvatarColor(currentSuggestion()!.user.username)">
-            {{ getAvatarInitial(currentSuggestion()!.user.username) }}
-          </div>
+          <app-avatar 
+            [username]="currentSuggestion()!.user.username" 
+            sizeClasses="w-12 h-12 text-lg">
+          </app-avatar>
           
           <div>
             <p class="text-white font-medium">{{ currentSuggestion()!.user.username }}</p>

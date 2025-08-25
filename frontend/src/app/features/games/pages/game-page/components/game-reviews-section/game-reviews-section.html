@@ -39,12 +39,11 @@
         <div class="pt-3 sm:pt-4">
           <!-- Header: Solo Usuario (sin botón editar) -->
           <div class="flex items-center space-x-2 sm:space-x-3 mb-3">
-            <!-- Avatar del usuario -->
-            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <span class="text-white text-xs sm:text-sm font-semibold">
-                {{ currentUser()?.username?.charAt(0)?.toUpperCase() }}
-              </span>
-            </div>
+            <!-- Avatar del usuario actual usando componente shared -->
+            <app-avatar 
+              [username]="currentUser()?.username || 'Usuario'"
+              sizeClasses="w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm ">
+            </app-avatar>
             
             <div class="min-w-0 flex-1">
               <span class="text-white font-medium text-sm sm:text-base">{{ currentUser()?.username }}</span>
@@ -118,12 +117,11 @@
             <!-- Header: Usuario + Rating + Fecha -->
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
               <div class="flex items-start space-x-2 sm:space-x-3 min-w-0 flex-1">
-                <!-- Avatar del usuario -->
-                <div class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span class="text-white text-xs sm:text-sm font-semibold">
-                    {{ review.username.charAt(0).toUpperCase() }}
-                  </span>
-                </div>
+                <!-- Avatar del usuario usando componente shared -->
+                <app-avatar 
+                  [username]="review.username"
+                  sizeClasses="w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm">
+                </app-avatar>
                 
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
