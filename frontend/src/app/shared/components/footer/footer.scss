@@ -114,100 +114,99 @@
   }
 }
 
-// Enlaces - botones compactos
+// Enlaces - solo LinkedIn
 .footer-links {
-  display: flex;
-  gap: 1rem;
   justify-self: end;
   
   @media (max-width: 768px) {
     justify-self: center;
   }
-  
-  @media (max-width: 480px) {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
 }
 
-// Botón LinkedIn compacto
+// Botón LinkedIn - solo icono
 .linkedin-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   background: linear-gradient(135deg, #0077b5, #005885);
   border: none;
-  border-radius: 25px;
+  border-radius: 50%;
   color: white;
   text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 600;
   transition: all 0.3s ease;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 119, 181, 0.3);
   
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 15px rgba(0, 119, 181, 0.4);
   }
   
   .fab {
-    font-size: 1.1rem;
-  }
-  
-  .fa-external-link-alt {
-    font-size: 0.7rem;
-    opacity: 0.7;
+    font-size: 1.3rem;
   }
 }
 
-// Botón RAWG compacto
-.rawg-link {
+// Footer bottom - attribution y copyright en línea
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+}
+
+// Attribution - estilo como tu imagen
+.attribution {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 25px;
-  color: #e0e0e0;
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  color: #a0a0a0;
+  font-size: 0.8rem;
   
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(139, 69, 255, 0.4);
+  span {
+    white-space: nowrap;
+  }
+  
+  .rawg-link {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
     color: #8b45ff;
-    transform: translateY(-2px);
-  }
-  
-  .rawg-icon {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .fa-external-link-alt {
-    font-size: 0.7rem;
-    opacity: 0.7;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      color: #a855f7;
+      text-decoration: underline;
+    }
+    
+    .fas.fa-star {
+      font-size: 0.7rem;
+      color: #fbbf24;
+    }
+    
+    .fa-external-link-alt {
+      font-size: 0.65rem;
+      opacity: 0.7;
+    }
   }
 }
 
-// Footer bottom - línea simple
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 1rem;
-  text-align: center;
-  
-  p {
-    color: #a0a0a0;
-    font-size: 0.8rem;
-    margin: 0;
-    line-height: 1.4;
-  }
+// Copyright
+.copyright {
+  color: #a0a0a0;
+  font-size: 0.8rem;
 }
 
 // Responsivo mobile
