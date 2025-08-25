@@ -1,25 +1,28 @@
 <!-- footer.html -->
-<footer class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-t border-purple-500/20">
+<footer class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 border-t border-gray-700">
   <!-- Gradiente superior -->
-  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-purple-400/40 via-purple-300/60 to-purple-400/40"></div>
   
-  <div class="max-w-7xl mx-auto px-6 py-6">
-    <!-- Layout principal redistribuido -->
-    <div class="grid grid-cols-4 gap-auto items-center sm:text-center">
+  <div class="px-6 py-6">
+    <!-- Layout principal con FLEXBOX -->
+    <div class="flex items-center gap-8 justify-between
+                md:flex-row md:gap-6
+                sm:flex-col sm:gap-4 sm:text-center sm:justify-center">
       
       <!-- Info del proyecto - PEGADO A LA IZQUIERDA -->
-      <div class="flex flex-col justify-self-start sm:justify-self-center">
-        <div class="flex items-center gap-2 text-purple-400 text-sm font-semibold">
+      <div class="flex flex-col gap-1 flex-shrink-0 lg:mx-28  md:mx-2">
+        <div class="flex items-center gap-2 text-purple-400 text-sm font-semibold
+                    sm:justify-center">
           <i class="fas fa-graduation-cap text-base"></i>
           <span>TFG Universidad de Jaén 2025</span>
         </div>
-        <p class="text-gray-400 text-xs m-0">
+        <p class="text-gray-400 text-xs m-0 sm:text-center">
           Por <strong class="text-gray-200 font-semibold">Rubén Alonso Cruz</strong>
         </p>
       </div>
       
-      <!-- Tech stack - EN LA MISMA LÍNEA -->
-      <div class="flex flex-col gap-2">
+      <!-- Tech stack - CENTRO IZQUIERDA con espacio automático -->
+      <div class="flex flex-col gap-2 lg:mx-24 md:mx-2">
         <span class="text-gray-400 text-xs font-medium text-center">Construido con</span>
         <div class="flex gap-3 justify-center">
           <div class="flex items-center gap-2 px-3 py-2 
@@ -43,44 +46,59 @@
         </div>
       </div>
       
-      <!-- Attribution y Copyright - UNO DEBAJO DEL OTRO -->
-      <div class="flex flex-col gap-1 text-xs sm:text-center">
+      <!-- Attribution y Copyright - CENTRO DERECHA con espacio automático -->
+      <div class="flex flex-col gap-1 text-xs flex-shrink-0 sm:text-center lg:mx-28 md:mx-2">
         <!-- Attribution -->
-        <div class=" text-gray-400 gap-1 sm:justify-center">
+        <div class="flex items-center gap-2 text-gray-400 sm:justify-center">
           <span>Datos proporcionados por</span>
           <a href="https://rawg.io" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            class=" text-purple-400 font-medium 
+             target="_blank" 
+             rel="noopener noreferrer"
+             class="flex items-center gap-1 text-purple-400 font-medium 
                     hover:text-purple-300 hover:underline transition-colors 
                     duration-300">
             <i class="fas fa-star text-yellow-400 text-xs"></i>
-            <span> RAWG Video Games Database</span>
+            <span>RAWG Video Games Database</span>
             <i class="fas fa-external-link-alt text-xs opacity-70"></i>
           </a>
         </div>
         
         <!-- Copyright -->
-        <div class="text-gray-400 sm:text-center">
+        <div class="text-gray-400">
           <span>&copy; {{getCurrentYear()}} Gamelyx. Todos los derechos reservados.</span>
         </div>
       </div>
       
       <!-- LinkedIn - PEGADO A LA DERECHA -->
-      <div class="justify-self-end sm:justify-self-center">
-        <a href="https://www.linkedin.com/in/tu-perfil" 
+      <div class="flex-shrink-0 flex flex-col gap-2 items-center lg:mx-28 md:mx-2">
+
+        <span class="text-emerald-400 text-xs font-semibold animate-pulse">
+            ¡Contactame!
+          </span>
+        <!-- Botón LinkedIn -->
+        <a href="https://linkedin.com/in/ruben-alonso-cruz" 
            target="_blank" 
            rel="noopener noreferrer"
-           class="flex items-center justify-center w-11 h-11 
-                  bg-gradient-to-br from-blue-600 to-blue-800 
-                  rounded-full text-white transition-all duration-300 
-                  hover:-translate-y-1 hover:scale-105 
-                  shadow-lg shadow-blue-600/30 
-                  hover:shadow-xl hover:shadow-blue-600/40"
-           (click)="openLinkedIn()">
-          <i class="fab fa-linkedin text-xl"></i>
+           class="flex items-center gap-2 px-4 py-2 
+                  bg-blue-600/20 border border-blue-500/40 
+                  rounded-full text-blue-300 text-sm font-medium 
+                  hover:bg-blue-600/30 hover:text-blue-200 
+                  hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/20
+                  transition-all duration-300 hover:-translate-y-px 
+                  group">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" 
+               alt="LinkedIn" 
+               class="w-5 h-5 filter brightness-0 invert opacity-80 
+                      group-hover:opacity-100 group-hover:scale-110 
+                      transition-all duration-300">
+          <span class="whitespace-nowrap">Ver perfil</span>
+          <i class="fas fa-external-link-alt text-xs opacity-70 group-hover:opacity-100 transition-opacity duration-300"></i>
         </a>
+
+        <div class="flex flex-col items-center gap-1">
+        </div>
       </div>
+
     </div>
   </div>
 </footer>
