@@ -46,10 +46,12 @@
               
               <!-- Friend Info -->
               <div class="flex items-center space-x-3 flex-1 min-w-0">
-                <!-- Avatar -->
-                <div [class]="'w-10 h-10 bg-gradient-to-br rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 ' + getAvatarColor(friend.user.username)">
-                  {{ getAvatarInitial(friend.user.username) }}
-                </div>
+                
+                <!-- Avatar Component 👇 CAMBIO PRINCIPAL -->
+                <app-avatar 
+                  [username]="friend.user.username" 
+                  sizeClasses="w-10 h-10 text-base">
+                </app-avatar>
                 
                 <!-- Name and Status -->
                 <div class="flex-1 min-w-0">
