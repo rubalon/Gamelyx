@@ -19,7 +19,7 @@ export class FooterComponent {
   }
 
   openLinkedIn(): void {
-    window.open('https://www.linkedin.com/in/ruben-alonso-cruz/', '_blank');
+    window.open('https://www.linkedin.com/in/rub%C3%A9nalonsocruz/', '_blank');
   }
   
   openRAWG(): void {

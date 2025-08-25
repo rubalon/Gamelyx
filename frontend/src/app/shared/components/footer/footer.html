@@ -1,64 +1,88 @@
 <!-- footer.html -->
-<footer class="footer">
-  <div class="footer-container">
-    <!-- Línea superior con info principal -->
-    <div class="footer-main">
+<footer class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-t border-purple-500/20">
+  <!-- Gradiente superior -->
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+  
+  <div class="max-w-7xl mx-auto px-6 py-6">
+    <!-- Layout principal - 5 columnas distribuidas -->
+    <div class="grid grid-cols-[auto_auto_1fr_auto_auto] gap-8 items-center
+                lg:grid-cols-[auto_auto_1fr_auto_auto]
+                md:grid-cols-2 md:gap-6
+                sm:grid-cols-1 sm:gap-4 sm:text-center">
+      
       <!-- Info del proyecto -->
-      <div class="project-info">
-        <div class="project-badge">
-          <i class="fas fa-graduation-cap"></i>
-          <span>TFG Universidad de Jaén 2025</span>
+      <div class="flex flex-col gap-1 md:order-1 sm:order-none">
+        <div class="flex items-center gap-2 text-purple-400 text-sm font-semibold sm:justify-center">
+          <i class="fas fa-graduation-cap text-base"></i>
+          <span class="whitespace-nowrap">TFG Universidad de Jaén 2025</span>
         </div>
-        <p class="author">Por <strong>Rubén Alonso Cruz</strong></p>
+        <p class="text-gray-400 text-xs m-0">
+          Por <strong class="text-gray-200 font-semibold">Rubén Alonso Cruz</strong>
+        </p>
       </div>
       
-      <!-- Tech stack inline -->
-      <div class="tech-stack">
-        <span class="built-with">Construido con</span>
-        <div class="tech-badges">
-          <div class="tech-badge">
-            <img src="https://angular.io/assets/images/logos/angular/angular.svg" alt="Angular" class="tech-icon">
+      <!-- Tech stack -->
+      <div class="flex flex-col items-center gap-2 md:order-2 sm:order-none">
+        <span class="text-gray-400 text-xs font-medium whitespace-nowrap">Construido con</span>
+        <div class="flex gap-3 sm:flex-col sm:gap-2">
+          <div class="flex items-center gap-2 px-3 py-2 
+                      bg-purple-500/10 border border-purple-500/30 
+                      rounded-full text-gray-200 text-xs font-medium 
+                      whitespace-nowrap hover:bg-purple-500/20 
+                      transition-all duration-300 hover:-translate-y-px">
+            <img src="https://angular.io/assets/images/logos/angular/angular.svg" 
+                 alt="Angular" class="w-4 h-4 object-contain">
             <span>Angular 20</span>
           </div>
-          <div class="tech-badge">
-            <img src="https://spring.io/img/spring-2.svg" alt="Spring Boot" class="tech-icon">
+          <div class="flex items-center gap-2 px-3 py-2 
+                      bg-purple-500/10 border border-purple-500/30 
+                      rounded-full text-gray-200 text-xs font-medium 
+                      whitespace-nowrap hover:bg-purple-500/20 
+                      transition-all duration-300 hover:-translate-y-px">
+            <img src="https://spring.io/img/spring-2.svg" 
+                 alt="Spring Boot" class="w-4 h-4 object-contain">
             <span>Spring Boot 3.5.3</span>
           </div>
         </div>
       </div>
       
-      <!-- Enlaces -->
-      <div class="footer-links">
-        <!-- LinkedIn -->
-        <a 
-          href="https://www.linkedin.com/in/tu-perfil" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="linkedin-btn"
-          (click)="openLinkedIn()"
-        >
-          <i class="fab fa-linkedin"></i>
-        </a>
-      </div>
-    </div>
-    
-    <!-- Attribution y Copyright en una línea -->
-    <div class="footer-bottom">
-      <div class="attribution">
-        <span>Datos proporcionados por</span>
-        <a 
-          href="https://rawg.io"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="rawg-link"
-        >
-          <i class="fas fa-star"></i>
+      <!-- Attribution -->
+      <div class="flex items-center gap-2 text-gray-400 text-xs 
+                  md:order-3 sm:order-none sm:justify-center">
+        <span class="whitespace-nowrap">Datos proporcionados por</span>
+        <a href="https://rawg.io" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="flex items-center gap-1 text-purple-400 font-medium 
+                  hover:text-purple-300 hover:underline transition-colors 
+                  duration-300 whitespace-nowrap">
+          <i class="fas fa-star text-yellow-400 text-xs"></i>
           <span>RAWG Video Games Database</span>
-          <i class="fas fa-external-link-alt"></i>
+          <i class="fas fa-external-link-alt text-xs opacity-70"></i>
         </a>
       </div>
-      <div class="copyright">
+      
+      <!-- Copyright -->
+      <div class="text-gray-400 text-xs whitespace-nowrap 
+                  md:order-4 sm:order-none">
         <span>&copy; {{getCurrentYear()}} Gamelyx. Todos los derechos reservados.</span>
+      </div>
+      
+      <!-- LinkedIn -->
+      <div class="md:order-5 md:col-span-full md:justify-self-center 
+                  sm:order-none sm:justify-self-center">
+        <a href="https://www.linkedin.com/in/tu-perfil" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="flex items-center justify-center w-11 h-11 
+                  bg-gradient-to-br from-linkedin-blue to-linkedin-dark 
+                  rounded-full text-white transition-all duration-300 
+                  hover:-translate-y-1 hover:scale-105 
+                  shadow-lg shadow-linkedin-blue/30 
+                  hover:shadow-xl hover:shadow-linkedin-blue/40"
+           (click)="openLinkedIn()">
+          <i class="fab fa-linkedin text-xl"></i>
+        </a>
       </div>
     </div>
   </div>
