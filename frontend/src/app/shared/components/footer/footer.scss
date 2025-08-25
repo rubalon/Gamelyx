@@ -1,0 +1,78 @@
+/* src/app/shared/components/footer/footer.scss */
+
+// Animación sutil para el gradiente de la barra final
+.footer-gradient-bar {
+  background: linear-gradient(-45deg, #8B5CF6, #3B82F6, #6366F1, #8B5CF6);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// Efectos hover mejorados para los enlaces
+.footer-link {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #A855F7, #3B82F6);
+    transition: width 0.3s ease;
+  }
+  
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+// Animación suave para el icono de LinkedIn
+.linkedin-icon {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));
+  }
+}
+
+// Responsividad mejorada
+@media (max-width: 640px) {
+  .footer-content {
+    text-align: center;
+  }
+  
+  .footer-attribution {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+// Animación para elementos que entran en vista
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}

@@ -1,11 +1,11 @@
 <!-- Landing Page completa -->
-<div class="min-h-screen">
+<div class="min-h-screen flex flex-col">
   <!-- Header sticky -->
-  <app-header></app-header>
+  <app-header class="flex-shrink-0"></app-header>
   
   <!-- 🆕 NUEVO: Banner de verificación exitosa (solo se muestra si es necesario) -->
   @if (showVerificationBanner) {
-    <div class="bg-green-100 border-b border-green-200 py-3">
+    <div class="bg-green-100 border-b border-green-200 py-3 flex-shrink-0">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-center">
           <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,11 +19,17 @@
     </div>
   }
   
-  <!-- Sección Hero -->
-  <app-hero-section></app-hero-section>
+  <!-- Contenido principal -->
+  <main class="flex-1">
+    <!-- Sección Hero -->
+    <app-hero-section></app-hero-section>
+    
+    <!-- Sección de funcionalidades -->
+    <app-features-section></app-features-section>
+  </main>
   
-  <!-- Sección de funcionalidades -->
-  <app-features-section></app-features-section>
+  <!-- Footer -->
+  <app-footer class="flex-shrink-0"></app-footer>
 </div>
 
 <!-- Modal condicional -->

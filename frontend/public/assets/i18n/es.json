@@ -5,6 +5,18 @@
     "logout": "Cerrar Sesión",
     "welcome": "Bienvenido,"
   },
+  "footer": {
+      "description": "Tu plataforma definitiva para descubrir, explorar y conectar con el mundo de los videojuegos. Encuentra tu próximo juego favorito.",
+      "author": "Creado por [Tu Nombre]",
+      "developer": "Desarrollador Full-Stack",
+      "hire_me": "¡Contrátame!",
+      "available": "Disponible para proyectos",
+      "linkedin_aria": "Visitar perfil de LinkedIn para oportunidades de colaboración",
+      "powered_by": "Datos proporcionados por",
+      "rights": "Todos los derechos reservados.",
+      "built_with": "Hecho con",
+      "in": "en"
+    },
   "hero": {
     "subtitle": "Tu experiencia gaming elevada al siguiente nivel",
     "description": "Descubre, conecta y domina. La plataforma definitiva para gamers que buscan más que solo jugar.",

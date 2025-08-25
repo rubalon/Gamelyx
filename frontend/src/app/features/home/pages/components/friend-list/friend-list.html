@@ -39,9 +39,9 @@
       </div>
     } @else if (friends.length > 0) {
       <!-- Friends List - Ocupa todo el espacio disponible -->
-      <div class="space-y-2 overflow-y-auto flex-1 pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-500">
+      <div class="space-y-2 overflow-y-auto flex-1 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 hover:scrollbar-thumb-purple-400">
         @for (friend of friends; track friend.user.userId) {
-          <div class="friend-item bg-gray-700 hover:bg-gray-600 rounded-lg p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer">
+          <div class="friend-item bg-gray-700 rounded-lg p-3 hover:bg-gray-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
             <div class="flex items-center justify-between">
               
               <!-- Friend Info -->

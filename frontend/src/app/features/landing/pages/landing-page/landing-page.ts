@@ -7,6 +7,7 @@ import { FeaturesSection } from '../../components/features-section/features-sect
 import { AuthModal } from '@shared/components/auth-modal/auth-modal';
 import { ModalService } from '@shared/services/modal';
 import { AsyncPipe } from '@angular/common';
+import { FooterComponent } from '@shared/components/footer/footer';
 
 @Component({
   selector: 'app-landing-page',
@@ -16,7 +17,8 @@ import { AsyncPipe } from '@angular/common';
     HeroSection,
     FeaturesSection,
     AuthModal,
-    AsyncPipe
+    AsyncPipe,
+    FooterComponent
   ],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss'

@@ -9,6 +9,7 @@ import { SearchToggleComponent } from '../components/search-toggle/search-toggle
 import { FriendListComponent } from '../components/friend-list/friend-list';
 import { FriendRequestComponent } from '../components/friend-request/friend-request';
 import { FriendFinderComponent } from '../components/friend-finder/friend-finder';
+import { FooterComponent } from '@shared/components/footer/footer';
 
 @Component({
   selector: 'app-home-page',
@@ -20,7 +21,8 @@ import { FriendFinderComponent } from '../components/friend-finder/friend-finder
     SearchToggleComponent,
     FriendListComponent, 
     FriendRequestComponent,
-    FriendFinderComponent
+    FriendFinderComponent,
+    FooterComponent
   ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss'
