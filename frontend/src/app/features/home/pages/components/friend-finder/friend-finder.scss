@@ -1,10 +1,8 @@
 /* src/app/features/home/components/friend-finder/friend-finder.scss */
-/* 🎯 CONVERTIDO A REM PARA MEJOR ESCALABILIDAD Y ACCESIBILIDAD */
+/* 🎯 SIMPLIFICADO - Ya no contiene estilos del result que se movieron al nuevo componente */
 
 .friend-finder-container {
   width: 100%;
-  /* Eliminar max-width para que ocupe todo el ancho */
-  /* max-width: 25rem; ❌ */
   
   /* Asegurar que el componente tenga límites visuales claros */
   border-radius: 0.75rem;
@@ -18,15 +16,15 @@
 }
 
 /* ========================================
-   FLECHA OPTIMIZADA - CONVERTIDA A REM
+   FLECHA OPTIMIZADA - MANTENIDA
    ======================================== */
 
 /* Contenedor de la flecha */
 .arrow-container {
   min-height: 7.5rem; /* 120px → 7.5rem */
   display: flex;
-  align-items: center; /* 🎯 Centrado vertical */
-  justify-content: center; /* 🎯 Centrado horizontal */
+  align-items: center;
+  justify-content: center;
 }
 
 /* Flecha Horizontal (Desktop) - Optimizada */
@@ -88,7 +86,7 @@
   margin-top: -0.125rem; /* -2px → -0.125rem */
 }
 
-/* 🎯 RESPONSIVE CON CSS NATIVO - ESTO SIEMPRE FUNCIONA */
+/* 🎯 RESPONSIVE CON CSS NATIVO */
 /* Desktop: Mostrar horizontal, ocultar vertical */
 .arrow-desktop {
   display: flex;
@@ -109,7 +107,7 @@
   }
 }
 
-/* Animaciones optimizadas - sin escalar el triángulo */
+/* Animaciones optimizadas */
 @keyframes flow-pulse-optimized {
   0%, 100% { 
     opacity: 0.8; 
@@ -135,14 +133,14 @@
 }
 
 /* ========================================
-   RESTO DE ESTILOS EXISTENTES - CONVERTIDOS A REM
+   ESTILOS DEL COMPONENTE PRINCIPAL - SIMPLIFICADOS
    ======================================== */
 
 .finder-content {
   .ready-state {
     /* Layout mejorado para el diseño horizontal */
     .flex {
-      align-items: center; /* 🎯 CAMBIO: center en lugar de stretch */
+      align-items: center;
       min-height: 7.5rem; /* 120px → 7.5rem */
     }
     
@@ -169,76 +167,14 @@
         animation-duration: 1.5s;
       }
     }
-    
-    /* Template placeholder mejorado */
-    .suggestion-template {
-      min-height: 8.75rem; /* 140px → 8.75rem */
-      max-width: 86%; 
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border-color: #4b5563;
-      background-color: #374151;
-      transition: all 0.2s ease;
-      
-      &:hover {
-        border-color: #6b7280;
-        background-color: #4b5563;
-      }
-    }
   }
 }
 
-/* Keyframes para animaciones existentes */
+/* Keyframes para animaciones del botón */
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
-}
-
-/* Estados especiales */
-.top-games-preview {
-  border-left: 0.25rem solid #8b5cf6; /* 4px → 0.25rem */
-  
-  .bg-gray-600 {
-    transition: all 0.2s ease;
-    
-    &:hover {
-      background-color: #4b5563;
-      transform: translateX(0.25rem); /* 4px → 0.25rem */
-    }
-  }
-}
-
-.current-suggestion {
-  border: 0.0625rem solid #10b981; /* 1px → 0.0625rem */
-  border-left: 0.25rem solid #10b981; /* 4px → 0.25rem */
-  animation: suggestion-glow 2s infinite;
-  
-  button {
-    transition: all 0.2s ease;
-    
-    &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2); /* 2px 8px → 0.125rem 0.5rem */
-    }
-    
-    &:active {
-      transform: scale(0.95);
-    }
-  }
-}
-
-@keyframes suggestion-glow {
-  0%, 100% {
-    border-color: #10b981;
-    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
-  }
-  50% {
-    border-color: #34d399;
-    box-shadow: 0 0 1.25rem rgba(16, 185, 129, 0.3); /* 20px → 1.25rem */
-  }
 }
 
 /* Estado sin juegos */
@@ -283,9 +219,5 @@
   .finder-content .ready-state .flex {
     flex-direction: column;
     text-align: center;
-    
-    .suggestion-template {
-      margin-top: 1rem;
-    }
   }
 }
