@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
 
 import { Header } from '@shared/components/header/header';
+import { FooterComponent } from '@shared/components/footer/footer';
 import { GameApiService, GameDetails as GameDetailsInterface, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
 import { GameReviewsSection } from './components/game-reviews-section/game-reviews-section';
@@ -18,6 +19,7 @@ import { StarRating } from '@shared/components/star-rating/star-rating';
     CommonModule,
     TranslateModule,
     Header,
+    FooterComponent,
     GameReviewsSection,
     GameStatusSelector,
     StarRating

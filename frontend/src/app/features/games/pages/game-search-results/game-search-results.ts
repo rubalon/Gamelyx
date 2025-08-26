@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
 
 import { Header } from '../../../../shared/components/header/header';
+import { FooterComponent } from '@shared/components/footer/footer';
 import { GameSearchBar } from '../../../../shared/components/game-search-bar/game-search-bar';
 import { GameCard } from '../../components/game-card/game-card';
 import { GameApiService, GameSearchResponse, GameSearchItem } from '@core/services/game-api';
@@ -18,7 +19,8 @@ import { GameApiService, GameSearchResponse, GameSearchItem } from '@core/servic
     TranslateModule,
     Header,
     GameSearchBar,
-    GameCard
+    GameCard,
+    FooterComponent
   ],
   templateUrl: './game-search-results.html',
   styleUrl: './game-search-results.scss'

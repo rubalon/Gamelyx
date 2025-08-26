@@ -1,11 +1,11 @@
 <!-- src/app/features/games/pages/game-search-results/game-search-results.html -->
-<div class="min-h-screen bg-gray-900">
+<div class="min-h-screen bg-gray-900 flex flex-col">
   
   <!-- Header reutilizable -->
   <app-header></app-header>
   
-  <!-- Main Content -->
-  <main class="pt-20 pb-16 px-4">
+  <!-- Main Content - flex-grow para ocupar espacio disponible -->
+  <main class="pt-20 pb-16 px-4 flex-grow">
     <div class="max-w-7xl mx-auto">
       
       <!-- Search Bar Section -->
@@ -144,4 +144,10 @@
       </section>
     </div>
   </main>
+
+  @if (!isLoading()) {
+    <!-- Footer -->
+    <app-footer></app-footer>
+  }
+  
 </div>
