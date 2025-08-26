@@ -35,7 +35,7 @@ public class SocialResponseDtos {
      */
     public record FriendRequestDto(
             UUID requestId,
-            ContactUserDto sender,
+            ContactUserDto contactUser,
             FriendRequest.RequestSource source,
             FriendRequest.FriendRequestStatus status,
             SharedGameInfoDto sharedGame,

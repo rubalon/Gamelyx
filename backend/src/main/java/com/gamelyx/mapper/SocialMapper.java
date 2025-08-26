@@ -61,7 +61,7 @@ public class SocialMapper {
                 projection.getContactId(),
                 projection.getContactUsername()
         );
-        ContactUserDto senderDto = new ContactUserDto(
+        ContactUserDto contactUserDto = new ContactUserDto(
                 senderUserDto,
                 null,
                 false
@@ -74,7 +74,7 @@ public class SocialMapper {
         // 4. Construir el DTO final
         return new FriendRequestDto(
                 projection.getRequestId(),          //  Desde projection
-                senderDto,                          //  Contact User
+                contactUserDto,                          //  Contact User
                 projection.getRequestSource(),      //  Source
                 projection.getStatus(),             //  Status
                 gameInfo,                           //  Con ratings reales o null
