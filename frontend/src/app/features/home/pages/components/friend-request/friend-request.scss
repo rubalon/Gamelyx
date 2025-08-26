@@ -14,12 +14,6 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Efectos de hover para las cards */
-.group {
-  &:hover {
-    transform: translateY(-4px) scale(1.02);
-  }
-}
 
 /* Efectos de focus para accesibilidad */
 button {
@@ -44,9 +38,9 @@ button {
   max-height: 2.6em;
 }
 
-/* Asegurar que el grid mantenga altura consistente */
+/* Asegurar que el grid mantenga altura consistente pero más compacta */
 .grid > div {
-  min-height: 320px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
 }

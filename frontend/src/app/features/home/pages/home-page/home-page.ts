@@ -52,13 +52,6 @@ export class HomePage implements OnInit {
     return this.socialStore.totalFriends(); 
   }
 
-  get pendingIncomingRequests() { 
-    return this.socialStore.pendingIncomingRequests(); 
-  }
-
-  get pendingOutgoingRequests() { 
-    return this.socialStore.pendingOutgoingRequests(); 
-  }
 
   /**
    * 🚀 Inicialización del componente

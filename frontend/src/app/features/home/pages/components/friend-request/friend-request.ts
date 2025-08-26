@@ -7,6 +7,7 @@ import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { StarRating } from '@shared/components/star-rating/star-rating';
 
 type RequestType = 'incoming' | 'outgoing';
+type OutgoingStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
 
 @Component({
   selector: 'app-friend-request',
@@ -14,8 +15,8 @@ type RequestType = 'incoming' | 'outgoing';
   imports: [
     CommonModule,
     TranslateModule,
-    AvatarComponent,  // 👈 Avatar compartido
-    StarRating        // 👈 StarRating compartido
+    AvatarComponent,  
+    StarRating
   ],
   templateUrl: './friend-request.html',
   styleUrl: './friend-request.scss'
@@ -25,14 +26,20 @@ export class FriendRequestComponent {
 
   // 🎯 Estado del componente
   requestType = signal<RequestType>('incoming');
+  outgoingStatus = signal<OutgoingStatus>('PENDING'); 
 
   // 📊 Datos del store
   get incomingRequests() {
-    return this.socialStore.pendingIncomingRequests();
+    return this.socialStore.incomingRequests();
   }
 
   get outgoingRequests() {
-    return this.socialStore.pendingOutgoingRequests();
+    // Filtrar por estado cuando estamos en "outgoing"
+    const allOutgoing = this.socialStore.outgoingRequests();
+    if (this.requestType() === 'outgoing') {
+      return allOutgoing.filter(request => request.status === this.outgoingStatus());
+    }
+    return allOutgoing;
   }
 
   get isLoading() {
@@ -48,7 +55,7 @@ export class FriendRequestComponent {
   }
 
   get totalOutgoing() {
-    return this.outgoingRequests.length;
+    return this.socialStore.outgoingRequests().length; // 👈 Total sin filtrar
   }
 
   /**

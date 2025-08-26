@@ -112,6 +112,146 @@
       "receivedAt": "2025-08-24T10:30:15.123456"
     },
     {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
+      "requestId": "req-001-incoming-suggestion",
+      "contactUser": {
+        "user": {
+          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "zelda-breath-of-the-wild",
+        "gameName": "The Legend of Zelda: Breath of the Wild",
+        "yourRating": 9,
+        "theirRating": 10
+      },
+      "receivedAt": "2025-08-24T10:30:15.123456"
+    },
+    {
       "requestId": "req-002-incoming-search",
       "contactUser": {
         "user": {
@@ -119,7 +259,7 @@
           "username": "darkSouls_champion"
         },
         "chatId": null,
-        "newMessages": false
+        "newMessages": true
       },
       "source": "SEARCH",
       "status": "PENDING",
@@ -145,6 +285,26 @@
         "theirRating": 9
       },
       "receivedAt": "2025-08-24T08:45:18.456789"
+    },
+    {
+      "requestId": "req-003-incoming-suggestion-2",
+      "contactUser": {
+        "user": {
+          "userId": "s6t7u8v9-w0x1-y2z3-a4b5-c6d7e8f9g0h1",
+          "username": "rubalontestting"
+        },
+        "chatId": null,
+        "newMessages": true
+      },
+      "source": "SUGGESTION",
+      "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "hollow-knight",
+        "gameName": "Hollow Knight",
+        "yourRating": 8,
+        "theirRating": 9
+      },
+      "receivedAt": "2025-08-24T08:45:18.456789"
     }
   ],
   "outgoingRequests": [
@@ -153,13 +313,53 @@
       "contactUser": {
         "user": {
           "userId": "62ab7ff7-b8fa-4535-981f-42d4eae915da",
-          "username": "rubalon"
+          "username": "rubalodn"
         },
         "chatId": null,
         "newMessages": false
       },
       "source": "SUGGESTION",
       "status": "PENDING",
+      "sharedGame": {
+        "gameSlug": "outer-wilds",
+        "gameName": "Outer Wilds",
+        "yourRating": 8,
+        "theirRating": 9
+      },
+      "receivedAt": "2025-08-24T11:51:51.419193"
+    },
+    {
+      "requestId": "acf0d00c-f549-474c-8098-574d09af50ac",
+      "contactUser": {
+        "user": {
+          "userId": "62ab7ff7-b8fa-4535-981f-42d4eae915da",
+          "username": "rubalonrEJECTED"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "REJECTED",
+      "sharedGame": {
+        "gameSlug": "outer-wilds",
+        "gameName": "Outer Wilds",
+        "yourRating": 8,
+        "theirRating": 9
+      },
+      "receivedAt": "2025-08-24T11:51:51.419193"
+    },
+    {
+      "requestId": "acf0d00c-f549-474c-8098-574d09af50ac",
+      "contactUser": {
+        "user": {
+          "userId": "62ab7ff7-b8fa-4535-981f-42d4eae915da",
+          "username": "rubalonaCEPTED"
+        },
+        "chatId": null,
+        "newMessages": false
+      },
+      "source": "SUGGESTION",
+      "status": "ACCEPTED",
       "sharedGame": {
         "gameSlug": "outer-wilds",
         "gameName": "Outer Wilds",

@@ -9,17 +9,17 @@
     </h2>
     
     <!-- Toggle Tabs -->
-    <div class="flex bg-gray-900/50 rounded-lg p-1">
+    <div class="flex bg-gray-900/50 rounded-lg p-1 max-w-md">
       <button
         (click)="requestType.set('incoming')"
         [class]="requestType() === 'incoming' 
-          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25' 
+          ? 'bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-lg shadow-purple-600/25' 
           : 'text-gray-300 hover:text-white hover:bg-gray-700/50'"
-        class="flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center">
+        class="flex-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center text-sm">
         <span class="mr-2">📥</span>
         Entrantes
         @if (totalIncoming > 0) {
-          <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[24px] text-center animate-pulse">
+          <span class="ml-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center animate-pulse">
             {{ totalIncoming }}
           </span>
         }
@@ -27,18 +27,50 @@
       <button
         (click)="requestType.set('outgoing')"
         [class]="requestType() === 'outgoing' 
-          ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/25' 
+          ? 'bg-gradient-to-br from-orange-600 via-orange-500 to-red-600 text-white shadow-lg shadow-orange-600/25' 
           : 'text-gray-300 hover:text-white hover:bg-gray-700/50'"
-        class="flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center">
+        class="flex-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center text-sm">
         <span class="mr-2">📤</span>
         Enviadas
         @if (totalOutgoing > 0) {
-          <span class="ml-2 bg-orange-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[24px] text-center">
+          <span class="ml-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center">
             {{ totalOutgoing }}
           </span>
         }
       </button>
     </div>
+    
+    <!-- Sub-selector para solicitudes enviadas -->
+    @if (requestType() === 'outgoing') {
+      <div class="mt-4">
+        <div class="flex bg-gray-900/30 rounded-lg p-1 text-xs">
+          <button
+            (click)="outgoingStatus.set('PENDING')"
+            [class]="outgoingStatus() === 'PENDING' 
+              ? 'bg-gradient-to-br from-yellow-600 via-yellow-500 to-orange-600 text-white shadow-md' 
+              : 'text-gray-400 hover:text-white hover:bg-gray-800/50'"
+            class="flex-1 px-2 py-1.5 rounded-md font-medium transition-all duration-200">
+            ⏳ Pendientes
+          </button>
+          <button
+            (click)="outgoingStatus.set('ACCEPTED')"
+            [class]="outgoingStatus() === 'ACCEPTED' 
+              ? 'bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 text-white shadow-md' 
+              : 'text-gray-400 hover:text-white hover:bg-gray-800/50'"
+            class="flex-1 px-2 py-1.5 rounded-md font-medium transition-all duration-200">
+            ✅ Aceptadas
+          </button>
+          <button
+            (click)="outgoingStatus.set('REJECTED')"
+            [class]="outgoingStatus() === 'REJECTED' 
+              ? 'bg-gradient-to-br from-red-600 via-red-500 to-pink-600 text-white shadow-md' 
+              : 'text-gray-400 hover:text-white hover:bg-gray-800/50'"
+            class="flex-1 px-2 py-1.5 rounded-md font-medium transition-all duration-200">
+            ❌ Rechazadas
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- Requests Content -->
@@ -83,12 +115,12 @@
         @for (request of currentRequests; track request.requestId) {
           <div class="bg-gradient-to-br from-gray-700/80 to-gray-800/60 rounded-xl p-4 border border-gray-600/30 hover:border-gray-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1 group">
             
-            <!-- Header con Avatar y tiempo -->
+            <!-- Header con Avatar, tiempo y botones -->
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center space-x-3">
                 <app-avatar 
                   [username]="request.contactUser.user.username" 
-                  sizeClasses="w-12 h-12 text-lg font-bold">
+                  sizeClasses="w-10 h-10 text-base font-bold">
                 </app-avatar>
                 
                 <div class="min-w-0">
@@ -100,26 +132,81 @@
                   </p>
                 </div>
               </div>
+
+              <!-- Action Buttons - Movidos aquí -->
+              <div class="flex space-x-2 flex-shrink-0">
+                @if (requestType() === 'incoming') {
+                  <!-- Incoming Request Actions -->
+                  <!-- Chat Button -->
+                  <button
+                    (click)="onOpenChat(request.contactUser.chatId ?? '', request.contactUser.user.username)"
+                    class="group relative p-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
+                    title="Abrir chat">
+                    
+                    <!-- Chat Icon -->
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                    </svg>
+                    
+                    <!-- New message notification dot -->
+                    @if (request.contactUser.newMessages) {
+                      <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-red-400 to-pink-500 rounded-full border-2 border-gray-800 animate-pulse"></span>
+                    }
+                  </button>
+                  
+                  <!-- Accept Button -->
+                  <button
+                    (click)="onAcceptRequest(request.requestId, request.contactUser.user.username)"
+                    class="p-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
+                    title="Aceptar solicitud">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- Reject Button -->
+                  <button
+                    (click)="onRejectRequest(request.requestId, request.contactUser.user.username)"
+                    class="p-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
+                    title="Rechazar solicitud">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                                  } @else {
+                  <!-- Outgoing Request Actions - Solo chat -->
+                  <!-- Chat Button -->
+                  <button
+                    (click)="onOpenChat(request.contactUser.chatId ?? '', request.contactUser.user.username)"
+                    class="group relative p-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
+                    title="Abrir chat">
+                    
+                    <!-- Chat Icon -->
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                    </svg>
+                    
+                    <!-- New message notification dot -->
+                    @if (request.contactUser.newMessages) {
+                      <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-red-400 to-pink-500 rounded-full border-2 border-gray-800 animate-pulse"></span>
+                    }
+                  </button>
+                }
+              </div>
             </div>
             
-            <!-- Source Badge -->
-            <div class="mb-4">
-              @if (request.source === 'SEARCH') {
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-600/30 text-purple-200 border border-purple-500/40">
-                  <span class="mr-1">🔍</span>
-                  Búsqueda
+            <!-- Solo status para solicitudes enviadas -->
+            @if (requestType() === 'outgoing') {
+              <div class="mb-3">
+                <span class="text-xs text-gray-400 px-2 py-1 bg-gray-700/50 rounded-lg border border-gray-600/50">
+                  {{ request.status }}
                 </span>
-              } @else {
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-600/30 text-green-200 border border-green-500/40">
-                  <span class="mr-1">🎮</span>
-                  Sugerencia
-                </span>
-              }
-            </div>
+              </div>
+            }
             
             <!-- Shared Game Info -->
             @if (request.sharedGame) {
-              <div class="bg-gray-800/60 border border-gray-600/40 rounded-lg p-3 mb-4">
+              <div class="bg-gray-800/60 border border-gray-600/40 rounded-lg p-3">
                 <div class="flex items-center space-x-1 mb-2">
                   <span class="text-xs">🎯</span>
                   <span class="font-medium text-white text-xs">Juego común</span>
@@ -127,110 +214,45 @@
                 <h4 class="font-bold text-white text-sm mb-3 line-clamp-2">
                   {{ request.sharedGame.gameName }}
                 </h4>
+                
+                <!-- Puntuaciones compactas - Una encima de otra -->
                 <div class="space-y-2">
                   <!-- Tu puntuación -->
-                  <div class="bg-blue-600/20 border border-blue-500/30 rounded-lg p-2">
-                    <div class="text-blue-300 text-xs font-medium mb-1 text-center">Tu puntuación</div>
-                    <div class="flex items-center justify-center">
-                      <app-star-rating
-                        [rating]="request.sharedGame.yourRating"
-                        [showNumeric]="true"
-                        [useDecimalFormat]="false"
-                        wrapperClasses=""
-                        textClasses="text-white text-xs font-bold ml-1">
-                      </app-star-rating>
-                    </div>
+                  <div class="flex items-center justify-between bg-gradient-to-r from-blue-600/20 via-blue-500/15 to-blue-600/10 border border-blue-500/30 rounded-md px-2 py-1.5">
+                    <span class="text-blue-300 text-xs font-medium">Tú:</span>
+                    <app-star-rating
+                      [rating]="request.sharedGame.yourRating"
+                      [showNumeric]="true"
+                      [useDecimalFormat]="false"
+                      wrapperClasses=""
+                      textClasses="text-white text-xs font-bold ml-1">
+                    </app-star-rating>
                   </div>
                   <!-- Su puntuación -->
-                  <div class="bg-orange-600/20 border border-orange-500/30 rounded-lg p-2">
-                    <div class="text-orange-300 text-xs font-medium mb-1 text-center">Su puntuación</div>
-                    <div class="flex items-center justify-center">
-                      <app-star-rating
-                        [rating]="request.sharedGame.theirRating"
-                        [showNumeric]="true"
-                        [useDecimalFormat]="false"
-                        wrapperClasses=""
-                        textClasses="text-white text-xs font-bold ml-1">
-                      </app-star-rating>
-                    </div>
+                  <div class="flex items-center justify-between bg-gradient-to-r from-orange-600/20 via-orange-500/15 to-orange-600/10 border border-orange-500/30 rounded-md px-2 py-1.5">
+                    <span class="text-orange-300 text-xs font-medium">Suyo:</span>
+                    <app-star-rating
+                      [rating]="request.sharedGame.theirRating"
+                      [showNumeric]="true"
+                      [useDecimalFormat]="false"
+                      wrapperClasses=""
+                      textClasses="text-white text-xs font-bold ml-1">
+                    </app-star-rating>
                   </div>
                 </div>
               </div>
             } @else {
-              <!-- Espaciador cuando no hay juego compartido -->
-              <div class="mb-4 h-20 flex items-center justify-center bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-600/50">
-                <div class="text-center text-gray-500">
-                  <span class="text-2xl block mb-1">🎮</span>
-                  <span class="text-xs">Sin juegos comunes</span>
+              <!-- Placeholder cuando no hay juego compartido - Localizado por búsqueda -->
+              <div class="bg-gray-800/60 border border-gray-600/40 rounded-lg p-3">
+                <div class="flex items-center justify-center space-x-2 text-gray-400">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="text-sm font-medium">Localizado por búsqueda</span>
                 </div>
+                <p class="text-xs text-gray-500 text-center mt-2">Usuario encontrado mediante búsqueda manual</p>
               </div>
             }
-            
-            <!-- Action Buttons -->
-            <div class="flex space-x-2">
-              @if (requestType() === 'incoming') {
-                <!-- Incoming Request Actions -->
-                <!-- Chat Button -->
-                <button
-                  (click)="onOpenChat(request.contactUser.chatId ?? '', request.contactUser.user.username)"
-                  class="group relative p-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
-                  title="Abrir chat">
-                  
-                  <!-- Chat Icon -->
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                  </svg>
-                  
-                  <!-- New message notification dot -->
-                  @if (request.contactUser.newMessages) {
-                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-red-400 to-pink-500 rounded-full border-2 border-gray-800 animate-pulse"></span>
-                  }
-                </button>
-                
-                <!-- Accept Button -->
-                <button
-                  (click)="onAcceptRequest(request.requestId, request.contactUser.user.username)"
-                  class="p-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
-                  title="Aceptar solicitud">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                
-                <!-- Reject Button -->
-                <button
-                  (click)="onRejectRequest(request.requestId, request.contactUser.user.username)"
-                  class="p-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
-                  title="Rechazar solicitud">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-              } @else {
-                <!-- Outgoing Request Actions - Solo chat -->
-                <!-- Chat Button -->
-                <button
-                  (click)="onOpenChat(request.contactUser.chatId ?? '', request.contactUser.user.username)"
-                  class="group relative p-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
-                  title="Abrir chat">
-                  
-                  <!-- Chat Icon -->
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                  </svg>
-                  
-                  <!-- New message notification dot -->
-                  @if (request.contactUser.newMessages) {
-                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-red-400 to-pink-500 rounded-full border-2 border-gray-800 animate-pulse"></span>
-                  }
-                </button>
-                
-                <!-- Status indicator -->
-                <div class="flex items-center px-3 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50">
-                  <span class="text-xs text-gray-300">{{ request.status }}</span>
-                </div>
-              }
-            </div>
             
           </div>
         }

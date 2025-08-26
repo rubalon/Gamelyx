@@ -86,19 +86,19 @@ export class SocialStore {
     return computed(() => this._socialState()[key]);
   }
 
-  // 🧮 Solo computed signals que realmente TRANSFORMAN datos (patrón correcto)
-  public readonly pendingIncomingRequests = computed(() => 
-    this._socialState().incomingRequests.filter(req => req.status === FriendRequestStatus.PENDING)
+  // 🧮 Computed signals corregidos para el componente
+  public readonly incomingRequests = computed(() => 
+    this._socialState().incomingRequests
   );
   
-  public readonly pendingOutgoingRequests = computed(() => 
-    this._socialState().outgoingRequests.filter(req => req.status === FriendRequestStatus.PENDING)
+  public readonly outgoingRequests = computed(() => 
+    this._socialState().outgoingRequests
   );
 
   // 📊 Computed para estadísticas calculadas 
   public readonly totalFriends = computed(() => this._socialState().friends.length);
-  public readonly totalPendingIncoming = computed(() => this.pendingIncomingRequests().length);
-  public readonly totalPendingOutgoing = computed(() => this.pendingOutgoingRequests().length);
+  public readonly totalIncomingRequests = computed(() => this.incomingRequests().length);
+  public readonly totalOutgoingRequests = computed(() => this.outgoingRequests().length);
 
   /**
    * 🔄 Actualiza el estado social
