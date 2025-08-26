@@ -38,7 +38,7 @@ export interface SharedGameInfoDto {
 
 export interface FriendRequestDto {
   requestId: string; // UUID como string
-  sender: ContactUserDto;
+  contactUser: ContactUserDto;
   source: RequestSource;
   status: FriendRequestStatus;
   sharedGame: SharedGameInfoDto | null;

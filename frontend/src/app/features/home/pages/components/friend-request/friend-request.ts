@@ -52,6 +52,15 @@ export class FriendRequestComponent {
   }
 
   /**
+   * 💬 Abrir chat con usuario (similar a friend-list)
+   */
+  onOpenChat(chatId: string, username: string): void {
+    console.log('💬 Opening chat with:', username, 'ChatId:', chatId);
+    // TODO: Implementar navegación al chat
+    // router.navigate(['/chat', chatId]);
+  }
+
+  /**
    * ✅ Aceptar solicitud de amistad (sin funcionalidad)
    */
   onAcceptRequest(requestId: string, username: string): void {
@@ -64,14 +73,6 @@ export class FriendRequestComponent {
    */
   onRejectRequest(requestId: string, username: string): void {
     console.log('❌ Reject request from:', username, requestId);
-    // TODO: Implementar funcionalidad
-  }
-
-  /**
-   * 🗑️ Cancelar solicitud enviada (sin funcionalidad)
-   */
-  onCancelRequest(requestId: string, username: string): void {
-    console.log('🗑️ Cancel request to:', username, requestId);
     // TODO: Implementar funcionalidad
   }
 
