@@ -55,6 +55,27 @@ backend/*.class
 backend/.idea/
 
 #################################################
+# Android/Mobile Build Artifacts (NUEVO)
+#################################################
+*.aab
+*.apk
+*.keystore
+*.jks
+/android/app/build/
+/android/app/release/
+
+#################################################
+# Claves y Certificados de Firmado (CRÍTICO)
+#################################################
+*-upload-key.keystore
+*-release-key.keystore
+*-signing-key.keystore
+upload-certificate.pem
+private_key.pem
+*.p12
+*.pfx
+
+#################################################
 # Base de datos
 #################################################
 *.db
