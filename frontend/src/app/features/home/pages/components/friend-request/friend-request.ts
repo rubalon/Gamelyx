@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { SocialStore } from '@core/stores/social-store';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
+import { StarRating } from '@shared/components/star-rating/star-rating';
 
 type RequestType = 'incoming' | 'outgoing';
 
@@ -13,7 +14,8 @@ type RequestType = 'incoming' | 'outgoing';
   imports: [
     CommonModule,
     TranslateModule,
-    AvatarComponent  // 👈 Importamos nuestro Avatar compartido
+    AvatarComponent,  // 👈 Avatar compartido
+    StarRating        // 👈 StarRating compartido
   ],
   templateUrl: './friend-request.html',
   styleUrl: './friend-request.scss'

@@ -1,21 +1,25 @@
 <!-- src/app/features/home/components/friend-request/friend-request.html -->
-<div class="friend-request-container bg-gray-800 rounded-lg p-6">
+<div class="w-full bg-gray-800/90 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden">
   
   <!-- Header with Toggle -->
-  <div class="mb-6">
-    <h2 class="text-xl font-bold text-white mb-4">📨 Solicitudes de amistad</h2>
+  <div class="p-6 border-b border-gray-700/50">
+    <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+      <span class="text-2xl mr-3">📨</span>
+      Solicitudes de amistad
+    </h2>
     
     <!-- Toggle Tabs -->
-    <div class="flex">
+    <div class="flex bg-gray-900/50 rounded-lg p-1">
       <button
         (click)="requestType.set('incoming')"
         [class]="requestType() === 'incoming' 
-          ? 'bg-blue-600 text-white' 
-          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
-        class="flex-1 px-4 py-2 rounded-l-lg font-medium transition-colors relative">
-        📥 Entrantes
+          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25' 
+          : 'text-gray-300 hover:text-white hover:bg-gray-700/50'"
+        class="flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center">
+        <span class="mr-2">📥</span>
+        Entrantes
         @if (totalIncoming > 0) {
-          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+          <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[24px] text-center animate-pulse">
             {{ totalIncoming }}
           </span>
         }
@@ -23,12 +27,13 @@
       <button
         (click)="requestType.set('outgoing')"
         [class]="requestType() === 'outgoing' 
-          ? 'bg-orange-600 text-white' 
-          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
-        class="flex-1 px-4 py-2 rounded-r-lg font-medium transition-colors relative">
-        📤 Enviadas
+          ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/25' 
+          : 'text-gray-300 hover:text-white hover:bg-gray-700/50'"
+        class="flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center">
+        <span class="mr-2">📤</span>
+        Enviadas
         @if (totalOutgoing > 0) {
-          <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+          <span class="ml-2 bg-orange-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[24px] text-center">
             {{ totalOutgoing }}
           </span>
         }
@@ -37,116 +42,187 @@
   </div>
 
   <!-- Requests Content -->
-  <div class="requests-content">
+  <div class="p-6">
     @if (isLoading) {
-      <!-- Loading State -->
-      <div class="space-y-3">
-        @for (item of [1,2]; track $index) {
-          <div class="request-item-skeleton">
-            <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg animate-pulse">
+      <!-- Loading State - Grid de 3 columnas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (item of [1,2,3,4,5,6]; track $index) {
+          <div class="bg-gray-700/50 rounded-xl p-4 animate-pulse">
+            <!-- Avatar y header -->
+            <div class="flex items-center justify-between mb-4">
               <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gray-600 rounded-full"></div>
+                <div class="w-12 h-12 bg-gray-600/50 rounded-full"></div>
                 <div>
-                  <div class="h-4 bg-gray-600 rounded w-24 mb-2"></div>
-                  <div class="h-3 bg-gray-600 rounded w-32"></div>
+                  <div class="h-4 bg-gray-600/50 rounded w-20 mb-1"></div>
+                  <div class="h-3 bg-gray-600/50 rounded w-16"></div>
                 </div>
               </div>
-              <div class="flex space-x-2">
-                <div class="w-16 h-8 bg-gray-600 rounded"></div>
-                <div class="w-16 h-8 bg-gray-600 rounded"></div>
+              <div class="w-6 h-6 bg-gray-600/50 rounded-full"></div>
+            </div>
+            <!-- Badge -->
+            <div class="w-20 h-6 bg-gray-600/50 rounded-full mb-3"></div>
+            <!-- Shared game -->
+            <div class="bg-gray-600/30 rounded-lg p-3 mb-4">
+              <div class="h-3 bg-gray-600/50 rounded w-full mb-2"></div>
+              <div class="h-4 bg-gray-600/50 rounded w-3/4 mb-2"></div>
+              <div class="flex justify-between">
+                <div class="h-3 bg-gray-600/50 rounded w-12"></div>
+                <div class="h-3 bg-gray-600/50 rounded w-12"></div>
               </div>
+            </div>
+            <!-- Buttons -->
+            <div class="flex space-x-2">
+              <div class="flex-1 h-8 bg-gray-600/50 rounded"></div>
+              <div class="flex-1 h-8 bg-gray-600/50 rounded"></div>
             </div>
           </div>
         }
       </div>
     } @else if (currentRequests.length > 0) {
-      <!-- Requests List -->
-      <div class="space-y-3 max-h-64 overflow-y-auto">
+      <!-- Requests Grid - 3 columnas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (request of currentRequests; track request.requestId) {
-          <div class="request-item bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all duration-200">
-            <div class="flex items-center justify-between">
-              
-              <!-- Request Info -->
+          <div class="bg-gradient-to-br from-gray-700/80 to-gray-800/60 rounded-xl p-4 border border-gray-600/30 hover:border-gray-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1 group">
+            
+            <!-- Header con Avatar y tiempo -->
+            <div class="flex items-center justify-between mb-4">
               <div class="flex items-center space-x-3">
-                <!-- Avatar using shared component -->
-                <app-avatar 
-                  [username]="request.sender.user.username" 
-                  sizeClasses="w-12 h-12 text-lg">
-                </app-avatar>
-                
-                <!-- Request Details -->
-                <div>
-                  <p class="text-white font-medium">{{ request.sender.user.username }}</p>
-                  <div class="text-xs text-gray-400 space-y-1">
-                    <p>{{ getRelativeTime(request.receivedAt) }}</p>
-                    <div class="flex items-center space-x-2">
-                      <!-- Source Badge -->
-                      @if (request.source === 'SEARCH') {
-                        <span class="bg-purple-600 text-white px-2 py-0.5 rounded text-xs">
-                          🔍 Búsqueda
-                        </span>
-                      } @else {
-                        <span class="bg-green-600 text-white px-2 py-0.5 rounded text-xs">
-                          🎮 Sugerencia
-                        </span>
-                      }
+                <div class="relative">
+                  <app-avatar 
+                    [username]="request.sender.user.username" 
+                    sizeClasses="w-12 h-12 text-lg font-bold">
+                  </app-avatar>
+                  <!-- Status Indicator más pequeño -->
+                  @if (request.source === 'SEARCH') {
+                    <div class="absolute -bottom-1 -right-1 bg-purple-600 rounded-full p-1">
+                      <span class="text-xs">🔍</span>
                     </div>
-                    
-                    <!-- Shared Game Info -->
-                    @if (request.sharedGame) {
-                      <div class="bg-gray-600 rounded p-2 mt-2 text-xs">
-                        <p class="text-white font-medium">{{ request.sharedGame.gameName }}</p>
-                        <div class="flex justify-between text-gray-300">
-                          <span>Tu: ⭐{{ request.sharedGame.yourRating }}/10</span>
-                          <span>Suyo: ⭐{{ request.sharedGame.theirRating }}/10</span>
-                        </div>
-                      </div>
-                    }
+                  } @else {
+                    <div class="absolute -bottom-1 -right-1 bg-green-600 rounded-full p-1">
+                      <span class="text-xs">🎮</span>
+                    </div>
+                  }
+                </div>
+                
+                <div class="min-w-0">
+                  <h3 class="text-white font-bold truncate text-sm">
+                    {{ request.sender.user.username }}
+                  </h3>
+                  <p class="text-gray-400 text-xs">
+                    {{ getRelativeTime(request.receivedAt) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Source Badge -->
+            <div class="mb-4">
+              @if (request.source === 'SEARCH') {
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-600/30 text-purple-200 border border-purple-500/40">
+                  <span class="mr-1">🔍</span>
+                  Búsqueda
+                </span>
+              } @else {
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-600/30 text-green-200 border border-green-500/40">
+                  <span class="mr-1">🎮</span>
+                  Sugerencia
+                </span>
+              }
+            </div>
+            
+            <!-- Shared Game Info -->
+            @if (request.sharedGame) {
+              <div class="bg-gray-800/60 border border-gray-600/40 rounded-lg p-3 mb-4">
+                <div class="flex items-center space-x-1 mb-2">
+                  <span class="text-xs">🎯</span>
+                  <span class="font-medium text-white text-xs">Juego común</span>
+                </div>
+                <h4 class="font-bold text-white text-sm mb-3 line-clamp-2">
+                  {{ request.sharedGame.gameName }}
+                </h4>
+                <div class="space-y-2">
+                  <!-- Tu puntuación -->
+                  <div class="bg-blue-600/20 border border-blue-500/30 rounded-lg p-2">
+                    <div class="text-blue-300 text-xs font-medium mb-1 text-center">Tu puntuación</div>
+                    <div class="flex items-center justify-center">
+                      <app-star-rating
+                        [rating]="request.sharedGame.yourRating"
+                        [showNumeric]="true"
+                        [useDecimalFormat]="false"
+                        wrapperClasses=""
+                        textClasses="text-white text-xs font-bold ml-1">
+                      </app-star-rating>
+                    </div>
+                  </div>
+                  <!-- Su puntuación -->
+                  <div class="bg-orange-600/20 border border-orange-500/30 rounded-lg p-2">
+                    <div class="text-orange-300 text-xs font-medium mb-1 text-center">Su puntuación</div>
+                    <div class="flex items-center justify-center">
+                      <app-star-rating
+                        [rating]="request.sharedGame.theirRating"
+                        [showNumeric]="true"
+                        [useDecimalFormat]="false"
+                        wrapperClasses=""
+                        textClasses="text-white text-xs font-bold ml-1">
+                      </app-star-rating>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <!-- Action Buttons -->
-              <div class="flex flex-col space-y-2">
-                @if (requestType() === 'incoming') {
-                  <!-- Incoming Request Actions -->
-                  <button
-                    (click)="onAcceptRequest(request.requestId, request.sender.user.username)"
-                    class="accept-btn px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors">
-                    ✅ Aceptar
-                  </button>
-                  <button
-                    (click)="onRejectRequest(request.requestId, request.sender.user.username)"
-                    class="reject-btn px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors">
-                    ❌ Rechazar
-                  </button>
-                } @else {
-                  <!-- Outgoing Request Actions -->
-                  <button
-                    (click)="onCancelRequest(request.requestId, request.sender.user.username)"
-                    class="cancel-btn px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors">
-                    🗑️ Cancelar
-                  </button>
-                  <div class="text-xs text-gray-400 text-center">
-                    {{ request.status }}
-                  </div>
-                }
+            } @else {
+              <!-- Espaciador cuando no hay juego compartido -->
+              <div class="mb-4 h-20 flex items-center justify-center bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-600/50">
+                <div class="text-center text-gray-500">
+                  <span class="text-2xl block mb-1">🎮</span>
+                  <span class="text-xs">Sin juegos comunes</span>
+                </div>
               </div>
+            }
+            
+            <!-- Action Buttons -->
+            <div class="flex space-x-2">
+              @if (requestType() === 'incoming') {
+                <!-- Incoming Request Actions -->
+                <button
+                  (click)="onAcceptRequest(request.requestId, request.sender.user.username)"
+                  class="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-green-600/25 focus:ring-2 focus:ring-green-500/50 focus:outline-none">
+                  <span class="mr-1">✅</span>
+                  Aceptar
+                </button>
+                <button
+                  (click)="onRejectRequest(request.requestId, request.sender.user.username)"
+                  class="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-600/25 focus:ring-2 focus:ring-red-500/50 focus:outline-none">
+                  <span class="mr-1">❌</span>
+                  Rechazar
+                </button>
+              } @else {
+                <!-- Outgoing Request Actions -->
+                <button
+                  (click)="onCancelRequest(request.requestId, request.sender.user.username)"
+                  class="flex-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-gray-600/25 focus:ring-2 focus:ring-gray-500/50 focus:outline-none">
+                  <span class="mr-1">🗑️</span>
+                  Cancelar
+                </button>
+                <div class="flex-1 text-xs text-gray-400 px-2 py-2 bg-gray-800/50 rounded-lg border border-gray-700/50 flex items-center justify-center">
+                  {{ request.status }}
+                </div>
+              }
             </div>
+            
           </div>
         }
       </div>
     } @else {
       <!-- Empty State -->
-      <div class="empty-state text-center py-8">
+      <div class="text-center py-16">
         @if (requestType() === 'incoming') {
-          <div class="text-6xl mb-4">📥</div>
-          <p class="text-gray-400 mb-2">No tienes solicitudes pendientes</p>
-          <p class="text-gray-500 text-sm">Las nuevas solicitudes aparecerán aquí</p>
+          <div class="text-8xl mb-6 opacity-40 animate-bounce">📥</div>
+          <h3 class="text-2xl font-bold text-gray-300 mb-3">No tienes solicitudes pendientes</h3>
+          <p class="text-gray-500 text-lg">Las nuevas solicitudes de amistad aparecerán aquí</p>
         } @else {
-          <div class="text-6xl mb-4">📤</div>
-          <p class="text-gray-400 mb-2">No has enviado solicitudes</p>
-          <p class="text-gray-500 text-sm">Busca usuarios para enviar solicitudes</p>
+          <div class="text-8xl mb-6 opacity-40 animate-bounce">📤</div>
+          <h3 class="text-2xl font-bold text-gray-300 mb-3">No has enviado solicitudes</h3>
+          <p class="text-gray-500 text-lg">Busca usuarios para enviar solicitudes de amistad</p>
         }
       </div>
     }
