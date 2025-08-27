@@ -120,11 +120,7 @@
             
             <!-- Texto condicional según pestaña activa -->
             <span class="text-sm font-medium text-gray-700">
-              @if (activeTab === 'login') {
                 {{ 'auth.google.login' | translate }}
-              } @else {
-                {{ 'auth.google.register' | translate }}
-              }
             </span>
             
             <!-- Spinner de loading (oculto por defecto) -->

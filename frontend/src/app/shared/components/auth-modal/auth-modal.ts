@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, effect } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -8,7 +8,7 @@ import { ModalService } from '@shared/services/modal';
 import { AuthStore, LoginRequest, RegisterRequest } from '@core/stores/auth-store';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { GoogleAuthService } from '@core/services/google-auth'; // 🆕 NUEVO
+import { GoogleAuthService } from '@core/services/google-auth';
 
 @Component({
   selector: 'app-auth-modal',
@@ -25,7 +25,7 @@ export class AuthModal implements OnInit, OnDestroy {
   private formBuilder = inject(FormBuilder);
   private translateService = inject(TranslateService);
   private router = inject(Router);
-  private googleAuthService = inject(GoogleAuthService); // 🆕 NUEVO 
+  private googleAuthService = inject(GoogleAuthService);
 
   // Control de pestañas
   activeTab: 'login' | 'register' = 'login';
@@ -36,7 +36,6 @@ export class AuthModal implements OnInit, OnDestroy {
 
   constructor() {
     this.initializeForms();
-    console.log('🔧 AuthModal: Inyectando GoogleAuthService para forzar inicialización');
   }
 
   ngOnInit(): void {
@@ -55,89 +54,63 @@ export class AuthModal implements OnInit, OnDestroy {
   onClose(): void {
     this.modalService.closeAuthModal();
     this.authStore.clearError();
-    // 🆕 NUEVO: Limpiar estado de registro pendiente al cerrar
     this.authStore.clearRegistrationPending();
   }
 
   switchTab(tab: 'login' | 'register'): void {
     this.modalService.setAuthModalTab(tab);
     this.authStore.clearError();
-    // 🆕 NUEVO: Limpiar estado de registro pendiente al cambiar pestañas
     this.authStore.clearRegistrationPending();
   }
 
-  // 🆕 NUEVO: Método para manejar autenticación con Google
+  // Método único para Google Auth - funciona igual para login y register
   onGoogleAuth(): void {
-    console.log(`🚀 Iniciando Google Auth - Modo: ${this.activeTab}`);
+    console.log(`Iniciando Google Auth desde pestaña: ${this.activeTab}`);
     
-    // Usar el GoogleAuthService real
     this.googleAuthService.signInWithGoogle(this.activeTab).then(
       (userInfo) => {
-        console.log(`✅ Google Auth exitoso en modo ${this.activeTab}:`, userInfo);
         this.handleGoogleAuthSuccess(userInfo);
       }
     ).catch(
       (error) => {
-        console.error(`❌ Error en Google Auth (${this.activeTab}):`, error);
         this.handleGoogleAuthError(error);
       }
     );
   }
 
-  // 🆕 NUEVO: Manejar éxito de Google Auth
+  // Manejar éxito de Google Auth
   private handleGoogleAuthSuccess(userInfo: any): void {
-    console.log('🎉 Procesando éxito de Google Auth:', userInfo);
-    
-    if (this.activeTab === 'login') {
-      console.log('🔐 Procesando Google Login...');
-      this.processGoogleLogin(userInfo);
-    } else {
-      console.log('📝 Procesando Google Register...');
-      this.processGoogleRegister(userInfo);
-    }
-  }
-
-  // 🆕 NUEVO: Manejar errores de Google Auth
-  private handleGoogleAuthError(error: any): void {
-    console.error('❌ Error en Google Auth:', error);
-    
-    // TODO: Mostrar error en UI
-    // Por ahora solo logging, en siguiente iteración mostraremos en template
-  }
-
-  // 🆕 NUEVO: Procesar login con Google (placeholder)
-  private processGoogleLogin(userInfo: any): void {
-    console.log('🔍 Login con Google - Info recibida:', {
-      email: userInfo.email,
-      name: userInfo.name,
-      googleId: userInfo.sub
-    });
-    
-    // 🚧 TODO: Enviar al backend para login/crear usuario
-    // Por ahora simulamos éxito
-    console.log('✅ Google Login simulado exitoso');
-    
-    // Cerrar modal y redirigir (simulado)
-    // this.modalService.closeAuthModal();
-    // this.router.navigate(['/home']);
-  }
-
-  // 🆕 NUEVO: Procesar registro con Google (placeholder)  
-  private processGoogleRegister(userInfo: any): void {
-    console.log('📝 Registro con Google - Info recibida:', {
-      email: userInfo.email,
-      name: userInfo.name,
+    console.log('Google Auth exitoso - Datos recibidos:', {
       googleId: userInfo.sub,
-      picture: userInfo.picture
+      email: userInfo.email,
+      name: userInfo.name
     });
     
-    // 🚧 TODO: Enviar al backend para crear usuario
-    // Por ahora simulamos éxito
-    console.log('✅ Google Register simulado exitoso');
-    
-    // Cerrar modal y redirigir (simulado)
-    // this.modalService.closeAuthModal(); 
-    // this.router.navigate(['/home']);
+    // Crear request único para el backend
+    const googleAuthRequest = {
+      googleId: userInfo.sub,
+      email: userInfo.email,
+      name: userInfo.name
+    };
+
+    // Llamar al método único del AuthStore (mismo para ambas pestañas)
+    this.authStore.authenticateWithGoogle(googleAuthRequest).subscribe({
+      next: (response) => {
+        console.log('Google Auth completado exitosamente:', response);
+        this.modalService.closeAuthModal();
+        this.router.navigate(['/home']);
+      },
+      error: (error) => {
+        console.error('Error en Google Auth:', error);
+        // El error ya se muestra en el template via authError getter
+      }
+    });
+  }
+
+  // Manejar errores de Google Auth
+  private handleGoogleAuthError(error: any): void {
+    console.error('Error en Google Sign-In:', error);
+    // Los errores se muestran automáticamente via el authError getter
   }
 
   private initializeForms(): void {
@@ -153,18 +126,6 @@ export class AuthModal implements OnInit, OnDestroy {
       confirmPassword: ['', [Validators.required,]]
     }, {
       validators: [this.passwordMatchValidator] 
-    });
-
-    // Manejar estado disabled con effect (Angular 20 Signals)
-    effect(() => {
-      const loading = this.authStore.isLoading();
-      if (loading) {
-        this.loginForm.disable();
-        this.registerForm.disable();
-      } else {
-        this.loginForm.enable();
-        this.registerForm.enable();
-      }
     });
   }
 
@@ -219,11 +180,7 @@ export class AuthModal implements OnInit, OnDestroy {
       this.authStore.register(registerData).subscribe({
         next: (response) => {
           console.log('Registro exitoso:', response);
-          // 🔧 CORREGIDO: NO cerrar modal, mostrar mensaje de verificación
-          // ❌ this.modalService.closeAuthModal();
-          
-          // 🆕 NUEVO: El estado de registrationPending se actualiza automáticamente
-          // El template mostrará el mensaje de verificación
+          // NO cerrar modal, mostrar mensaje de verificación de email
         },
         error: (error) => {
           console.error('Error en registro:', error);
@@ -278,7 +235,6 @@ export class AuthModal implements OnInit, OnDestroy {
     return this.authStore.isAuthenticated();
   }
 
-  // 🆕 NUEVO: Getter para estado de registro pendiente
   get registrationPending() {
     return this.authStore.registrationPending();
   }

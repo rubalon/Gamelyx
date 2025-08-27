@@ -45,6 +45,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.emailVerified = true")
     long countVerifiedUsers();
 
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE LOWER(u.username) = LOWER(:username)")
+    boolean existsByUsernameIgnoreCase(@Param("username") String username);
+
 
 
 }

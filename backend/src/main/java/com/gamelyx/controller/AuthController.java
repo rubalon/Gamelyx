@@ -5,6 +5,8 @@ import com.gamelyx.dto.AuthDtos.RegisterResponse;
 import com.gamelyx.dto.AuthDtos.LoginRequest;
 import com.gamelyx.dto.AuthDtos.AuthResponse;
 import com.gamelyx.dto.AuthDtos.VerifyEmailRequest;
+import com.gamelyx.dto.AuthDtos.GoogleAuthRequest;
+import com.gamelyx.dto.AuthDtos.RefreshTokenRequest;
 import com.gamelyx.service.AuthService;
 import com.gamelyx.service.EmailService;
 import jakarta.validation.Valid;
@@ -30,26 +32,12 @@ public class AuthController {
     /**
      * Endpoint para registrar nuevos usuarios
      * POST /api/auth/register
-     * CORREGIDO: Ahora devuelve RegisterResponse sin JWT
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            // Validación básica de confirmación de contraseña
-            if (!request.password().equals(request.confirmPassword())) {
-                return ResponseEntity.badRequest()
-                        .body(createErrorResponse("Las contraseñas no coinciden"));
-            }
 
-            // Validación de longitud de contraseña (mínimo 6 caracteres)
-            if (request.password().length() < 6) {
-                return ResponseEntity.badRequest()
-                        .body(createErrorResponse("La contraseña debe tener al menos 6 caracteres"));
-            }
-
-            // Registrar usuario - CORREGIDO: Devuelve RegisterResponse
             RegisterResponse response = authService.register(request);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (RuntimeException e) {
@@ -64,7 +52,6 @@ public class AuthController {
     /**
      * Endpoint para login de usuarios
      * POST /api/auth/login
-     * MEJORADO: Verifica email antes de generar JWT
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -84,19 +71,43 @@ public class AuthController {
         }
     }
 
+    // =====================================================
+    // GOOGLE AUTH ENDPOINT ÚNICO
+    // =====================================================
+
+    /**
+     * Endpoint único para autenticación con Google
+     * POST /api/auth/google
+     * Maneja tanto login como registro automáticamente
+     */
+    @PostMapping("/google")
+    public ResponseEntity<?> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
+        try {
+            AuthResponse response = authService.authenticateWithGoogle(request);
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse("Error interno del servidor"));
+        }
+    }
+
     /**
      * Endpoint para renovar access token usando refresh token
      * POST /api/auth/refresh
      */
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         try {
-            if (request.getRefreshToken() == null || request.getRefreshToken().trim().isEmpty()) {
+            if (request.refreshToken() == null || request.refreshToken().trim().isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(createErrorResponse("Refresh token requerido"));
             }
 
-            AuthResponse response = authService.refreshToken(request.getRefreshToken());
+            AuthResponse response = authService.refreshToken(request.refreshToken());
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
@@ -111,7 +122,6 @@ public class AuthController {
     /**
      * Endpoint para verificar email
      * POST /api/auth/verify-email
-     * MEJORADO: Usa VerifyEmailRequest del AuthDtos
      */
     @PostMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
@@ -134,9 +144,6 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-        // Por ahora, con JWT stateless, el logout se maneja en el frontend
-        // eliminando los tokens del almacenamiento local
-        // En futuras fases se puede implementar blacklist de tokens
         return ResponseEntity.ok(createSuccessResponse("Logout exitoso"));
     }
 
@@ -160,7 +167,6 @@ public class AuthController {
     @GetMapping("/test-email")
     public ResponseEntity<?> testEmail(@RequestParam String email) {
         try {
-            // Validación básica del email
             if (email == null || !email.contains("@")) {
                 return ResponseEntity.badRequest()
                         .body(createErrorResponse("Email inválido"));
@@ -187,7 +193,10 @@ public class AuthController {
         }
     }
 
-    // Métodos de utilidad para crear respuestas consistentes
+    // =====================================================
+    // MÉTODOS DE UTILIDAD
+    // =====================================================
+
     private Map<String, String> createErrorResponse(String message) {
         Map<String, String> response = new HashMap<>();
         response.put("error", message);
@@ -202,24 +211,5 @@ public class AuthController {
         response.put("success", "true");
         response.put("timestamp", String.valueOf(System.currentTimeMillis()));
         return response;
-    }
-
-    // DTOs para requests específicos del controller
-    public static class RefreshTokenRequest {
-        private String refreshToken;
-
-        public RefreshTokenRequest() {}
-
-        public RefreshTokenRequest(String refreshToken) {
-            this.refreshToken = refreshToken;
-        }
-
-        public String getRefreshToken() {
-            return refreshToken;
-        }
-
-        public void setRefreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-        }
     }
 }
