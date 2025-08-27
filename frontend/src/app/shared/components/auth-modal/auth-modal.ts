@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, effect } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -153,6 +153,18 @@ export class AuthModal implements OnInit, OnDestroy {
       confirmPassword: ['', [Validators.required,]]
     }, {
       validators: [this.passwordMatchValidator] 
+    });
+
+    // Manejar estado disabled con effect (Angular 20 Signals)
+    effect(() => {
+      const loading = this.authStore.isLoading();
+      if (loading) {
+        this.loginForm.disable();
+        this.registerForm.disable();
+      } else {
+        this.loginForm.enable();
+        this.registerForm.enable();
+      }
     });
   }
 
