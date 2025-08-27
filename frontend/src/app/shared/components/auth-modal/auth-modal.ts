@@ -8,6 +8,7 @@ import { ModalService } from '@shared/services/modal';
 import { AuthStore, LoginRequest, RegisterRequest } from '@core/stores/auth-store';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { GoogleAuthService } from '@core/services/google-auth'; // 🆕 NUEVO
 
 @Component({
   selector: 'app-auth-modal',
@@ -23,7 +24,8 @@ export class AuthModal implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private formBuilder = inject(FormBuilder);
   private translateService = inject(TranslateService);
-  private router = inject(Router); 
+  private router = inject(Router);
+  private googleAuthService = inject(GoogleAuthService); // 🆕 NUEVO 
 
   // Control de pestañas
   activeTab: 'login' | 'register' = 'login';
@@ -34,6 +36,7 @@ export class AuthModal implements OnInit, OnDestroy {
 
   constructor() {
     this.initializeForms();
+    console.log('🔧 AuthModal: Inyectando GoogleAuthService para forzar inicialización');
   }
 
   ngOnInit(): void {
@@ -65,48 +68,76 @@ export class AuthModal implements OnInit, OnDestroy {
 
   // 🆕 NUEVO: Método para manejar autenticación con Google
   onGoogleAuth(): void {
-    console.log(`Iniciando Google Auth - Modo: ${this.activeTab}`);
+    console.log(`🚀 Iniciando Google Auth - Modo: ${this.activeTab}`);
     
-    // 🔧 Por ahora, solo logging para verificar que se llama correctamente
-    // En la siguiente fase implementaremos la lógica real
+    // Usar el GoogleAuthService real
+    this.googleAuthService.signInWithGoogle(this.activeTab).then(
+      (userInfo) => {
+        console.log(`✅ Google Auth exitoso en modo ${this.activeTab}:`, userInfo);
+        this.handleGoogleAuthSuccess(userInfo);
+      }
+    ).catch(
+      (error) => {
+        console.error(`❌ Error en Google Auth (${this.activeTab}):`, error);
+        this.handleGoogleAuthError(error);
+      }
+    );
+  }
+
+  // 🆕 NUEVO: Manejar éxito de Google Auth
+  private handleGoogleAuthSuccess(userInfo: any): void {
+    console.log('🎉 Procesando éxito de Google Auth:', userInfo);
     
     if (this.activeTab === 'login') {
-      console.log('🔍 Google Login solicitado');
-      // TODO: Implementar Google Sign-In para login
-      this.handleGoogleLogin();
+      console.log('🔐 Procesando Google Login...');
+      this.processGoogleLogin(userInfo);
     } else {
-      console.log('📝 Google Register solicitado');  
-      // TODO: Implementar Google Sign-In para registro
-      this.handleGoogleRegister();
+      console.log('📝 Procesando Google Register...');
+      this.processGoogleRegister(userInfo);
     }
   }
 
-  // 🆕 NUEVO: Placeholder para Google Login
-  private handleGoogleLogin(): void {
-    console.log('Procesando Google Login...');
+  // 🆕 NUEVO: Manejar errores de Google Auth
+  private handleGoogleAuthError(error: any): void {
+    console.error('❌ Error en Google Auth:', error);
     
-    // 🚧 PLACEHOLDER: Simular comportamiento para testing
-    // TODO: Integrar con Google Sign-In SDK y AuthStore
-    
-    // Simular loading state brevemente
-    setTimeout(() => {
-      console.log('Google Login completado (placeholder)');
-      // En la implementación real, aquí llamaremos al AuthStore
-    }, 1000);
+    // TODO: Mostrar error en UI
+    // Por ahora solo logging, en siguiente iteración mostraremos en template
   }
 
-  // 🆕 NUEVO: Placeholder para Google Register  
-  private handleGoogleRegister(): void {
-    console.log('Procesando Google Register...');
+  // 🆕 NUEVO: Procesar login con Google (placeholder)
+  private processGoogleLogin(userInfo: any): void {
+    console.log('🔍 Login con Google - Info recibida:', {
+      email: userInfo.email,
+      name: userInfo.name,
+      googleId: userInfo.sub
+    });
     
-    // 🚧 PLACEHOLDER: Simular comportamiento para testing
-    // TODO: Integrar con Google Sign-In SDK y AuthStore
+    // 🚧 TODO: Enviar al backend para login/crear usuario
+    // Por ahora simulamos éxito
+    console.log('✅ Google Login simulado exitoso');
     
-    // Simular loading state brevemente
-    setTimeout(() => {
-      console.log('Google Register completado (placeholder)');
-      // En la implementación real, aquí llamaremos al AuthStore
-    }, 1000);
+    // Cerrar modal y redirigir (simulado)
+    // this.modalService.closeAuthModal();
+    // this.router.navigate(['/home']);
+  }
+
+  // 🆕 NUEVO: Procesar registro con Google (placeholder)  
+  private processGoogleRegister(userInfo: any): void {
+    console.log('📝 Registro con Google - Info recibida:', {
+      email: userInfo.email,
+      name: userInfo.name,
+      googleId: userInfo.sub,
+      picture: userInfo.picture
+    });
+    
+    // 🚧 TODO: Enviar al backend para crear usuario
+    // Por ahora simulamos éxito
+    console.log('✅ Google Register simulado exitoso');
+    
+    // Cerrar modal y redirigir (simulado)
+    // this.modalService.closeAuthModal(); 
+    // this.router.navigate(['/home']);
   }
 
   private initializeForms(): void {

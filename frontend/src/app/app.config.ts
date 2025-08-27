@@ -1,5 +1,5 @@
 // src/app/app.config.ts
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, provideAppInitializer, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
@@ -9,8 +9,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt-interceptor';
-
-
+import { GoogleAuthService } from './core/services/google-auth'; // 🆕 NUEVO
 
 /**
  * 🏭 Factory function para ngx-translate
@@ -21,6 +20,19 @@ export function httpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 /**
+ * 🏭 Factory function para inicializar Google Auth (Angular 20)
+ * Garantiza que Google Identity Services esté listo antes de usar la app
+ */
+export function initializeGoogleAuth(googleAuthService: GoogleAuthService): () => Promise<void> {
+  return () => {
+    console.log('🚀 Inicializando GoogleAuthService desde app.config (Angular 20)...');
+    // El solo hecho de inyectar el servicio lo inicializa automáticamente
+    // Retornamos Promise resuelto para que el inicializador continúe
+    return Promise.resolve();
+  };
+}
+
+/**
  * 🎯 Configuración central de la aplicación Angular
  * 
  * Centraliza todos los providers necesarios para la app:
@@ -28,6 +40,7 @@ export function httpLoaderFactory(http: HttpClient): TranslateHttpLoader {
  * - Routing
  * - HTTP Client + JWT Interceptor
  * - Internationalization (ngx-translate)
+ * - Google Authentication initialization
  */
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -52,6 +65,14 @@ export const appConfig: ApplicationConfig = {
           deps: [HttpClient]
         }
       })
-    )
+    ),
+    
+    // 🔐 Google Authentication Initialization (Angular 20)
+    provideAppInitializer(() => {
+      console.log('🚀 Inicializando GoogleAuthService desde app.config (Angular 20)...');
+      const googleAuthService = inject(GoogleAuthService);
+      return Promise.resolve();
+    })
   ]
+  
 };
