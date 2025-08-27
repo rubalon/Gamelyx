@@ -33,7 +33,8 @@
         (click)="modalService.openAuthModal('register')">
         {{ 'hero.cta.start' | translate }}
       </button>
-      <button class="border-2 border-white/30 hover:border-white/50 text-white font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-300 backdrop-blur-sm hover:backdrop-blur-md min-w-48">
+      <button class="border-2 border-white/30 hover:border-white/50 text-white font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-300 backdrop-blur-sm hover:backdrop-blur-md min-w-48 transform hover:scale-105 hover:bg-white/10"
+        (click)="onLearnMoreClick()">
         {{ 'hero.cta.learn' | translate }}
       </button>
     </div>

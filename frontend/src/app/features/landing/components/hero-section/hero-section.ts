@@ -14,7 +14,17 @@ export class HeroSection {
   protected modalService = inject(ModalService);
 
   onStartClick(): void {
-  this.modalService.openAuthModal('register'); // Abre en registro
-}
+    this.modalService.openAuthModal('register'); // Abre en registro
+  }
+
+  onLearnMoreClick(): void {
+    const featuresSection = document.getElementById('features-section');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }
 
 }
