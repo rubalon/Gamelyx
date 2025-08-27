@@ -18,7 +18,7 @@ export interface RegisterRequest {
   password: string;
 }
 
-// NUEVO: Interface única para Google Auth
+// Interface única para Google Auth
 export interface GoogleAuthRequest {
   googleId: string;
   email: string;
@@ -41,16 +41,6 @@ export interface RegisterResponse {
   email: string;
   message: string;
   emailVerificationRequired: boolean;
-}
-
-// Respuesta específica de Google Auth (igual que AuthResponse normal)
-export interface GoogleAuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-  username: string;
-  email: string;
-  message: string;
 }
 
 export interface User {
@@ -139,14 +129,14 @@ export class AuthStore {
   /**
    * Almacena los datos de autenticación en localStorage
    */
-  private storeAuthData(response: AuthResponse | GoogleAuthResponse): void {
+  private storeAuthData(response: AuthResponse): void {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
     localStorage.setItem('userData', JSON.stringify({
       id: response.userId,
       username: response.username,
       email: response.email,
-      emailVerified: true // Google emails siempre están verificados
+      emailVerified: true
     }));
   }
 
@@ -234,13 +224,13 @@ export class AuthStore {
   }
 
   /**
-   * NUEVO: Autenticación única con Google
+   * Autenticación única con Google
    * Maneja automáticamente login o registro según si el usuario existe
    */
-  authenticateWithGoogle(googleUserInfo: GoogleAuthRequest): Observable<GoogleAuthResponse> {
+  authenticateWithGoogle(googleUserInfo: GoogleAuthRequest): Observable<AuthResponse> {
     this.updateAuthState({ isLoading: true, error: null });
 
-    return this.http.post<GoogleAuthResponse>(`${this.API_URL}/google`, googleUserInfo)
+    return this.http.post<AuthResponse>(`${this.API_URL}/google`, googleUserInfo)
       .pipe(
         tap(response => {
           this.storeAuthData(response);
