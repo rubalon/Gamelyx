@@ -64,6 +64,8 @@
   "auth": {
     "welcome": "¡Bienvenido a Gamelyx!",
     "subtitle": "Únete a la comunidad gaming más grande",
+    "loading": "Cargando...",
+    "or": "o",
     "login": {
       "tab": "Entrar",
       "title": "Iniciar Sesión",
@@ -75,6 +77,10 @@
       "title": "Crear Cuenta",
       "subtitle": "Únete a miles de gamers",
       "submit": "Crear Cuenta"
+    },
+    "google": {
+      "login": "Continuar con Google",
+      "register": "Registrarse con Google"
     },
     "fields": {
       "emailOrUsername": "Email o Nombre de Usuario",
@@ -96,8 +102,7 @@
       "minlength": "Mínimo {{length}} caracteres",
       "maxlength": "Máximo {{length}} caracteres",
       "passwordMismatch": "Las contraseñas no coinciden"
-    },
-    "loading": "Cargando..."
+    }
     
   }
 }

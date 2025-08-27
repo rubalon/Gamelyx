@@ -63,6 +63,52 @@ export class AuthModal implements OnInit, OnDestroy {
     this.authStore.clearRegistrationPending();
   }
 
+  // 🆕 NUEVO: Método para manejar autenticación con Google
+  onGoogleAuth(): void {
+    console.log(`Iniciando Google Auth - Modo: ${this.activeTab}`);
+    
+    // 🔧 Por ahora, solo logging para verificar que se llama correctamente
+    // En la siguiente fase implementaremos la lógica real
+    
+    if (this.activeTab === 'login') {
+      console.log('🔍 Google Login solicitado');
+      // TODO: Implementar Google Sign-In para login
+      this.handleGoogleLogin();
+    } else {
+      console.log('📝 Google Register solicitado');  
+      // TODO: Implementar Google Sign-In para registro
+      this.handleGoogleRegister();
+    }
+  }
+
+  // 🆕 NUEVO: Placeholder para Google Login
+  private handleGoogleLogin(): void {
+    console.log('Procesando Google Login...');
+    
+    // 🚧 PLACEHOLDER: Simular comportamiento para testing
+    // TODO: Integrar con Google Sign-In SDK y AuthStore
+    
+    // Simular loading state brevemente
+    setTimeout(() => {
+      console.log('Google Login completado (placeholder)');
+      // En la implementación real, aquí llamaremos al AuthStore
+    }, 1000);
+  }
+
+  // 🆕 NUEVO: Placeholder para Google Register  
+  private handleGoogleRegister(): void {
+    console.log('Procesando Google Register...');
+    
+    // 🚧 PLACEHOLDER: Simular comportamiento para testing
+    // TODO: Integrar con Google Sign-In SDK y AuthStore
+    
+    // Simular loading state brevemente
+    setTimeout(() => {
+      console.log('Google Register completado (placeholder)');
+      // En la implementación real, aquí llamaremos al AuthStore
+    }, 1000);
+  }
+
   private initializeForms(): void {
     this.loginForm = this.formBuilder.group({
       emailOrUsername: ['', [Validators.required]], 
@@ -98,7 +144,7 @@ export class AuthModal implements OnInit, OnDestroy {
         password: this.loginForm.value.password
       };
 
-      console.log('Iniciando login:', loginData);
+      console.log('Iniciando login tradicional:', loginData);
 
       this.authStore.login(loginData).subscribe({
         next: (response) => {
@@ -125,7 +171,7 @@ export class AuthModal implements OnInit, OnDestroy {
         confirmPassword: this.registerForm.value.confirmPassword
       };
 
-      console.log('Iniciando registro:', registerData);
+      console.log('Iniciando registro tradicional:', registerData);
 
       this.authStore.register(registerData).subscribe({
         next: (response) => {

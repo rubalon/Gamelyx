@@ -64,6 +64,8 @@
   "auth": {
     "welcome": "Welcome to Gamelyx!",
     "subtitle": "Join the biggest gaming community",
+    "loading": "Loading...",
+    "or": "or",
     "login": {
       "tab": "Sign In",
       "title": "Sign In",
@@ -75,6 +77,10 @@
       "title": "Create Account", 
       "subtitle": "Join thousands of gamers",
       "submit": "Create Account"
+    },
+    "google": {
+      "login": "Continue with Google",
+      "register": "Sign up with Google"
     },
     "fields": {
       "emailOrUsername": "Email or Username",
@@ -88,7 +94,7 @@
       "email": "your@email.com",
       "password": "••••••••",
       "username": "Your username",
-      "confirmPassword": "Repeat your password"
+      "confirmPassword": "••••••••"
     },
     "errors": {
       "required": "This field is required",
@@ -96,7 +102,6 @@
       "minlength": "Minimum {{length}} characters", 
       "maxlength": "Maximum {{length}} characters",
       "passwordMismatch": "Passwords do not match"
-    },
-    "loading": "Loading..."
+    }
   }
 }
