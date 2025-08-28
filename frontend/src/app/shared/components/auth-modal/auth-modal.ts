@@ -30,6 +30,10 @@ export class AuthModal implements OnInit, OnDestroy {
   // Control de pestañas
   activeTab: 'login' | 'register' = 'login';
 
+  // 🆕 Estados de loading independientes
+  isGoogleLoading = false;
+  isTraditionalLoading = false;
+
   // Formularios reactivos
   loginForm!: FormGroup;
   registerForm!: FormGroup;
@@ -67,6 +71,9 @@ export class AuthModal implements OnInit, OnDestroy {
   onGoogleAuth(): void {
     console.log(`Iniciando Google Auth desde pestaña: ${this.activeTab}`);
     
+    // 🆕 Activar loading específico de Google
+    this.isGoogleLoading = true;
+    
     this.googleAuthService.signInWithGoogle(this.activeTab).then(
       (userInfo) => {
         this.handleGoogleAuthSuccess(userInfo);
@@ -75,7 +82,10 @@ export class AuthModal implements OnInit, OnDestroy {
       (error) => {
         this.handleGoogleAuthError(error);
       }
-    );
+    ).finally(() => {
+      // 🆕 Desactivar loading específico de Google
+      this.isGoogleLoading = false;
+    });
   }
 
   // Manejar éxito de Google Auth
@@ -103,6 +113,10 @@ export class AuthModal implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error en Google Auth:', error);
         // El error ya se muestra en el template via authError getter
+      },
+      complete: () => {
+        // 🆕 Asegurar que se desactive el loading al completar
+        this.isGoogleLoading = false;
       }
     });
   }
@@ -110,6 +124,8 @@ export class AuthModal implements OnInit, OnDestroy {
   // Manejar errores de Google Auth
   private handleGoogleAuthError(error: any): void {
     console.error('Error en Google Sign-In:', error);
+    // 🆕 Desactivar loading en caso de error
+    this.isGoogleLoading = false;
     // Los errores se muestran automáticamente via el authError getter
   }
 
@@ -150,6 +166,9 @@ export class AuthModal implements OnInit, OnDestroy {
 
       console.log('Iniciando login tradicional:', loginData);
 
+      // 🆕 Activar loading específico de autenticación tradicional
+      this.isTraditionalLoading = true;
+
       this.authStore.login(loginData).subscribe({
         next: (response) => {
           console.log('Login exitoso:', response);
@@ -158,6 +177,10 @@ export class AuthModal implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error en login:', error);
+        },
+        complete: () => {
+          // 🆕 Desactivar loading al completar
+          this.isTraditionalLoading = false;
         }
       });
     } else {
@@ -177,6 +200,9 @@ export class AuthModal implements OnInit, OnDestroy {
 
       console.log('Iniciando registro tradicional:', registerData);
 
+      // 🆕 Activar loading específico de autenticación tradicional
+      this.isTraditionalLoading = true;
+
       this.authStore.register(registerData).subscribe({
         next: (response) => {
           console.log('Registro exitoso:', response);
@@ -184,6 +210,10 @@ export class AuthModal implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error en registro:', error);
+        },
+        complete: () => {
+          // 🆕 Desactivar loading al completar
+          this.isTraditionalLoading = false;
         }
       });
     } else {
@@ -223,6 +253,7 @@ export class AuthModal implements OnInit, OnDestroy {
     return null;
   }
 
+  // 🆕 Getters actualizados para usar los estados de loading independientes
   get isLoading() {
     return this.authStore.isLoading();
   }
