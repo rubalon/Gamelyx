@@ -44,6 +44,21 @@ public class AuthDtos {
     ) {}
 
     /**
+     * Request para autenticación con Google (login o registro automático)
+     */
+    public record GoogleAuthRequest(
+            @NotBlank(message = "El Google ID es obligatorio")
+            String googleId,
+
+            @NotBlank(message = "El email es obligatorio")
+            @Email(message = "El formato del email es inválido")
+            String email,
+
+            @NotBlank(message = "El name es obligatorio")
+            String name
+    ) {}
+
+    /**
      * Respuesta del registro que NO incluye JWT tokens
      * El usuario debe verificar su email antes de poder autenticarse
      */

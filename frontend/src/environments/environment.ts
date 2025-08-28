@@ -29,5 +29,8 @@ export const environment = {
   features: {
     enableGoogleAuth: false,
     enableEmailVerification: true
+  },
+  google: {
+    clientId: '662461007359-647kj5vf6430eakt2ke00ufimdmseksl.apps.googleusercontent.com'
   }
 };

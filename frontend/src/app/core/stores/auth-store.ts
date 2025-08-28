@@ -1,4 +1,4 @@
-// src/app/core/stores/auth-store.ts (ACTUALIZADO)
+// src/app/core/stores/auth-store.ts (ACTUALIZADO CON GOOGLE AUTH)
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -18,6 +18,13 @@ export interface RegisterRequest {
   password: string;
 }
 
+// Interface única para Google Auth
+export interface GoogleAuthRequest {
+  googleId: string;
+  email: string;
+  name: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -27,7 +34,7 @@ export interface AuthResponse {
   message: string;
 }
 
-// 🆕 NUEVA: Respuesta del registro sin JWT
+// Respuesta del registro sin JWT
 export interface RegisterResponse {
   userId: string;
   username: string;
@@ -43,13 +50,12 @@ export interface User {
   emailVerified: boolean;
 }
 
-// 🆕 ACTUALIZADO: Estado con información de registro pendiente
+// Estado con información de registro pendiente
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  // 🆕 NUEVO: Estado para mostrar mensaje de verificación
   registrationPending: {
     email: string;
     message: string;
@@ -71,7 +77,7 @@ export class AuthStore {
     isAuthenticated: false,
     isLoading: false,
     error: null,
-    registrationPending: null // 🆕 NUEVO
+    registrationPending: null
   });
 
   // Estado público readonly
@@ -82,8 +88,6 @@ export class AuthStore {
   public readonly isLoading = computed(() => this._authState().isLoading);
   public readonly user = computed(() => this._authState().user);
   public readonly error = computed(() => this._authState().error);
-  
-  // 🆕 NUEVO: Signal para estado de registro pendiente
   public readonly registrationPending = computed(() => this._authState().registrationPending);
 
   constructor() {
@@ -167,35 +171,17 @@ export class AuthStore {
    * Realiza el login del usuario
    */
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    // 🧹 LIMPIAR DATOS ANTES DE ENVIAR
     const cleanCredentials: LoginRequest = {
-      usernameOrEmail: credentials.usernameOrEmail.trim(), // 👈 Solo trim, sin toLowerCase para usernames
-      password: credentials.password // Password no se modifica
+      usernameOrEmail: credentials.usernameOrEmail.trim(),
+      password: credentials.password
     };
-
-    // 🔍 DEBUG DETALLADO
-    /*
-    console.log('🔍 LOGIN DEBUG - Original:', credentials);
-    console.log('🔍 LOGIN DEBUG - Cleaned:', cleanCredentials);
-    console.log('🔍 LOGIN DEBUG - Comparison:', {
-      originalLength: credentials.usernameOrEmail.length,
-      cleanedLength: cleanCredentials.usernameOrEmail.length,
-      hasSpaces: credentials.usernameOrEmail !== credentials.usernameOrEmail.trim(),
-      originalBytes: Array.from(credentials.usernameOrEmail).map(c => c.charCodeAt(0)),
-      cleanedBytes: Array.from(cleanCredentials.usernameOrEmail).map(c => c.charCodeAt(0))
-    });
-    */
 
     this.updateAuthState({ isLoading: true, error: null });
 
     return this.http.post<AuthResponse>(`${this.API_URL}/login`, cleanCredentials)
       .pipe(
         tap(response => {
-//          console.log('✅ Login successful:', response);
-          // Almacenar tokens y datos del usuario
           this.storeAuthData(response);
-          
-          // Actualizar estado como autenticado
           this.updateAuthState({
             user: {
               id: response.userId,
@@ -206,18 +192,15 @@ export class AuthStore {
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            registrationPending: null // Limpiar estado de registro
+            registrationPending: null
           });
         }),
-        catchError(error => {
- //         console.error('❌ Login error:', error);
-          return this.handleError(error);
-        })
+        catchError(error => this.handleError(error))
       );
   }
 
   /**
-   * 🔧 CORREGIDO: Registro NO autentica, solo muestra mensaje de verificación
+   * Registro tradicional con email y contraseña
    */
   register(userData: RegisterRequest): Observable<RegisterResponse> {
     this.updateAuthState({ isLoading: true, error: null });
@@ -225,16 +208,11 @@ export class AuthStore {
     return this.http.post<RegisterResponse>(`${this.API_URL}/register`, userData)
       .pipe(
         tap(response => {
-          // 🔧 CORREGIDO: NO almacenar tokens (no los hay)
-          // ❌ this.storeAuthData(response);
-          
-          // 🔧 CORREGIDO: NO marcar como autenticado
           this.updateAuthState({
-            user: null, // 👈 NO hay usuario autenticado
-            isAuthenticated: false, // 👈 NO está autenticado
+            user: null,
+            isAuthenticated: false,
             isLoading: false,
             error: null,
-            // 🆕 NUEVO: Guardar info de registro pendiente
             registrationPending: {
               email: response.email,
               message: response.message
@@ -246,7 +224,35 @@ export class AuthStore {
   }
 
   /**
-   * 🆕 NUEVO: Limpia el estado de registro pendiente
+   * Autenticación única con Google
+   * Maneja automáticamente login o registro según si el usuario existe
+   */
+  authenticateWithGoogle(googleUserInfo: GoogleAuthRequest): Observable<AuthResponse> {
+    this.updateAuthState({ isLoading: true, error: null });
+
+    return this.http.post<AuthResponse>(`${this.API_URL}/google`, googleUserInfo)
+      .pipe(
+        tap(response => {
+          this.storeAuthData(response);
+          this.updateAuthState({
+            user: {
+              id: response.userId,
+              username: response.username,
+              email: response.email,
+              emailVerified: true
+            },
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            registrationPending: null
+          });
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+
+  /**
+   * Limpia el estado de registro pendiente
    */
   clearRegistrationPending(): void {
     this.updateAuthState({ registrationPending: null });
@@ -282,7 +288,7 @@ export class AuthStore {
   }
 
   /**
-   * 🆕 NUEVO: Verifica el email del usuario
+   * Verifica el email del usuario
    */
   verifyEmail(token: string): Observable<any> {
     this.updateAuthState({ isLoading: true, error: null });

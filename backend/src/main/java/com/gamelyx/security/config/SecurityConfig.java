@@ -76,8 +76,8 @@ public class SecurityConfig {
                 // Configuración de autorización
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos de autenticación
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/refresh").permitAll() // AÑADIDO: refresh también es público
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/google").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll()
 
                         // Endpoints de testing y salud (públicos para desarrollo)
                         .requestMatchers("/api/auth/health", "/api/auth/test-email").permitAll()
