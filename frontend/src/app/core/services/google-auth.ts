@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-// 🔧 Declaración de tipos para Google Identity Services
+// Declaración de tipos para Google Identity Services completa
 declare global {
   interface Window {
     google: {
@@ -12,6 +12,17 @@ declare global {
           prompt: () => void;
           renderButton: (element: HTMLElement, config: any) => void;
           disableAutoSelect: () => void;
+        };
+        oauth2: {
+          initTokenClient: (config: {
+            client_id: string;
+            scope: string;
+            prompt?: string;
+            callback: (response: any) => void;
+            error_callback?: (error: any) => void;
+          }) => {
+            requestAccessToken: () => void;
+          };
         };
       };
     };
@@ -47,16 +58,30 @@ export class GoogleAuthService {
    * Carga e inicializa Google Identity Services
    */
   private loadGoogleScript(): void {
-    // 🔍 Verificar si Google ya está cargado
+    console.log('Iniciando carga de Google Script...');
+    console.log('Window disponible:', typeof window !== 'undefined');
+    console.log('Google disponible:', typeof window.google);
+    
+    // Verificar si Google ya está cargado
     if (typeof window !== 'undefined' && window.google?.accounts?.id) {
+      console.log('Google ya estaba cargado');
       this.initializeGoogleAuth();
       return;
     }
 
-    // 🕒 Esperar a que se cargue el script
+    console.log('Esperando a que se cargue Google Script...');
+    let attempts = 0;
+    
+    // Esperar a que se cargue el script
     const checkGoogleLoaded = () => {
+      attempts++;
+      console.log(`Intento ${attempts} - Google disponible:`, typeof window.google);
+      
       if (window.google?.accounts?.id) {
+        console.log('Google Script cargado correctamente');
         this.initializeGoogleAuth();
+      } else if (attempts > 50) { // 5 segundos máximo
+        console.error('Timeout esperando Google Script');
       } else {
         setTimeout(checkGoogleLoaded, 100);
       }
@@ -69,36 +94,41 @@ export class GoogleAuthService {
    * Inicializa la configuración de Google Auth
    */
   private initializeGoogleAuth(): void {
-    if (this.isInitialized) return;
+    console.log('Intentando inicializar Google Auth...');
+    console.log('Ya inicializado:', this.isInitialized);
+    console.log('Client ID:', environment.google.clientId);
+    
+    if (this.isInitialized) {
+      console.log('Google Auth ya estaba inicializado');
+      return;
+    }
 
     try {
+      // Solo inicializar la API básica, OAuth2 se manejará separadamente
       window.google.accounts.id.initialize({
         client_id: environment.google.clientId,
         callback: this.handleCredentialResponse.bind(this),
         auto_select: false,
-        cancel_on_tap_outside: true
+        cancel_on_tap_outside: false,
+        itp_support: true
       });
 
       this.isInitialized = true;
-      console.log('✅ Google Auth inicializado correctamente');
+      console.log('Google Auth inicializado correctamente');
       
     } catch (error) {
-      console.error('❌ Error inicializando Google Auth:', error);
+      console.error('Error inicializando Google Auth:', error);
     }
   }
 
   /**
-   * Callback que maneja la respuesta de Google
+   * Callback que maneja la respuesta de Google (no usado en OAuth2)
    */
   private handleCredentialResponse(response: GoogleAuthResponse): void {
-    console.log('🔍 Respuesta de Google recibida:', response);
+    console.log('Respuesta de Google recibida:', response);
     
-    // 🔧 Decodificar el JWT token para obtener info del usuario
     const userInfo = this.decodeJWT(response.credential);
-    console.log('👤 Info del usuario:', userInfo);
-
-    // 🚧 Por ahora solo logging, en la siguiente iteración integraremos con AuthStore
-    // TODO: Enviar al AuthStore para procesar login/registro
+    console.log('Info del usuario:', userInfo);
   }
 
   /**
@@ -114,13 +144,13 @@ export class GoogleAuthService {
 
       return JSON.parse(jsonPayload) as GoogleUserInfo;
     } catch (error) {
-      console.error('❌ Error decodificando JWT:', error);
+      console.error('Error decodificando JWT:', error);
       throw new Error('Token inválido');
     }
   }
 
   /**
-   * Inicia el flujo de autenticación con Google
+   * Inicia el flujo de autenticación con Google usando Authorization API
    * @param mode - 'login' o 'register'
    */
   signInWithGoogle(mode: 'login' | 'register' = 'login'): Promise<GoogleUserInfo> {
@@ -130,29 +160,62 @@ export class GoogleAuthService {
         return;
       }
 
-      console.log(`🚀 Iniciando Google Sign-In - Modo: ${mode}`);
+      console.log(`Iniciando Google Sign-In - Modo: ${mode}`);
 
-      // 🔧 Configurar callback temporal para esta operación específica
-      const originalCallback = this.handleCredentialResponse.bind(this);
-      
-      window.google.accounts.id.initialize({
-        client_id: environment.google.clientId,
-        callback: (response: GoogleAuthResponse) => {
-          try {
-            const userInfo = this.decodeJWT(response.credential);
-            console.log(`✅ ${mode} con Google exitoso:`, userInfo);
-            resolve(userInfo);
-          } catch (error) {
-            console.error(`❌ Error en ${mode} con Google:`, error);
-            reject(error);
+      try {
+        // Usar Authorization API oficial para forzar selección de cuenta
+        const client = window.google.accounts.oauth2.initTokenClient({
+          client_id: environment.google.clientId,
+          scope: 'openid email profile', // Scopes básicos para autenticación
+          prompt: 'select_account', // Fuerza selección de cuenta siempre
+          callback: async (tokenResponse: any) => {
+            try {
+              if (tokenResponse.error) {
+                reject(new Error(`Google Auth error: ${tokenResponse.error}`));
+                return;
+              }
+
+              // Obtener información del usuario usando el access token
+              const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                headers: {
+                  'Authorization': `Bearer ${tokenResponse.access_token}`
+                }
+              });
+
+              if (!userInfoResponse.ok) {
+                reject(new Error('Error obteniendo información del usuario'));
+                return;
+              }
+
+              const userInfo = await userInfoResponse.json();
+              
+              resolve({
+                sub: userInfo.id,
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                given_name: userInfo.given_name,
+                family_name: userInfo.family_name
+              });
+
+            } catch (error) {
+              console.error(`Error procesando respuesta de Google:`, error);
+              reject(error);
+            }
+          },
+          error_callback: (error: any) => {
+            console.error('Google Auth error callback:', error);
+            reject(new Error(`Google Auth failed: ${error.type || 'unknown error'}`));
           }
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
+        });
 
-      // 🎯 Mostrar el popup de Google
-      window.google.accounts.id.prompt();
+        // Solicitar token (abre popup de Google)
+        client.requestAccessToken();
+
+      } catch (error) {
+        console.error('Error iniciando Google Sign-In:', error);
+        reject(error);
+      }
     });
   }
 
