@@ -47,6 +47,7 @@ public class AuthService {
      * NUEVO: Autenticación única con Google
      * Maneja automáticamente login o registro según si el usuario existe
      */
+    @Transactional
     public AuthResponse authenticateWithGoogle(GoogleAuthRequest request) {
         System.out.println("=== GOOGLE AUTH INICIADO ===");
         System.out.println("Google ID: " + request.googleId());
@@ -70,7 +71,7 @@ public class AuthService {
                 if (existingEmailUser.get().getGoogleId() == null) {
                     throw new RuntimeException(
                             "Este email ya está registrado con contraseña. " +
-                                    "Por favor, inicia sesión con tu contraseña o usa la opción 'Olvidé mi contraseña'."
+                                    "Por favor, inicia sesión con tu contraseña."
                     );
                 }
 
