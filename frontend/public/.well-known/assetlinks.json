@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "es.gamelyx.www.twa",
-    "sha256_cert_fingerprints": ["BC500295FEDAF9442CCD98D1A8596D1C2629AF99E848211E9644EF0C34235655"]
+    "sha256_cert_fingerprints": ["BC:50:02:95:FE:DA:F9:44:2C:CD:98:D1:A8:59:6D:4C:26:29:AF:99:E8:48:21:1E:96:44:EF:0C:34:23:56:55"]
   }
 }]
