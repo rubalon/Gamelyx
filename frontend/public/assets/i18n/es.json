@@ -79,8 +79,7 @@
       "submit": "Crear Cuenta"
     },
     "google": {
-      "login": "Continuar con Google",
-      "register": "Registrarse con Google"
+      "login": "Continuar con Google"
     },
     "fields": {
       "emailOrUsername": "Email o Nombre de Usuario",
