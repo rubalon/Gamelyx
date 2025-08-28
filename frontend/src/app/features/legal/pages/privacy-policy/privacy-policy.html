@@ -1,0 +1,160 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-white mb-4">
+        Política de Privacidad
+      </h1>
+      <p class="text-gray-300">
+        Última actualización: {{ lastUpdated }}
+      </p>
+    </div>
+
+    <!-- Content -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl p-8 text-gray-100 animate-fade-in">
+      
+      <!-- Introducción -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4 border-b border-purple-300/30 pb-2">1. Introducción</h2>
+        <p class="mb-4 leading-relaxed text-gray-200">
+          En Gamelyx (<strong>www.gamelyx.es</strong>), nos comprometemos a proteger y respetar tu privacidad. 
+          Esta política explica cómo recopilamos, usamos y protegemos tu información personal cuando utilizas 
+          nuestra plataforma de comunidad gaming, tanto en la versión web como en la aplicación móvil.
+        </p>
+        <p class="leading-relaxed text-gray-200">
+          Al utilizar Gamelyx, aceptas la recopilación y uso de información de acuerdo con esta política.
+        </p>
+      </section>
+
+      <!-- Información que recopilamos -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4 border-b border-purple-300/30 pb-2">2. Información que Recopilamos</h2>
+        
+        <h3 class="text-xl font-medium text-blue-300 mb-3 mt-6">2.1 Información que nos proporcionas</h3>
+        <ul class="list-disc list-inside mb-4 space-y-2 pl-4 text-gray-200">
+          <li><strong>Datos de registro:</strong> Nombre de usuario y dirección de email</li>
+          <li><strong>Contraseña:</strong> Almacenamos únicamente el hash cifrado con salt, nunca la contraseña real</li>
+          <li><strong>Reviews de juegos:</strong> Las reseñas y opiniones que escribes sobre videojuegos</li>
+          <li><strong>Comunicaciones:</strong> Mensajes que nos envíes a través del email de soporte</li>
+        </ul>
+
+        <h3 class="text-xl font-medium text-blue-300 mb-3 mt-6">2.2 Información técnica</h3>
+        <ul class="list-disc list-inside mb-4 space-y-2 pl-4 text-gray-200">
+          <li><strong>Tokens de autenticación:</strong> JWT tokens almacenados localmente para mantener tu sesión</li>
+          <li><strong>Datos de verificación:</strong> Tokens temporales para verificación de email</li>
+          <li><strong>Información del dispositivo:</strong> Tipo de dispositivo y navegador utilizado</li>
+        </ul>
+      </section>
+
+      <!-- Cómo usamos tu información -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4">3. Cómo Usamos tu Información</h2>
+        <p class="mb-4">Utilizamos tu información personal para:</p>
+        <ul class="list-disc list-inside space-y-2 pl-4 text-gray-200">
+          <li><strong>Proporcionar el servicio:</strong> Crear y mantener tu cuenta de usuario</li>
+          <li><strong>Autenticación:</strong> Verificar tu identidad y mantener tu sesión segura</li>
+          <li><strong>Mostrar contenido:</strong> Publicar las reviews y opiniones que escribes sobre juegos</li>
+          <li><strong>Comunicaciones:</strong> Enviarte emails de verificación y notificaciones importantes</li>
+          <li><strong>Mejora del servicio:</strong> Entender cómo utilizas la plataforma para mejorarla</li>
+          <li><strong>Soporte técnico:</strong> Responder a tus consultas y resolver problemas</li>
+        </ul>
+      </section>
+
+      <!-- Servicios de terceros -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4">4. Servicios de Terceros</h2>
+        
+        <h3 class="text-xl font-medium text-blue-300 mb-3">4.1 RAWG API</h3>
+        <p class="mb-4 leading-relaxed">
+          Utilizamos la API de <strong>RAWG.io</strong> para obtener información sobre videojuegos. 
+          Esta integración nos permite mostrar datos actualizados sobre juegos, pero no compartimos 
+          tu información personal con RAWG. Puedes consultar su política de privacidad en: 
+          <a href="https://rawg.io/privacy_policy" class="text-blue-400 hover:text-blue-300 underline" target="_blank">
+            https://rawg.io/privacy_policy
+          </a>
+        </p>
+
+        <h3 class="text-xl font-medium text-blue-300 mb-3">4.2 Servicio de Email</h3>
+        <p class="mb-4 leading-relaxed">
+          Utilizamos Gmail SMTP para el envío de emails de verificación y notificaciones. 
+          Google puede tener acceso a estos emails según su política de privacidad.
+        </p>
+      </section>
+
+      <!-- Almacenamiento de datos -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4">5. Almacenamiento y Seguridad</h2>
+        
+        <h3 class="text-xl font-medium text-blue-300 mb-3">5.1 Almacenamiento local</h3>
+        <p class="mb-4 leading-relaxed">
+          Los tokens de autenticación (JWT) se almacenan localmente en tu dispositivo para mantener 
+          tu sesión activa. Estos tokens tienen una duración limitada y se renuevan automáticamente.
+        </p>
+
+        <h3 class="text-xl font-medium text-blue-300 mb-3">5.2 Base de datos</h3>
+        <p class="mb-4 leading-relaxed">
+          Tus datos de usuario se almacenan de forma segura en nuestra base de datos PostgreSQL, 
+          con contraseñas cifradas y medidas de seguridad apropiadas.
+        </p>
+
+        <h3 class="text-xl font-medium text-blue-300 mb-3">5.3 Cookies</h3>
+        <p class="mb-4 leading-relaxed">
+          Actualmente <strong>no utilizamos cookies</strong> para rastrear tu actividad. 
+          La autenticación se gestiona mediante tokens JWT almacenados localmente.
+        </p>
+      </section>
+
+      <!-- Tus derechos -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4">6. Tus Derechos</h2>
+        <p class="mb-4">Tienes derecho a:</p>
+        <ul class="list-disc list-inside space-y-2 pl-4">
+          <li><strong>Acceso:</strong> Solicitar una copia de tus datos personales</li>
+          <li><strong>Rectificación:</strong> Corregir datos inexactos o incompletos</li>
+          <li><strong>Eliminación:</strong> Solicitar la eliminación de tu cuenta y datos asociados</li>
+          <li><strong>Portabilidad:</strong> Obtener tus datos en un formato estructurado</li>
+          <li><strong>Oposición:</strong> Oponerte al procesamiento de tus datos personales</li>
+        </ul>
+        <p class="mt-4 leading-relaxed">
+          Para ejercer estos derechos, contáctanos en: 
+          <strong>gamelyx.mail&#64;gmail.com</strong>
+        </p>
+      </section>
+
+      <!-- Menores de edad - ELIMINADO -->
+
+      <!-- Cambios en la política -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4 border-b border-purple-300/30 pb-2">7. Cambios en esta Política</h2>
+        <p class="leading-relaxed text-gray-200">
+          Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos 
+          de cualquier cambio importante publicando la nueva política en esta página y 
+          actualizando la fecha de "última actualización".
+        </p>
+      </section>
+
+      <!-- Contacto -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-purple-300 mb-4 border-b border-purple-300/30 pb-2">8. Contacto</h2>
+        <p class="leading-relaxed text-gray-200">
+          Si tienes preguntas sobre esta política de privacidad, puedes contactarnos en:
+        </p>
+        <div class="bg-purple-800/30 rounded-lg p-4 mt-4">
+          <p><strong>Email:</strong> gamelyx.mail&#64;gmail.com</p>
+          <p><strong>Sitio web:</strong> www.gamelyx.es</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-8">
+      <a routerLink="/" 
+         class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:scale-105 transition-all duration-200 shadow-lg">
+        Volver a Gamelyx
+      </a>
+    </div>
+
+  </div>
+</div>

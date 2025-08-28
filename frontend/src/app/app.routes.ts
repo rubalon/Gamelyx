@@ -49,6 +49,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/pages/email-verification/email-verification')
       .then(m => m.EmailVerification)
   },
+
+  {
+    path: 'privacy-policy',
+    loadComponent: () => import('./features/legal/pages/privacy-policy/privacy-policy')
+      .then(m => m.PrivacyPolicy)
+  },
   
   {
     path: '**',
