@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "es.gamelyx.www.twa",
+    "sha256_cert_fingerprints": ["BC500295FEDAF9442CCD98D1A8596D1C2629AF99E848211E9644EF0C34235655"]
+  }
+}]
