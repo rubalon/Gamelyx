@@ -61,6 +61,8 @@ export class ContactUserCard {
 
   onChatClick(): void {
     const userData = this.userData();
+    if (!userData) return;
+    
     this.chatClick.emit({
       chatId: userData.contactUser.chatId ?? '',
       username: userData.contactUser.user.username
@@ -69,6 +71,7 @@ export class ContactUserCard {
 
   onAcceptClick(): void {
     const userData = this.userData();
+    if (!userData) return;
     
     // Para incoming: aceptar solicitud a través del store
     this.socialStore.respondToFriendRequest(userData.requestId, 'ACCEPT').subscribe({
@@ -83,6 +86,7 @@ export class ContactUserCard {
 
   onRejectClick(): void {
     const userData = this.userData();
+    if (!userData) return;
     
     // Para incoming: rechazar solicitud a través del store
     this.socialStore.respondToFriendRequest(userData.requestId, 'REJECT').subscribe({
@@ -100,8 +104,9 @@ export class ContactUserCard {
    */
   onSendRequestClick(): void {
     const userData = this.userData();
-    const sharedGame = userData.sharedGame;
+    if (!userData) return;
     
+    const sharedGame = userData.sharedGame;
     if (!sharedGame) {
       console.error('❌ No shared game data for suggestion');
       return;
@@ -131,8 +136,9 @@ export class ContactUserCard {
    */
   onRejectSuggestionClick(): void {
     const userData = this.userData();
-    const sharedGame = userData.sharedGame;
+    if (!userData) return;
     
+    const sharedGame = userData.sharedGame;
     if (!sharedGame) {
       console.error('❌ No shared game data for suggestion');
       return;
