@@ -292,6 +292,56 @@ export class SocialStore {
   }
 
   /**
+   * 💡 Obtener sugerencia de amigo por juego
+   */
+  getFriendSuggestionByGame(gameSlug: string, userRating: number): Observable<SuggestedUserDto | null> {
+    this.updateSocialState({ 
+      error: null 
+    });
+
+    return this.socialApi.getFriendSuggestionByGame(gameSlug, userRating)
+      .pipe(
+        tap(suggestion => {
+          console.log('✅ Friend suggestion received:', suggestion);
+          this.updateSocialState({
+            currentSuggestion: suggestion,
+            error: null
+          });
+        }),
+        catchError(error => {
+          console.error('❌ Error getting friend suggestion:', error);
+          this.updateSocialState({ currentSuggestion: null });
+          return this.handleError(error);
+        })
+      );
+  }
+
+  /**
+   * 🚫 Rechazar sugerencia de amigo
+   */
+  rejectFriendSuggestion(rejectedUserId: string, gameSlug: string): Observable<any> {
+    this.updateSocialState({ 
+      error: null 
+    });
+
+    return this.socialApi.rejectFriendSuggestion(rejectedUserId, gameSlug)
+      .pipe(
+        tap(response => {
+          console.log('✅ Friend suggestion rejected:', response);
+          // Limpiar la sugerencia actual después de rechazarla
+          this.updateSocialState({
+            currentSuggestion: null,
+            error: null
+          });
+        }),
+        catchError(error => {
+          console.error('❌ Error rejecting friend suggestion:', error);
+          return this.handleError(error);
+        })
+      );
+  }
+
+  /**
    * 🧹 Limpiar sugerencia actual
    */
   clearCurrentSuggestion(): void {

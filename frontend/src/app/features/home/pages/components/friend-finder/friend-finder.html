@@ -56,13 +56,13 @@
             </div>
           </div>
 
-          <!-- Columna Derecha: Friend Finder Result Component -->
+          <!-- Columna Derecha: Contact User Card -->
           <div class="w-full lg:w-3/5 flex-grow">
-            <app-friend-finder-result
-              [currentSuggestion]="currentSuggestion"
-              (sendRequest)="onSendRequestToSuggestion($event)"
-              (rejectSuggestion)="onRejectSuggestion($event)">
-            </app-friend-finder-result>
+            <app-contact-user-card
+              [userData]="suggestionAsContactData()"
+              [cardType]="suggestionAsContactData() ? 'suggestion' : 'empty-result'"
+              (requestNewSuggestion)="onRequestNewSuggestion()">
+            </app-contact-user-card>
           </div>
           
         </div>

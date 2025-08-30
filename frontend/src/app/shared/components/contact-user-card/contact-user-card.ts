@@ -1,14 +1,17 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { StarRating } from '@shared/components/star-rating/star-rating';
+import { SocialStore } from '@core/stores/social-store';
+import { RequestSource } from '@core/services/social-api';
 
-export type CardType = 'incoming' | 'outgoing';
+export type CardType = 'incoming' | 'outgoing' | 'suggestion' | 'empty-result';
 
 export interface ContactUserData {
   requestId: string;
   contactUser: {
     user: {
+      userId: string;
       username: string;
     };
     chatId?: string | null;
@@ -17,6 +20,7 @@ export interface ContactUserData {
   receivedAt: string;
   status: string;
   sharedGame?: {
+    gameSlug: string;
     gameName: string;
     yourRating: number;
     theirRating: number;
@@ -41,31 +45,111 @@ export interface CardActions {
   styleUrl: './contact-user-card.scss'
 })
 export class ContactUserCard {
-  @Input({ required: true }) userData!: ContactUserData;
-  @Input({ required: true }) cardType!: CardType;
+  private socialStore = inject(SocialStore);
   
-  @Output() chatClick = new EventEmitter<{chatId: string, username: string}>();
-  @Output() acceptClick = new EventEmitter<{requestId: string, username: string}>();
-  @Output() rejectClick = new EventEmitter<{requestId: string, username: string}>();
+  // 📥 Inputs modernos
+  userData = input<ContactUserData | null>(null);  // Opcional para 'empty-result'
+  cardType = input.required<CardType>();
+  
+  // 📤 Outputs modernos
+  chatClick = output<{chatId: string, username: string}>();
+  acceptClick = output<{requestId: string, username: string}>();
+  rejectClick = output<{requestId: string, username: string}>();
+  
+  // Para notificar que necesita nueva sugerencia
+  requestNewSuggestion = output<void>();
 
   onChatClick(): void {
+    const userData = this.userData();
     this.chatClick.emit({
-      chatId: this.userData.contactUser.chatId ?? '',
-      username: this.userData.contactUser.user.username
+      chatId: userData.contactUser.chatId ?? '',
+      username: userData.contactUser.user.username
     });
   }
 
   onAcceptClick(): void {
-    this.acceptClick.emit({
-      requestId: this.userData.requestId,
-      username: this.userData.contactUser.user.username
+    const userData = this.userData();
+    
+    // Para incoming: aceptar solicitud a través del store
+    this.socialStore.respondToFriendRequest(userData.requestId, 'ACCEPT').subscribe({
+      next: () => {
+        console.log('✅ Request accepted');
+      },
+      error: (error) => {
+        console.error('❌ Error accepting request:', error);
+      }
     });
   }
 
   onRejectClick(): void {
-    this.rejectClick.emit({
-      requestId: this.userData.requestId,
-      username: this.userData.contactUser.user.username
+    const userData = this.userData();
+    
+    // Para incoming: rechazar solicitud a través del store
+    this.socialStore.respondToFriendRequest(userData.requestId, 'REJECT').subscribe({
+      next: () => {
+        console.log('✅ Request rejected');
+      },
+      error: (error) => {
+        console.error('❌ Error rejecting request:', error);
+      }
+    });
+  }
+
+  /**
+   * 📤 Enviar solicitud de amistad (para suggestions)
+   */
+  onSendRequestClick(): void {
+    const userData = this.userData();
+    const sharedGame = userData.sharedGame;
+    
+    if (!sharedGame) {
+      console.error('❌ No shared game data for suggestion');
+      return;
+    }
+
+    const requestData = {
+      targetUserId: userData.contactUser.user.userId,
+      source: RequestSource.SUGGESTION,
+      gameSlug: sharedGame.gameSlug,
+      yourRating: sharedGame.yourRating
+    };
+
+    this.socialStore.sendFriendRequest(requestData).subscribe({
+      next: () => {
+        console.log('✅ Friend request sent for suggestion');
+        // Notificar que necesita nueva sugerencia
+        this.requestNewSuggestion.emit();
+      },
+      error: (error) => {
+        console.error('❌ Error sending friend request:', error);
+      }
+    });
+  }
+
+  /**
+   * ❌ Rechazar sugerencia
+   */
+  onRejectSuggestionClick(): void {
+    const userData = this.userData();
+    const sharedGame = userData.sharedGame;
+    
+    if (!sharedGame) {
+      console.error('❌ No shared game data for suggestion');
+      return;
+    }
+
+    this.socialStore.rejectFriendSuggestion(
+      userData.contactUser.user.userId, 
+      sharedGame.gameSlug
+    ).subscribe({
+      next: () => {
+        console.log('✅ Suggestion rejected');
+        // Notificar que necesita nueva sugerencia
+        this.requestNewSuggestion.emit();
+      },
+      error: (error) => {
+        console.error('❌ Error rejecting suggestion:', error);
+      }
     });
   }
 
