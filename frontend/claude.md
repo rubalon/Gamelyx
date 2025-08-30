@@ -129,6 +129,24 @@ public isLoading$ = this.loadingSubject.asObservable();
 - **Variables CSS custom** cuando Tailwind no sea suficiente
 - **Estilo basado en gradientes** 
 
+### ⚠️ IMPORTANTE: Tailwind v4 + SCSS Limitaciones
+- **❌ PROHIBIDO**: Usar `@apply` en archivos SCSS
+- **✅ PERMITIDO**: Clases Tailwind directamente en HTML/templates
+- **✅ SOLUCIÓN**: Si necesitas Tailwind en SCSS, usar valores RGB equivalentes:
+```scss
+// ❌ PROHIBIDO - Causa errores
+.my-class {
+  @apply bg-gray-800 text-white rounded-lg;
+}
+
+// ✅ CORRECTO - Usar valores RGB equivalentes  
+.my-class {
+  background-color: rgb(31, 41, 55); /* bg-gray-800 */
+  color: rgb(255, 255, 255); /* text-white */
+  border-radius: 0.5rem; /* rounded-lg */
+}
+```
+
 ```typescript
 // ✅ CORRECTO - Tailwind preferido
 @Component({
