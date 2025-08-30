@@ -6,11 +6,13 @@ import { CommonModule } from '@angular/common';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { Subject, EMPTY } from 'rxjs';
 import { SocialStore } from '@core/stores/social-store';
+import { RequestSource } from '@core/services/social-api';
+import { UserSearchResultCard } from '@shared/components/user-search-result-card/user-search-result-card';
 
 @Component({
   selector: 'app-user-search-bar',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, UserSearchResultCard],
   templateUrl: './user-search-bar.html',
   styleUrl: './user-search-bar.scss'
 })
@@ -40,27 +42,37 @@ export class UserSearchBar {
         switchMap(query => {
           if (query.trim().length < 2) {
             this.showResults.set(false);
+            this.socialStore.clearSearchResults();
             return EMPTY;
           }
           
           this.isSearching.set(true);
           this.searchError.set(null);
           
-          // TODO: Reemplazar con la llamada real al store
-          return new Promise(resolve => {
-            setTimeout(() => resolve({ users: [] }), 1000);
-          }).then(() => {
-            this.isSearching.set(false);
-            this.showResults.set(true);
-            return EMPTY;
-          }).catch(error => {
-            this.searchError.set('Error al buscar usuarios');
-            this.isSearching.set(false);
-            return EMPTY;
-          });
+          // 🔍 Llamada real al store para buscar usuarios
+          return this.socialStore.searchUsers(query.trim(), 10)
+            .pipe(
+              catchError(error => {
+                console.error('❌ Error in search:', error);
+                this.searchError.set('Error al buscar usuarios');
+                this.isSearching.set(false);
+                this.showResults.set(false);
+                return EMPTY;
+              })
+            );
         })
       )
-      .subscribe();
+      .subscribe({
+        next: () => {
+          this.isSearching.set(false);
+          this.showResults.set(true);
+        },
+        error: (error) => {
+          console.error('❌ Search subscription error:', error);
+          this.isSearching.set(false);
+          this.showResults.set(false);
+        }
+      });
   }
 
   /**
@@ -98,8 +110,28 @@ export class UserSearchBar {
    */
   onSendFriendRequest(userId: string): void {
     console.log('📤 Send friend request to:', userId);
-    // TODO: Implementar funcionalidad real
-    // this.socialStore.sendFriendRequest(userId).subscribe();
+    
+    // 📤 Preparar datos de la solicitud con tipo SEARCH
+    const requestData = {
+      targetUserId: userId,
+      source: RequestSource.SEARCH
+      // No se incluyen gameSlug ni yourRating para búsqueda directa
+    };
+    
+    // 🚀 Enviar solicitud a través del store
+    this.socialStore.sendFriendRequest(requestData).subscribe({
+      next: (response) => {
+        console.log('✅ Friend request sent successfully:', response);
+        // Actualizar resultados de búsqueda después de enviar solicitud
+        if (this.searchQuery.trim().length >= 2) {
+          this.socialStore.searchUsers(this.searchQuery.trim(), 10).subscribe();
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error sending friend request:', error);
+        // El error ya se maneja en el store y se muestra en la UI
+      }
+    });
   }
 
   /**

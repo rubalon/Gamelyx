@@ -18,7 +18,7 @@
       (keyup.enter)="performSearch()"
       placeholder="Buscar usuarios por nombre..."
       [disabled]="isSearching() || isLoadingUsers"
-      class="w-full pl-12 pr-32 py-4 text-lg bg-gray-800 border-2 border-gray-700 rounded-xl
+      class="w-full pl-12 pr-32 py-4 text-lg bg-gray-900 border-2 border-gray-700 rounded-xl
              text-white placeholder-gray-400 focus:outline-none focus:border-purple-500
              focus:ring-2 focus:ring-purple-500/20 transition-all duration-300
              disabled:opacity-50 disabled:cursor-not-allowed"
@@ -64,7 +64,7 @@
 
   <!-- Search Results Dropdown -->
   @if (showResults() && searchResults && searchQuery.trim().length >= 2) {
-    <div class="absolute top-full left-0 right-0 mt-2 bg-gray-800 border-2 border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-hidden">
+    <div class="absolute top-full left-0 right-0 mt-2 bg-gray-900 border-2 border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-hidden">
       
       <!-- Results Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-700">
@@ -91,58 +91,10 @@
       @if (searchResults.users && searchResults.users.length > 0) {
         <div class="max-h-60 overflow-y-auto">
           @for (userResult of searchResults.users; track userResult.user.userId) {
-            <div class="flex items-center justify-between p-4 hover:bg-gray-700 transition-colors border-b border-gray-700/50 last:border-b-0">
-              <div class="flex items-center space-x-3">
-                <!-- Avatar -->
-                <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  {{ userResult.user.username.charAt(0).toUpperCase() }}
-                </div>
-                
-                <!-- User Info -->
-                <div>
-                  <p class="text-white font-medium text-lg">{{ userResult.user.username }}</p>
-                  <div class="flex space-x-2 text-sm mt-1">
-                    @if (userResult.isFriend) {
-                      <span class="text-green-400 flex items-center">
-                        <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Amigo
-                      </span>
-                    }
-                    @if (userResult.hasPendingRequest) {
-                      <span class="text-yellow-400 flex items-center">
-                        <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                        </svg>
-                        Solicitud enviada
-                      </span>
-                    }
-                    @if (userResult.hasRejectedRequest) {
-                      <span class="text-red-400 flex items-center">
-                        <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                        Rechazado
-                      </span>
-                    }
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Action Button -->
-              @if (!userResult.isFriend && !userResult.hasPendingRequest) {
-                <button
-                  (click)="onSendFriendRequest(userResult.user.userId)"
-                  class="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
-                         text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500/50">
-                  <svg class="h-4 w-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                  </svg>
-                  Añadir
-                </button>
-              }
-            </div>
+            <app-user-search-result-card 
+              [searchedUser]="userResult"
+              (sendFriendRequest)="onSendFriendRequest($event)">
+            </app-user-search-result-card>
           }
         </div>
       } @else {
