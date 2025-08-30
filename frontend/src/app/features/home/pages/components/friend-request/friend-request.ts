@@ -3,8 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { SocialStore } from '@core/stores/social-store';
-import { AvatarComponent } from '@shared/components/avatar/avatar';
-import { StarRating } from '@shared/components/star-rating/star-rating';
+import { ContactUserCard } from '@shared/components/contact-user-card/contact-user-card';
 
 type RequestType = 'incoming' | 'outgoing';
 type OutgoingStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
@@ -15,8 +14,7 @@ type OutgoingStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
   imports: [
     CommonModule,
     TranslateModule,
-    AvatarComponent,  
-    StarRating
+    ContactUserCard  // 👈 Nueva card reutilizable
   ],
   templateUrl: './friend-request.html',
   styleUrl: './friend-request.scss'
@@ -26,7 +24,7 @@ export class FriendRequestComponent {
 
   // 🎯 Estado del componente
   requestType = signal<RequestType>('incoming');
-  outgoingStatus = signal<OutgoingStatus>('PENDING'); 
+  outgoingStatus = signal<OutgoingStatus>('PENDING'); // 👈 Nuevo selector
 
   // 📊 Datos del store
   get incomingRequests() {
@@ -59,7 +57,7 @@ export class FriendRequestComponent {
   }
 
   /**
-   * 💬 Abrir chat con usuario (similar a friend-list)
+   * 💬 Abrir chat con usuario (delegado desde la card)
    */
   onOpenChat(chatId: string, username: string): void {
     console.log('💬 Opening chat with:', username, 'ChatId:', chatId);
@@ -68,7 +66,7 @@ export class FriendRequestComponent {
   }
 
   /**
-   * ✅ Aceptar solicitud de amistad (sin funcionalidad)
+   * ✅ Aceptar solicitud de amistad (delegado desde la card)
    */
   onAcceptRequest(requestId: string, username: string): void {
     console.log('✅ Accept request from:', username, requestId);
@@ -76,32 +74,10 @@ export class FriendRequestComponent {
   }
 
   /**
-   * ❌ Rechazar solicitud de amistad (sin funcionalidad)
+   * ❌ Rechazar solicitud de amistad (delegado desde la card)
    */
   onRejectRequest(requestId: string, username: string): void {
     console.log('❌ Reject request from:', username, requestId);
     // TODO: Implementar funcionalidad
-  }
-
-  /**
-   * 📅 Formatear fecha relativa
-   */
-  getRelativeTime(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-    const diffMinutes = Math.floor(diffTime / (1000 * 60));
-
-    if (diffDays > 0) {
-      return `hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
-    } else if (diffHours > 0) {
-      return `hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
-    } else if (diffMinutes > 0) {
-      return `hace ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
-    } else {
-      return 'ahora';
-    }
   }
 }
