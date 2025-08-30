@@ -115,6 +115,26 @@
       "maxlength": "Máximo {{length}} caracteres",
       "passwordMismatch": "Las contraseñas no coinciden"
     }
-    
+  },
+  "social": {
+    "search": {
+      "placeholder": "Buscar usuarios por nombre...",
+      "button": "Buscar",
+      "resultsFor": "Resultados para:",
+      "noUsersFound": "No se encontraron usuarios",
+      "for": "para",
+      "hint": "👥 Encuentra a tus amigos buscando por su nombre de usuario"
+    },
+    "status": {
+      "friend": "Amigo",
+      "requestSent": "Solicitud enviada", 
+      "rejected": "Rechazado",
+      "alreadyFriends": "Ya son amigos",
+      "requestPending": "Solicitud enviada",
+      "notAvailable": "No disponible"
+    },
+    "actions": {
+      "addFriend": "Añadir"
+    }
   }
 }

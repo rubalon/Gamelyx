@@ -34,57 +34,14 @@ export class UserSearchBar {
   }
 
   ngOnInit() {
-    // 🚀 Configurar debounce para búsqueda en tiempo real
-    this.searchSubject
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap(query => {
-          if (query.trim().length < 2) {
-            this.showResults.set(false);
-            this.socialStore.clearSearchResults();
-            return EMPTY;
-          }
-          
-          this.isSearching.set(true);
-          this.searchError.set(null);
-          
-          // 🔍 Llamada real al store para buscar usuarios
-          return this.socialStore.searchUsers(query.trim(), 10)
-            .pipe(
-              catchError(error => {
-                console.error('❌ Error in search:', error);
-                this.searchError.set('Error al buscar usuarios');
-                this.isSearching.set(false);
-                this.showResults.set(false);
-                return EMPTY;
-              })
-            );
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.isSearching.set(false);
-          this.showResults.set(true);
-        },
-        error: (error) => {
-          console.error('❌ Search subscription error:', error);
-          this.isSearching.set(false);
-          this.showResults.set(false);
-        }
-      });
+    // No hacer nada automáticamente, solo esperar a que el usuario pulse enter o buscar
   }
 
   /**
    * 🔍 Manejar input de búsqueda
    */
   onInputChange(): void {
-    if (this.searchError()) {
-      this.searchError.set(null);
-    }
-    
-    // Trigger search con debounce
-    this.searchSubject.next(this.searchQuery);
+    // No hacer nada, el usuario decide cuándo buscar
   }
 
   /**
@@ -100,9 +57,22 @@ export class UserSearchBar {
       return;
     }
 
-    // Limpiar errores previos
+    // Realizar búsqueda
+    this.isSearching.set(true);
     this.searchError.set(null);
-    this.searchSubject.next(query);
+    
+    this.socialStore.searchUsers(query, 10).subscribe({
+      next: () => {
+        this.isSearching.set(false);
+        this.showResults.set(true);
+      },
+      error: (error) => {
+        console.error('❌ Error searching users:', error);
+        this.searchError.set('Error al buscar usuarios');
+        this.isSearching.set(false);
+        this.showResults.set(false);
+      }
+    });
   }
 
   /**

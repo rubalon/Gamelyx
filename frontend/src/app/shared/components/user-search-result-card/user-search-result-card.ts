@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { SearchedUserDto } from '@core/services/social-api';
 
+
 @Component({
   selector: 'app-user-search-result-card',
   standalone: true,

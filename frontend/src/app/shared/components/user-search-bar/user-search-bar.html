@@ -1,5 +1,5 @@
 <!-- src/app/shared/components/user-search-bar/user-search-bar.html -->
-<div class="relative max-w-2xl mx-auto">
+<div class="relative w-full mx-auto">
   <!-- Search Input Container -->
   <div class="relative">
     <!-- Search Icon -->
@@ -16,9 +16,9 @@
       [(ngModel)]="searchQuery"
       (input)="onInputChange()"
       (keyup.enter)="performSearch()"
-      placeholder="Buscar usuarios por nombre..."
+      [placeholder]="'social.search.placeholder' | translate"
       [disabled]="isSearching() || isLoadingUsers"
-      class="w-full pl-12 pr-32 py-4 text-lg bg-gray-900 border-2 border-gray-700 rounded-xl
+      class="w-full pl-12 pr-32 py-4 text-lg bg-gray-800 border-2 border-gray-700 rounded-xl
              text-white placeholder-gray-400 focus:outline-none focus:border-purple-500
              focus:ring-2 focus:ring-purple-500/20 transition-all duration-300
              disabled:opacity-50 disabled:cursor-not-allowed"
@@ -43,7 +43,7 @@
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
           </svg>
         } @else {
-          Buscar
+          {{ 'social.search.button' | translate }}
         }
       </button>
     </div>
@@ -64,13 +64,13 @@
 
   <!-- Search Results Dropdown -->
   @if (showResults() && searchResults && searchQuery.trim().length >= 2) {
-    <div class="absolute top-full left-0 right-0 mt-2 bg-gray-900 border-2 border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-hidden">
+    <div class="absolute top-full left-0 right-0 mt-2 bg-gray-800 border-2 border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 lg:max-h-96 overflow-hidden">
       
       <!-- Results Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-700">
         <div>
           <span class="text-gray-400 text-sm">
-            Resultados para: "<span class="text-white font-medium">{{ searchQuery }}</span>"
+            {{ 'social.search.resultsFor' | translate }} "<span class="text-white font-medium">{{ searchQuery }}</span>"
           </span>
           @if (searchResults.users && searchResults.users.length > 0) {
             <span class="text-purple-400 text-sm ml-2">({{ searchResults.users.length }})</span>
@@ -89,7 +89,7 @@
 
       <!-- Results List -->
       @if (searchResults.users && searchResults.users.length > 0) {
-        <div class="max-h-60 overflow-y-auto">
+        <div class="max-h-60 lg:max-h-72 overflow-y-auto">
           @for (userResult of searchResults.users; track userResult.user.userId) {
             <app-user-search-result-card 
               [searchedUser]="userResult"
@@ -104,9 +104,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
           </svg>
-          <p class="text-gray-400 text-lg">No se encontraron usuarios</p>
+          <p class="text-gray-400 text-lg">{{ 'social.search.noUsersFound' | translate }}</p>
           <p class="text-gray-500 text-sm mt-1">
-            para "<span class="text-white">{{ searchQuery }}</span>"
+            {{ 'social.search.for' | translate }} "<span class="text-white">{{ searchQuery }}</span>"
           </p>
         </div>
       }
@@ -116,7 +116,7 @@
   <!-- Search Hints -->
   <div class="mt-4 text-center">
     <p class="text-gray-400 text-sm">
-      👥 Encuentra a tus amigos buscando por su nombre de usuario
+      {{ 'social.search.hint' | translate }}
     </p>
   </div>
 </div>

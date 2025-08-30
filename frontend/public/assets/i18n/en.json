@@ -115,5 +115,26 @@
       "maxlength": "Maximum {{length}} characters",
       "passwordMismatch": "Passwords do not match"
     }
+  },
+  "social": {
+    "search": {
+      "placeholder": "Search users by name...",
+      "button": "Search",
+      "resultsFor": "Results for:",
+      "noUsersFound": "No users found",
+      "for": "for",
+      "hint": "👥 Find your friends by searching their username"
+    },
+    "status": {
+      "friend": "Friend",
+      "requestSent": "Request sent",
+      "rejected": "Rejected", 
+      "alreadyFriends": "Already friends",
+      "requestPending": "Request sent",
+      "notAvailable": "Not available"
+    },
+    "actions": {
+      "addFriend": "Add"
+    }
   }
 }
