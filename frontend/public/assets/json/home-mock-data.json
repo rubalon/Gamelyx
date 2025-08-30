@@ -34,7 +34,7 @@
     },
     {
       "user": {
-        "userId": "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+        "userId": "f2g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
         "username": "sthNinja99"
       },
       "chatId": "chat-111-222-333",
@@ -42,7 +42,7 @@
     },
     {
       "user": {
-        "userId": "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+        "userId": "f3g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
         "username": "tipuni"
       },
       "chatId": "chat-111-222-333",
@@ -50,7 +50,7 @@
     },
     {
       "user": {
-        "userId": "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+        "userId": "f4g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
         "username": "carti"
       },
       "chatId": "chat-111-222-333",
@@ -58,7 +58,7 @@
     },
     {
       "user": {
-        "userId": "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+        "userId": "f5g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
         "username": "anomalo"
       },
       "chatId": "chat-111-222-333",
@@ -66,7 +66,7 @@
     },
     {
       "user": {
-        "userId": "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+        "userId": "f6g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
         "username": "jesuch"
       },
       "chatId": "chat-111-222-333",
@@ -74,7 +74,7 @@
     },
     {
       "user": {
-        "userId": "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+        "userId": "f7g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
         "username": "trapecio87"
       },
       "chatId": "chat-111-222-333",
@@ -90,6 +90,8 @@
       "newMessages": false
     }
   ],
+
+
   "incomingRequests": [
     {
       "requestId": "req-001-incoming-suggestion",
@@ -112,11 +114,11 @@
       "receivedAt": "2025-08-24T10:30:15.123456"
     },
     {
-      "requestId": "req-001-incoming-suggestion",
+      "requestId": "req-001-B-incoming-suggestion",
       "contactUser": {
         "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
+          "userId": "b7c8d9e0-f1g2-h3i5-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatic2"
         },
         "chatId": null,
         "newMessages": false
@@ -132,111 +134,11 @@
       "receivedAt": "2025-08-24T10:30:15.123456"
     },
     {
-      "requestId": "req-001-incoming-suggestion",
+      "requestId": "req-004-gincoming-suggestion",
       "contactUser": {
         "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
-        },
-        "chatId": null,
-        "newMessages": false
-      },
-      "source": "SUGGESTION",
-      "status": "PENDING",
-      "sharedGame": {
-        "gameSlug": "zelda-breath-of-the-wild",
-        "gameName": "The Legend of Zelda: Breath of the Wild",
-        "yourRating": 9,
-        "theirRating": 10
-      },
-      "receivedAt": "2025-08-24T10:30:15.123456"
-    },
-    {
-      "requestId": "req-001-incoming-suggestion",
-      "contactUser": {
-        "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
-        },
-        "chatId": null,
-        "newMessages": false
-      },
-      "source": "SUGGESTION",
-      "status": "PENDING",
-      "sharedGame": {
-        "gameSlug": "zelda-breath-of-the-wild",
-        "gameName": "The Legend of Zelda: Breath of the Wild",
-        "yourRating": 9,
-        "theirRating": 10
-      },
-      "receivedAt": "2025-08-24T10:30:15.123456"
-    },
-    {
-      "requestId": "req-001-incoming-suggestion",
-      "contactUser": {
-        "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
-        },
-        "chatId": null,
-        "newMessages": false
-      },
-      "source": "SUGGESTION",
-      "status": "PENDING",
-      "sharedGame": {
-        "gameSlug": "zelda-breath-of-the-wild",
-        "gameName": "The Legend of Zelda: Breath of the Wild",
-        "yourRating": 9,
-        "theirRating": 10
-      },
-      "receivedAt": "2025-08-24T10:30:15.123456"
-    },
-    {
-      "requestId": "req-001-incoming-suggestion",
-      "contactUser": {
-        "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
-        },
-        "chatId": null,
-        "newMessages": false
-      },
-      "source": "SUGGESTION",
-      "status": "PENDING",
-      "sharedGame": {
-        "gameSlug": "zelda-breath-of-the-wild",
-        "gameName": "The Legend of Zelda: Breath of the Wild",
-        "yourRating": 9,
-        "theirRating": 10
-      },
-      "receivedAt": "2025-08-24T10:30:15.123456"
-    },
-    {
-      "requestId": "req-001-incoming-suggestion",
-      "contactUser": {
-        "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
-        },
-        "chatId": null,
-        "newMessages": false
-      },
-      "source": "SUGGESTION",
-      "status": "PENDING",
-      "sharedGame": {
-        "gameSlug": "zelda-breath-of-the-wild",
-        "gameName": "The Legend of Zelda: Breath of the Wild",
-        "yourRating": 9,
-        "theirRating": 10
-      },
-      "receivedAt": "2025-08-24T10:30:15.123456"
-    },
-    {
-      "requestId": "req-001-incoming-suggestion",
-      "contactUser": {
-        "user": {
-          "userId": "b7c8d9e0-f1g2-h3i4-j5k6-l7m8n9o0p1q2",
-          "username": "zelda_fanatic"
+          "userId": "b7c8d9e0-f1h2-h3i4-j5k6-l7m8n9o0p1q2",
+          "username": "zelda_fanatichg"
         },
         "chatId": null,
         "newMessages": false
@@ -267,7 +169,7 @@
       "receivedAt": "2025-08-24T09:15:42.987654"
     },
     {
-      "requestId": "req-003-incoming-suggestion-2",
+      "requestId": "req-0123-incoming-suggestion-2",
       "contactUser": {
         "user": {
           "userId": "s6t7u8v9-w0x1-y2z3-a4b5-c6d7e8f9g0h1",
@@ -287,7 +189,7 @@
       "receivedAt": "2025-08-24T08:45:18.456789"
     },
     {
-      "requestId": "req-003-incoming-suggestion-2",
+      "requestId": "req-01903-incoming-suggestion-2",
       "contactUser": {
         "user": {
           "userId": "s6t7u8v9-w0x1-y2z3-a4b5-c6d7e8f9g0h1",
