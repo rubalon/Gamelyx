@@ -5,7 +5,7 @@ import { StarRating } from '@shared/components/star-rating/star-rating';
 import { SocialStore } from '@core/stores/social-store';
 import { RequestSource } from '@core/services/social-api';
 
-export type CardType = 'incoming' | 'outgoing' | 'suggestion' | 'empty-result';
+export type CardType = 'incoming' | 'outgoing-pending' | 'outgoing-completed' | 'suggestion' | 'empty-result';
 
 export interface ContactUserData {
   requestId: string;
@@ -59,6 +59,10 @@ export class ContactUserCard {
   // Para notificar que necesita nueva sugerencia
   requestNewSuggestion = output<void>();
 
+   /****************************************************************************
+   * BOTONES PARA INCOMING Y OUTGOING-PENDING
+   * ***************************************************************************/
+
   onChatClick(): void {
     const userData = this.userData();
     if (!userData) return;
@@ -68,6 +72,10 @@ export class ContactUserCard {
       username: userData.contactUser.user.username
     });
   }
+
+   /****************************************************************************
+   * BOTONES PARA INCOMING 
+   * ****************************************************************************/
 
   onAcceptClick(): void {
     const userData = this.userData();
@@ -99,8 +107,33 @@ export class ContactUserCard {
     });
   }
 
+  /****************************************************************************
+   * BOTONES PARA OUTGOING-COMPLETED 
+   * ****************************************************************************/
+
   /**
-   * 📤 Enviar solicitud de amistad (para suggestions)
+   * 👁️ Marcar como notificado 
+   */
+  onMarkAsNotified(): void {
+    const userData = this.userData();
+    if (!userData) return;
+    
+    this.socialStore.markAsNotified(userData.requestId).subscribe({
+      next: () => {
+        console.log('✅ Request marked as notified and removed');
+      },
+      error: (error) => {
+        console.error('❌ Error marking request as notified:', error);
+      }
+    });
+  }
+
+  /****************************************************************************
+   * BOTONES PARA SUGGESTION 
+   * ****************************************************************************/
+
+  /**
+   * 📤 Enviar solicitud de amistad 
    */
   onSendRequestClick(): void {
     const userData = this.userData();
@@ -158,6 +191,11 @@ export class ContactUserCard {
       }
     });
   }
+
+    /****************************************************************************
+   * MÉTODOS COMUNES
+   * ****************************************************************************/
+  
 
   /**
    * 📅 Formatear fecha relativa

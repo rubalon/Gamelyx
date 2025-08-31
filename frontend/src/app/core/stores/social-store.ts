@@ -233,6 +233,32 @@ export class SocialStore {
   }
 
   /**
+   * 👁️ Marcar solicitud como notificada y eliminarla de outgoing requests
+   */
+  markAsNotified(requestId: string): Observable<any> {
+    return this.socialApi.markRequestAsNotified(requestId)
+      .pipe(
+        tap(() => {
+          console.log('✅ Request marked as notified:', requestId);
+          // Eliminar de outgoingRequests
+          const currentState = this._socialState();
+          const updatedOutgoing = currentState.outgoingRequests.filter(
+            request => request.requestId !== requestId
+          );
+          
+          this.updateSocialState({
+            outgoingRequests: updatedOutgoing,
+            totalOutgoingRequests: updatedOutgoing.length
+          });
+        }),
+        catchError(error => {
+          console.error('❌ Error marking request as notified:', error);
+          return this.handleError(error);
+        })
+      );
+  }
+
+  /**
    * 🔍 Buscar usuarios
    */
   searchUsers(query: string, limit: number = 10): Observable<UserSearchResultDto> {

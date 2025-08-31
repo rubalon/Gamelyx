@@ -48,6 +48,18 @@ export class FriendRequestComponent {
     return this.requestType() === 'incoming' ? this.incomingRequests : this.outgoingRequests;
   }
 
+  /**
+   * 🎯 Determinar el tipo de card según el contexto
+   */
+  getCardType(): 'incoming' | 'outgoing-pending' | 'outgoing-completed' {
+    if (this.requestType() === 'incoming') {
+      return 'incoming';
+    }
+    
+    // Para outgoing, determinar si es pending o completed
+    return this.outgoingStatus() === 'PENDING' ? 'outgoing-pending' : 'outgoing-completed';
+  }
+
   get totalIncoming() {
     return this.incomingRequests.length;
   }
