@@ -1,6 +1,6 @@
 // src/app/features/games/pages/game-search-results/game-search-results.ts
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
@@ -27,6 +27,7 @@ import { GameApiService, GameSearchResponse, GameSearchItem } from '@core/servic
 })
 export class GameSearchResults implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private gameApiService = inject(GameApiService);
   private destroy$ = new Subject<void>();
 
@@ -107,30 +108,74 @@ export class GameSearchResults implements OnInit, OnDestroy {
   }
 
   /**
-   * 📊 Generar números de páginas para paginación
+   * 📄 Manejar click en página (helper para template)
    */
-  getPageNumbers(): number[] {
+  onPageClick(page: number | string): void {
+    if (typeof page === 'number') {
+      this.goToPage(page);
+    }
+  }
+
+  /**
+   * 📊 Generar números de páginas para paginación con puntos suspensivos
+   */
+  getPageNumbers(): (number | string)[] {
     const results = this.searchResults();
     if (!results) return [];
 
     const totalPages = results.totalPages;
     const current = this.currentPage();
-    const pages: number[] = [];
+    const pages: (number | string)[] = [];
 
-    // Mostrar máximo 7 páginas
-    const maxPages = 7;
-    let startPage = Math.max(1, current - Math.floor(maxPages / 2));
-    let endPage = Math.min(totalPages, startPage + maxPages - 1);
-
-    // Ajustar si estamos cerca del final
-    if (endPage - startPage + 1 < maxPages) {
-      startPage = Math.max(1, endPage - maxPages + 1);
+    // Si hay 5 páginas o menos, mostrar todas
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+      return pages;
     }
 
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+    // Siempre mostrar la primera página
+    pages.push(1);
+
+    // Si la página actual está cerca del principio (páginas 1-3)
+    if (current <= 3) {
+      for (let i = 2; i <= Math.min(4, totalPages - 1); i++) {
+        pages.push(i);
+      }
+      if (totalPages > 4) {
+        pages.push('...');
+      }
+    }
+    // Si la página actual está cerca del final
+    else if (current >= totalPages - 2) {
+      if (totalPages > 4) {
+        pages.push('...');
+      }
+      for (let i = Math.max(totalPages - 3, 2); i <= totalPages - 1; i++) {
+        pages.push(i);
+      }
+    }
+    // Si la página actual está en el medio
+    else {
+      pages.push('...');
+      pages.push(current);
+      pages.push('...');
+    }
+
+    // Siempre mostrar la última página
+    if (totalPages > 1) {
+      pages.push(totalPages);
     }
 
     return pages;
   }
+
+  /**
+   * 🏠 Navegar al home
+   */
+  goToHome(): void {
+    this.router.navigate(['/']);
+  }
+
 }
