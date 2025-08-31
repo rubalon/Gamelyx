@@ -22,12 +22,24 @@
         <p class="text-gray-500 text-sm mb-4 pt-5.5">Valora algunos juegos para encontrar amigos con gustos similares</p>
       
       </div>
-    } @else if (allGamesExhausted) {
-      <!-- All Games Exhausted Without Results -->
-      <div class="no-games-state text-center py-8">
+    } @else if (isFirstAttemptExhausted) {
+      <!-- First Attempt Exhausted - No suggestions found initially -->
+      <div class="no-games-state text-center pt-5.5 pb-2">
         <div class="text-6xl mb-4">😔</div>
         <p class="text-gray-400 mb-2">No se encontraron amigos con gustos similares</p>
-        <p class="text-gray-500 text-sm mb-4">Hemos buscado en todos tus juegos favoritos pero no hay sugerencias disponibles en este momento</p>
+        <p class="text-gray-500 text-sm mb-4 lg:mx-16">Hemos buscado en todos tus juegos favoritos pero no hay sugerencias disponibles en este momento, Valora más juegos para ampliar las opciones de búsqueda</p>
+        <button 
+          (click)="onFindFriends()"
+          class="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all">
+          🔄 Intentar de nuevo
+        </button>
+      </div>
+    } @else if (hasExhaustedAfterProcessing) {
+      <!-- Exhausted After Processing Suggestions -->
+      <div class="no-games-state text-center pt-5.5 pb-2">
+        <div class="text-6xl mb-4">🎯</div>
+        <p class="text-gray-400 mb-2">No se encontraron más amigos con gustos similares</p>
+        <p class="text-gray-500 text-sm mb-4 lg:mx-16">Hemos buscado en todos tus juegos favoritos pero no hay más sugerencias disponibles en este momento, Valora más juegos para ampliar las opciones de búsqueda</p>
         <button 
           (click)="onFindFriends()"
           class="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all">
@@ -39,7 +51,7 @@
       <div class="ready-state">
         
         <!-- Layout Horizontal: Botón + Flecha + Result Component -->
-        <div class="flex flex-col lg:flex-row items-center gap-6 min-h-[120px]">
+        <div class="flex flex-col lg:flex-row items-center gap-4 lg:gap-6 min-h-[60px] lg:min-h-[120px]">
           
           <!-- Columna Izquierda: Botón Principal -->
           <div class="w-full lg:w-2/5 flex-shrink-0 flex flex-col justify-center">

@@ -25,6 +25,9 @@ export class FriendFinderComponent {
   // 🔍 Flag para trackear si ya se ha iniciado alguna búsqueda
   private hasStartedSearch = false;
 
+  // 🎯 Flag para trackear si ya se procesó al menos una sugerencia (aceptada/rechazada)
+  private hasProcessedSuggestions = false;
+
   // 📊 Datos del store
   get preferredGames() {
     return this.socialStore.state().preferredGames;
@@ -53,6 +56,16 @@ export class FriendFinderComponent {
            this.preferredGames.length > 0 && 
            this.availableGamesForSuggestion.length === 0 && 
            !this.currentSuggestion;
+  }
+
+  // 🎯 Verificar si es el primer intento fallido (sin sugerencias procesadas previamente)
+  get isFirstAttemptExhausted() {
+    return this.allGamesExhausted && !this.hasProcessedSuggestions;
+  }
+
+  // 🔄 Verificar si ya se procesaron sugerencias y se agotaron las opciones
+  get hasExhaustedAfterProcessing() {
+    return this.allGamesExhausted && this.hasProcessedSuggestions;
   }
 
   // 🔄 Computed para convertir sugerencia a ContactUserData
@@ -168,6 +181,8 @@ export class FriendFinderComponent {
    */
   onRequestNewSuggestion(): void {
     console.log('🔄 Requesting new suggestion...');
+    // 🎯 Marcar que ya se ha procesado al menos una sugerencia
+    this.hasProcessedSuggestions = true;
     // 🔄 Reiniciar proceso completo de búsqueda (resetear lista y buscar de nuevo)
     this.onFindFriends();
   }

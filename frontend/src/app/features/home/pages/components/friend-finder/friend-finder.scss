@@ -21,10 +21,16 @@
 
 /* Contenedor de la flecha */
 .arrow-container {
-  min-height: 7.5rem; /* 120px → 7.5rem */
+  min-height: 3.75rem; /* 60px → 3.75rem en móvil */
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (min-width: 64rem) { /* 1024px → 64rem */
+  .arrow-container {
+    min-height: 7.5rem; /* 120px → 7.5rem en desktop */
+  }
 }
 
 /* Flecha Horizontal (Desktop) - Optimizada */
@@ -141,7 +147,13 @@
     /* Layout mejorado para el diseño horizontal */
     .flex {
       align-items: center;
-      min-height: 7.5rem; /* 120px → 7.5rem */
+      min-height: 3.75rem; /* 60px → 3.75rem en móvil */
+    }
+    
+    @media (min-width: 64rem) { /* 1024px → 64rem */
+      .flex {
+        min-height: 7.5rem; /* 120px → 7.5rem en desktop */
+      }
     }
     
     /* Botón principal con proporciones optimizadas */

@@ -1,5 +1,5 @@
 // src/app/features/home/components/friend-list/friend-list.ts
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { SocialStore } from '@core/stores/social-store';
@@ -19,6 +19,9 @@ import { AvatarComponent } from '@shared/components/avatar/avatar';
 export class FriendListComponent {
   private socialStore = inject(SocialStore);
 
+  // 🎯 Estado de expansión para móvil (expandido por defecto)
+  isExpanded = signal(true);
+
   // 📊 Datos del store
   get friends() {
     return this.socialStore.state().friends;
@@ -30,6 +33,13 @@ export class FriendListComponent {
 
   get isLoading() {
     return this.socialStore.state().isLoadingHomeSocialData;
+  }
+
+  /**
+   * 📱 Alternar expansión en móvil
+   */
+  toggleExpansion(): void {
+    this.isExpanded.set(!this.isExpanded());
   }
 
   /**
