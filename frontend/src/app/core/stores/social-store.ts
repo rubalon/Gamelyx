@@ -322,6 +322,7 @@ export class SocialStore {
 
   /**
    * 🗑️ Eliminar amigo
+   * 🔧 OPTIMIZADO: Actualiza la lista de amigos localmente sin refetch
    */
   deleteFriend(friendId: string): Observable<DeleteFriendResponseDto> {
     return this.socialApi.deleteFriend(friendId)
@@ -329,7 +330,17 @@ export class SocialStore {
         tap(response => {
           console.log('✅ Friend deleted:', response);
           
-
+          // 🗑️ Eliminar amigo de la lista local
+          const currentState = this._socialState();
+          const updatedFriends = currentState.friends.filter(
+            friend => friend.user.userId !== friendId
+          );
+          
+          // 📊 Actualizar estado local
+          this.updateSocialState({
+            friends: updatedFriends,
+            totalFriends: updatedFriends.length
+          });
         }),
         catchError(error => {
           console.error('❌ Error deleting friend:', error);

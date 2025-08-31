@@ -41,11 +41,19 @@ export class FriendListComponent {
   }
 
   /**
-   * 🗑️ Eliminar amigo (sin funcionalidad)
+   * 🗑️ Eliminar amigo
    */
   onDeleteFriend(friendId: string, username: string): void {
-    console.log('🗑️ Delete friend:', username, friendId);
-    // TODO: Implementar funcionalidad de eliminar amigo
+    if (confirm(`¿Estás seguro de que quieres eliminar a ${username} de tu lista de amigos?`)) {
+      this.socialStore.deleteFriend(friendId).subscribe({
+        next: (response) => {
+          console.log('✅ Friend deleted successfully:', response);
+        },
+        error: (error) => {
+          console.error('❌ Error deleting friend:', error);
+        }
+      });
+    }
   }
 
   // ✅ Ya no necesitamos estos métodos, los maneja AvatarComponent
