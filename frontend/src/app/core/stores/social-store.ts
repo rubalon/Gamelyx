@@ -178,6 +178,7 @@ export class SocialStore {
 
   /**
    * 📤 Enviar solicitud de amistad
+   * 🔧 OPTIMIZADO: Agrega la nueva outgoingRequest localmente usando respuesta del backend
    */
   sendFriendRequest(requestData: SendFriendRequestDto): Observable<any> {
     this.updateSocialState({ 
@@ -189,11 +190,27 @@ export class SocialStore {
       .pipe(
         tap(response => {
           console.log('✅ Friend request sent:', response);
+          
+          // 🆕 Agregar la nueva outgoingRequest directamente desde la respuesta del backend
+          if (response && typeof response === 'object') {
+            const newOutgoingRequest = response as FriendRequestDto;
+
+            // ➕ Agregar la nueva outgoingRequest al array local
+            const currentState = this._socialState();
+            const updatedOutgoing = [...currentState.outgoingRequests, newOutgoingRequest];
+
+            this.updateSocialState({
+              outgoingRequests: updatedOutgoing,
+              totalOutgoingRequests: updatedOutgoing.length
+            });
+          } else {
+            console.error('❌ Backend response is not a valid FriendRequestDto - cannot create local outgoing request');
+          }
+          
           this.updateSocialState({
             isLoadingSendRequest: false,
             error: null
           });
-          
         }),
         catchError(error => {
           console.error('❌ Error sending friend request:', error);
@@ -205,7 +222,7 @@ export class SocialStore {
 
   /**
    * ✅❌ Responder a solicitud de amistad
-   * 🔧 CORREGIDO: No auto-refresh para evitar circular updates
+   * 🔧 OPTIMIZADO: Maneja ACCEPT/REJECT localmente sin refetch
    */
   respondToFriendRequest(requestId: string, action: 'ACCEPT' | 'REJECT'): Observable<FriendRequestResponseDto> {
     this.updateSocialState({ 
@@ -217,12 +234,30 @@ export class SocialStore {
       .pipe(
         tap(response => {
           console.log(`✅ Friend request ${action.toLowerCase()}ed:`, response);
+          
+          const currentState = this._socialState();
+          
+          // 🗑️ Eliminar la incomingRequest en ambos casos (ACCEPT/REJECT)
+          const updatedIncoming = currentState.incomingRequests.filter(
+            request => request.requestId !== requestId
+          );
+          
+          let updatedFriends = currentState.friends;
+          
+          // ➕ Si es ACCEPT, agregar nuevo amigo a la lista
+          if (action === 'ACCEPT' && response.newFriend) {
+            updatedFriends = [...currentState.friends, response.newFriend];
+          }
+          
+          // 📊 Actualizar estado local
           this.updateSocialState({
+            incomingRequests: updatedIncoming,
+            friends: updatedFriends,
+            totalIncomingRequests: updatedIncoming.length,
+            totalFriends: updatedFriends.length,
             isLoadingRespondRequest: false,
             error: null
           });
-          
-
         }),
         catchError(error => {
           console.error(`❌ Error ${action.toLowerCase()}ing friend request:`, error);

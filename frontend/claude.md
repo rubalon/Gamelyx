@@ -380,8 +380,8 @@ Obtiene toda la información inicial para el dashboard social.
 ```typescript
 interface HomeSocialDataDto {
   friends: ContactUserDto[];           // Lista de amigos
-  incomingRequests: IncomingRequestDto[];  // Solicitudes recibidas
-  outgoingRequests: OutgoingRequestDto[];  // Solicitudes enviadas
+  incomingRequests: FriendRequestDto[];  // Solicitudes recibidas
+  outgoingRequests: FriendRequestDto[];  // Solicitudes enviadas
   preferredGames: PreferredGameDto[];      // Juegos favoritos (rating >= 7)
 }
 
@@ -391,7 +391,7 @@ interface ContactUserDto {
   newMessages: boolean;
 }
 
-interface IncomingRequestDto {
+interface FriendRequestDto {
   requestId: string;
   contactUser: ContactUserDto;
   source: "SEARCH" | "SUGGESTION";
