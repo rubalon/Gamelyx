@@ -141,4 +141,16 @@
     }
   </div>
 
+  <!-- Modal de confirmación para eliminar amigo -->
+  @if (showDeleteModal()) {
+    <app-confirmation-modal
+      [title]="'Eliminar amigo'"
+      [message]="'¿Estás seguro de que quieres eliminar a ' + friendToDelete()?.username + ' de tu lista de amigos? '"
+      [confirmText]="'Eliminar'"
+      [cancelText]="'Cancelar'"
+      (confirm)="onConfirmDelete()"
+      (cancel)="onCancelDelete()">
+    </app-confirmation-modal>
+  }
+
 </div>

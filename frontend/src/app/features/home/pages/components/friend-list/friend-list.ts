@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { SocialStore } from '@core/stores/social-store';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal';
 
 @Component({
   selector: 'app-friend-list',
@@ -11,7 +12,8 @@ import { AvatarComponent } from '@shared/components/avatar/avatar';
   imports: [
     CommonModule,
     TranslateModule,
-    AvatarComponent  // 👈 Importamos nuestro Avatar
+    AvatarComponent,
+    ConfirmationModalComponent
   ],
   templateUrl: './friend-list.html',
   styleUrl: './friend-list.scss'
@@ -21,6 +23,10 @@ export class FriendListComponent {
 
   // 🎯 Estado de expansión para móvil (expandido por defecto)
   isExpanded = signal(true);
+
+  // 🗑️ Estado del modal de confirmación
+  showDeleteModal = signal(false);
+  friendToDelete = signal<{ id: string; username: string } | null>(null);
 
   // 📊 Datos del store
   get friends() {
@@ -51,11 +57,20 @@ export class FriendListComponent {
   }
 
   /**
-   * 🗑️ Eliminar amigo
+   * 🗑️ Mostrar modal de confirmación para eliminar amigo
    */
   onDeleteFriend(friendId: string, username: string): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar a ${username} de tu lista de amigos?`)) {
-      this.socialStore.deleteFriend(friendId).subscribe({
+    this.friendToDelete.set({ id: friendId, username });
+    this.showDeleteModal.set(true);
+  }
+
+  /**
+   * ✅ Confirmar eliminación de amigo
+   */
+  onConfirmDelete(): void {
+    const friend = this.friendToDelete();
+    if (friend) {
+      this.socialStore.deleteFriend(friend.id).subscribe({
         next: (response) => {
           console.log('✅ Friend deleted successfully:', response);
         },
@@ -64,6 +79,22 @@ export class FriendListComponent {
         }
       });
     }
+    this.closeDeleteModal();
+  }
+
+  /**
+   * ❌ Cancelar eliminación de amigo
+   */
+  onCancelDelete(): void {
+    this.closeDeleteModal();
+  }
+
+  /**
+   * 🔒 Cerrar modal y limpiar estado
+   */
+  private closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+    this.friendToDelete.set(null);
   }
 
   // ✅ Ya no necesitamos estos métodos, los maneja AvatarComponent
