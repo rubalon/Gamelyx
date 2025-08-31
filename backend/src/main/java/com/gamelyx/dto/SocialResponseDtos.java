@@ -127,9 +127,7 @@ public class SocialResponseDtos {
      */
     public record SuggestedUserDto(
             UserDto user,
-            String gameSlug,
-            int yourRating,
-            int theirRating
+            SharedGameInfoDto sharedGameInfoDto
     ) {}
 
     // ================================================

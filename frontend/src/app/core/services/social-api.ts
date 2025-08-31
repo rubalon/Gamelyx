@@ -79,9 +79,12 @@ export interface UserSearchResultDto {
 
 export interface SuggestedUserDto {
   user: UserDto;
-  gameSlug: string;
-  yourRating: number;
-  theirRating: number;
+  sharedGameInfoDto: {
+    gameSlug: string;
+    gameName: string;
+    yourRating: number;
+    theirRating: number;
+  };
 }
 
 export interface FriendRequestResponseDto {
@@ -105,7 +108,7 @@ export class SocialApiService {
   private readonly API_URL = `${environment.apiUrl}/social`;
 
   // 🎭 Flag para activar/desactivar mock data
-  private readonly USE_MOCK_DATA = true; // Cambiar a false para usar backend real
+  private readonly USE_MOCK_DATA = false; // Cambiar a false para usar backend real
 
   /**
    * 🏠 Obtener todos los datos sociales para el home

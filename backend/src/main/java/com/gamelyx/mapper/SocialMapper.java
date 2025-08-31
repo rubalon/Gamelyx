@@ -191,9 +191,13 @@ public class SocialMapper {
                         userGameDetails.getUser().getId(),
                         userGameDetails.getUser().getUsername()
                 ),
-                gameSlug,                           // Slug del juego en común
-                yourRating,                         // Tu rating del juego
-                userGameDetails.getRating()         // Su rating del juego
+                new SharedGameInfoDto(
+                        gameSlug,                              // Slug del juego en común
+                        userGameDetails.getGame().getName(),   // Nombre del juego en común
+                        yourRating,                            // Tu rating del juego
+                        userGameDetails.getRating()            // Su rating del juego
+                )
+
         );
     }
 

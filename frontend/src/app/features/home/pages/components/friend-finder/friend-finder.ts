@@ -54,10 +54,10 @@ export class FriendFinderComponent {
       receivedAt: new Date().toISOString(), // Tiempo actual
       status: 'SUGGESTION', 
       sharedGame: {
-        gameSlug: suggestion.gameSlug,
-        gameName: suggestion.gameSlug, // El API solo devuelve slug, podríamos mejorarlo
-        yourRating: suggestion.yourRating,
-        theirRating: suggestion.theirRating
+        gameSlug: suggestion.sharedGameInfoDto.gameSlug,
+        gameName: suggestion.sharedGameInfoDto.gameName,
+        yourRating: suggestion.sharedGameInfoDto.yourRating,
+        theirRating: suggestion.sharedGameInfoDto.theirRating
       }
     } as ContactUserData;
   });
