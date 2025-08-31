@@ -143,17 +143,34 @@ public class SocialMapper {
     // MAPPERS PARA SOLICITUDES DE AMISTAD HU-17
     // ================================================
 
-    public OutgoingRequestDto toOutgoingRequestDto(FriendRequest friendRequest) {
-        return new OutgoingRequestDto(
+    /**
+     * Convierte FriendRequest entity directamente a FriendRequestDto
+     * Para respuestas de envío de solicitud con ratings
+     */
+    public FriendRequestDto toFriendRequestDto(FriendRequest friendRequest, Integer yourRating, Integer theirRating) {
+        // Para outgoing requests, el contactUser es el receiver
+        ContactUserDto contactUser = new ContactUserDto(
+                new UserDto(friendRequest.getReceiver().getId(), friendRequest.getReceiver().getUsername()),
+                null, // No hay chatId hasta que se IMPLEMENTE
+                false // siempre son false de momento
+        );
+
+        SharedGameInfoDto sharedGameInfo = null;
+        if (friendRequest.getSharedGame() != null) {
+            sharedGameInfo = new SharedGameInfoDto(
+                    friendRequest.getSharedGame().getSlug(),
+                    friendRequest.getSharedGame().getName(),
+                    yourRating != null ? yourRating : 0,
+                    theirRating != null ? theirRating : 0
+            );
+        }
+
+        return new FriendRequestDto(
                 friendRequest.getId(),
-                new ContactUserDto(
-                        new UserDto(friendRequest.getReceiver().getId(), friendRequest.getReceiver().getUsername()),
-                        null, // No hay chatId hasta que se IMPLEMENTE
-                        false // siempre son false de momento
-                ),
+                contactUser,
                 friendRequest.getSource(),
                 friendRequest.getStatus(),
-                friendRequest.getSharedGame() != null ? friendRequest.getSharedGame().getSlug() : null,
+                sharedGameInfo,
                 friendRequest.getCreatedAt()
         );
     }

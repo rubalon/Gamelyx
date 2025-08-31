@@ -55,11 +55,11 @@ public class SocialController {
      * POST /api/social/friend-requests
      */
     @PostMapping("/friend-requests")
-    public ResponseEntity<OutgoingRequestDto> sendFriendRequest(
+    public ResponseEntity<FriendRequestDto> sendFriendRequest(
             @AuthenticationPrincipal String username,
             @RequestBody SendFriendRequestDto request) {
 
-        OutgoingRequestDto response = socialService.sendFriendRequest(
+        FriendRequestDto response = socialService.sendFriendRequest(
                 username,
                 request
         );

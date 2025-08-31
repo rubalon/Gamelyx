@@ -111,7 +111,7 @@ public class SocialService {
      * Envía una solicitud de amistad.
      * IMPLEMENTACIÓN REAL: Usa validator para validaciones limpias.
      */
-    public OutgoingRequestDto sendFriendRequest(String senderUsername, SendFriendRequestDto request) {
+    public FriendRequestDto sendFriendRequest(String senderUsername, SendFriendRequestDto request) {
         // 1. Validar todo usando el validator
         SocialValidator.ValidationResult validation = socialValidator.validateSendFriendRequest(senderUsername, request);
 
@@ -129,8 +129,22 @@ public class SocialService {
         // 3. Guardar en BD
         FriendRequest savedRequest = friendRequestRepository.save(friendRequest);
 
-        // 4. Convertir a DTO usando el mapper
-        return socialMapper.toOutgoingRequestDto(savedRequest);
+        // 4. Si hay sharedGame, obtener ratings
+        Integer yourRating = null;
+        Integer theirRating = null;
+        
+        if (savedRequest.getSharedGame() != null) {
+            yourRating = request.yourRating();
+            
+            // Buscar theirRating del receiver para este juego
+            theirRating = userGameDetailsRepository.findByUserIdAndGameId(
+                    savedRequest.getReceiver().getId(),
+                    savedRequest.getSharedGame().getId()
+            ).map(UserGameDetails::getRating).orElse(null);
+        }
+        
+        // 5. Convertir a DTO usando el mapper con ratings
+        return socialMapper.toFriendRequestDto(savedRequest, yourRating, theirRating);
     }
 
     /**

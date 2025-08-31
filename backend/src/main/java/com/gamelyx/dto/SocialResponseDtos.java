@@ -52,21 +52,6 @@ public class SocialResponseDtos {
             int theirRating
     ) {}
 
-    // ================================================
-    // DTOs PARA SOLICITUDES SALIENTES
-    // ================================================
-
-    /**
-     * Solicitud de amistad saliente (enviada por el usuario actual)
-     */
-    public record OutgoingRequestDto(
-            UUID requestId,
-            ContactUserDto receiver,
-            FriendRequest.RequestSource source,
-            FriendRequest.FriendRequestStatus status,
-            String gameSlug,
-            LocalDateTime sentAt
-    ) {}
 
     // ================================================
     // DTOs PARA JUEGOS PREFERIDOS
