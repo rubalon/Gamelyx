@@ -18,12 +18,20 @@
       <!-- No Preferred Games -->
       <div class="no-games-state text-center py-8">
         <div class="text-6xl mb-4">🎮</div>
-        <p class="text-gray-400 mb-2">Aún no tienes juegos valorados</p>
-        <p class="text-gray-500 text-sm mb-4">Valora algunos juegos para encontrar amigos con gustos similares</p>
+        <p class="text-gray-400 mb-2 pt-2">Aún no tienes juegos valorados</p>
+        <p class="text-gray-500 text-sm mb-4 pt-5.5">Valora algunos juegos para encontrar amigos con gustos similares</p>
+      
+      </div>
+    } @else if (allGamesExhausted) {
+      <!-- All Games Exhausted Without Results -->
+      <div class="no-games-state text-center py-8">
+        <div class="text-6xl mb-4">😔</div>
+        <p class="text-gray-400 mb-2">No se encontraron amigos con gustos similares</p>
+        <p class="text-gray-500 text-sm mb-4">Hemos buscado en todos tus juegos favoritos pero no hay sugerencias disponibles en este momento</p>
         <button 
-          disabled
-          class="px-6 py-3 rounded-lg cursor-not-allowed bg-gray-600 text-gray-400">
-          🔍 Buscar amigos que compartan mis gustos
+          (click)="onFindFriends()"
+          class="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all">
+          🔄 Intentar de nuevo
         </button>
       </div>
     } @else {

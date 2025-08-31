@@ -19,6 +19,12 @@ import { ContactUserCard, ContactUserData } from '@shared/components/contact-use
 export class FriendFinderComponent {
   private socialStore = inject(SocialStore);
 
+  // 🎯 Lista local para manejar reintentos (se resetea en cada búsqueda)
+  private availableGamesForSuggestion: any[] = [];
+  
+  // 🔍 Flag para trackear si ya se ha iniciado alguna búsqueda
+  private hasStartedSearch = false;
+
   // 📊 Datos del store
   get preferredGames() {
     return this.socialStore.state().preferredGames;
@@ -34,6 +40,19 @@ export class FriendFinderComponent {
 
   get currentSuggestion() {
     return this.socialStore.state().currentSuggestion;
+  }
+
+  // 🎯 Verificar si hay juegos disponibles para sugerencias
+  get hasAvailableGamesForSuggestion() {
+    return this.availableGamesForSuggestion.length > 0;
+  }
+
+  // 🚫 Verificar si se agotaron todos los juegos sin encontrar sugerencias
+  get allGamesExhausted() {
+    return this.hasStartedSearch && 
+           this.preferredGames.length > 0 && 
+           this.availableGamesForSuggestion.length === 0 && 
+           !this.currentSuggestion;
   }
 
   // 🔄 Computed para convertir sugerencia a ContactUserData
@@ -73,25 +92,74 @@ export class FriendFinderComponent {
       return;
     }
     
-    // Seleccionar juego aleatoriamente con ponderación por rating
-    const selectedGame = this.selectWeightedRandomGame(this.preferredGames);
+    // 🔍 Marcar que se ha iniciado una búsqueda
+    this.hasStartedSearch = true;
+    
+    // 🔄 Inicializar lista de juegos disponibles (copia completa)
+    this.availableGamesForSuggestion = [...this.preferredGames];
+    
+    // 🎯 Iniciar proceso de búsqueda con reintentos
+    this.searchSuggestionWithRetries();
+  }
+
+  /**
+   * 🎯 Buscar sugerencia con sistema de reintentos automáticos
+   * Elimina juegos sin resultados y reintenta hasta encontrar uno o agotar opciones
+   */
+  private searchSuggestionWithRetries(): void {
+    // ❌ Si no quedan juegos disponibles, mostrar estado sin juegos
+    if (this.availableGamesForSuggestion.length === 0) {
+      console.log('❌ Se agotaron todos los juegos disponibles sin encontrar sugerencias');
+      // El template ya maneja el caso cuando totalPreferredGames === 0
+      // Pero necesitamos limpiar cualquier sugerencia anterior
+      this.socialStore.clearCurrentSuggestion();
+      return;
+    }
+
+    // 🎲 Seleccionar juego aleatoriamente con ponderación por rating
+    const selectedGame = this.selectWeightedRandomGame(this.availableGamesForSuggestion);
     
     if (!selectedGame) {
       console.log('❌ No se pudo seleccionar un juego');
       return;
     }
     
-    console.log('🎮 Juego seleccionado:', selectedGame.gameName, 'con rating:', selectedGame.userRating);
+    console.log('🎮 Intentando con juego:', selectedGame.gameName, 'con rating:', selectedGame.userRating);
+    console.log(`📊 Juegos disponibles restantes: ${this.availableGamesForSuggestion.length}`);
     
-    // Llamar al API para obtener sugerencia
+    // 🔍 Llamar al API para obtener sugerencia
     this.socialStore.getFriendSuggestionByGame(selectedGame.gameSlug, selectedGame.userRating).subscribe({
       next: (suggestion) => {
-        console.log('✅ Sugerencia obtenida:', suggestion);
+        if (suggestion) {
+          // ✅ Sugerencia encontrada
+          console.log('✅ Sugerencia obtenida:', suggestion);
+        } else {
+          // 🚫 No hay sugerencias para este juego, eliminarlo y reintentar
+          console.log(`🚫 No hay sugerencias para ${selectedGame.gameName}, eliminando y reintentando...`);
+          this.removeGameAndRetry(selectedGame.gameSlug);
+        }
       },
       error: (error) => {
         console.error('❌ Error obteniendo sugerencia:', error);
+        // En caso de error, también eliminar el juego y reintentar
+        this.removeGameAndRetry(selectedGame.gameSlug);
       }
     });
+  }
+
+  /**
+   * 🗑️ Eliminar juego de la lista disponible y reintentar
+   */
+  private removeGameAndRetry(gameSlugToRemove: string): void {
+    // Eliminar el juego que no tuvo resultados
+    this.availableGamesForSuggestion = this.availableGamesForSuggestion.filter(
+      game => game.gameSlug !== gameSlugToRemove
+    );
+    
+    console.log(`🗑️ Juego eliminado. Juegos restantes: ${this.availableGamesForSuggestion.length}`);
+    
+    // 🔄 Reintentar automáticamente
+    this.searchSuggestionWithRetries();
   }
 
   /**
@@ -100,7 +168,7 @@ export class FriendFinderComponent {
    */
   onRequestNewSuggestion(): void {
     console.log('🔄 Requesting new suggestion...');
-    // Volver a buscar amigos automáticamente
+    // 🔄 Reiniciar proceso completo de búsqueda (resetear lista y buscar de nuevo)
     this.onFindFriends();
   }
 
