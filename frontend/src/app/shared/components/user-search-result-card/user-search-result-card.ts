@@ -37,6 +37,6 @@ export class UserSearchResultCard {
    */
   canSendRequest(): boolean {
     const user = this.searchedUser();
-    return !user.isFriend && !user.hasPendingRequest;
+    return !user.isFriend && !user.hasPendingRequest && !user.hasRejectedRequest;
   }
 }
