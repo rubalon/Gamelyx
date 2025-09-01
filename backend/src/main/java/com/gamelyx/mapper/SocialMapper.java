@@ -63,7 +63,6 @@ public class SocialMapper {
         );
         ContactUserDto contactUserDto = new ContactUserDto(
                 senderUserDto,
-                null,
                 false
         );
 
@@ -151,7 +150,6 @@ public class SocialMapper {
         // Para outgoing requests, el contactUser es el receiver
         ContactUserDto contactUser = new ContactUserDto(
                 new UserDto(friendRequest.getReceiver().getId(), friendRequest.getReceiver().getUsername()),
-                null, // No hay chatId hasta que se IMPLEMENTE
                 false // siempre son false de momento
         );
 
@@ -181,7 +179,7 @@ public class SocialMapper {
     public ContactUserDto toContactUserDto(User user) {
         UserDto userDto = new UserDto(user.getId(), user.getUsername());
 
-        return new ContactUserDto(userDto, null, false);
+        return new ContactUserDto(userDto, false);
     }
 
     /**

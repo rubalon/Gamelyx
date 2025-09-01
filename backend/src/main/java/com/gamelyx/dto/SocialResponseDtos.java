@@ -132,7 +132,6 @@ public class SocialResponseDtos {
      */
     public record ContactUserDto(
             UserDto user,
-            UUID chatId,
             Boolean newMessages
     ) {}
 }
