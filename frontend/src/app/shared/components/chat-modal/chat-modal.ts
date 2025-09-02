@@ -1,7 +1,8 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+import { Component, input, output, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
+import { ChatStore } from '@core/stores/chat-store';
 
 export interface ChatModalData {
   userId: string;
@@ -20,6 +21,8 @@ export interface ChatModalData {
   styleUrl: './chat-modal.scss'
 })
 export class ChatModalComponent {
+  private chatStore = inject(ChatStore);
+  
   // 📥 Inputs
   isOpen = input<boolean>(false);
   userData = input.required<ChatModalData>();
@@ -31,37 +34,42 @@ export class ChatModalComponent {
   messageText = signal('');
   isTyping = signal(false);
   
-  // 💬 Mock messages para el diseño
-  messages = signal([
-    {
-      id: '1',
-      content: '¡Hola! ¿Cómo estás?',
-      senderId: 'other',
-      senderUsername: 'Usuario',
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      isRead: true
-    },
-    {
-      id: '2', 
-      content: '¡Muy bien! ¿Qué tal tu partida de Zelda?',
-      senderId: 'me',
-      senderUsername: 'Yo',
-      timestamp: new Date(Date.now() - 1800000).toISOString(),
-      isRead: true
-    },
-    {
-      id: '3',
-      content: 'Increíble, acabo de completar todos los santuarios. ¡Fue épico!',
-      senderId: 'other', 
-      senderUsername: 'Usuario',
-      timestamp: new Date(Date.now() - 900000).toISOString(),
-      isRead: false
-    }
-  ]);
+  // 💬 Estado del chat desde ChatStore
+  activeConversation = this.chatStore.activeConversation;
+  messages = this.chatStore.messages;
+  isLoading = this.chatStore.isLoading;
+  error = this.chatStore.error;
+  wsConnected = this.chatStore.wsConnected;
   
   // 📊 Computed
   hasMessages = computed(() => this.messages().length > 0);
-  canSend = computed(() => this.messageText().trim().length > 0);
+  canSend = computed(() => this.messageText().trim().length > 0 && this.wsConnected());
+  
+  // 🛡️ Helper seguro para obtener el userId del otro usuario
+  otherUserId = computed(() => this.activeConversation()?.otherUser?.userId ?? 'unknown');
+
+  constructor() {
+    // 🔄 Abrir conversación cuando se abre el modal
+    effect(() => {
+      const userData = this.userData();
+      const isOpen = this.isOpen();
+      
+      if (isOpen && userData) {
+        console.log('📂 Abriendo conversación con:', userData.username);
+        this.chatStore.openConversation(userData.userId);
+      }
+    });
+
+    // 🔄 Cerrar conversación cuando se cierra el modal
+    effect(() => {
+      const isOpen = this.isOpen();
+      
+      if (!isOpen) {
+        console.log('❌ Cerrando conversación');
+        this.chatStore.closeConversation();
+      }
+    });
+  }
   
   /**
    * ❌ Cerrar modal
@@ -75,23 +83,14 @@ export class ChatModalComponent {
    */
   onSendMessage(): void {
     const text = this.messageText().trim();
-    if (text) {
-      console.log('📤 Send message:', text, 'to:', this.userData().username);
+    if (text && this.wsConnected()) {
+      console.log('📤 Enviando mensaje:', text);
       
-      // Agregar mensaje a la lista local (simulación)
-      const newMessage = {
-        id: Date.now().toString(),
-        content: text,
-        senderId: 'me',
-        senderUsername: 'Yo',
-        timestamp: new Date().toISOString(),
-        isRead: false
-      };
-      
-      this.messages.update(current => [...current, newMessage]);
+      // Enviar via ChatStore
+      this.chatStore.sendMessage(text);
       this.messageText.set('');
-      
-      // TODO: Aquí se implementará el envío real via WebSocket
+    } else if (!this.wsConnected()) {
+      console.error('❌ WebSocket no conectado, no se puede enviar mensaje');
     }
   }
   

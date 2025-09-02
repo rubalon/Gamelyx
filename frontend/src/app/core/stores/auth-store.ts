@@ -1,10 +1,11 @@
 // src/app/core/stores/auth-store.ts (ACTUALIZADO CON GOOGLE AUTH)
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, Injector } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { ChatStore } from './chat-store';
 
 // Interfaces para tipado
 export interface LoginRequest {
@@ -68,6 +69,7 @@ export interface AuthState {
 export class AuthStore {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private injector = inject(Injector);
 
   private readonly API_URL = `${environment.apiUrl}/auth`;
 
@@ -95,6 +97,13 @@ export class AuthStore {
   }
 
   /**
+   * 🔌 Obtener ChatStore con lazy loading usando Injector para evitar circular dependency
+   */
+  private getChatStore() {
+    return this.injector.get(ChatStore);
+  }
+
+  /**
    * Verifica si hay tokens almacenados y restaura el estado de autenticación
    */
   private checkStoredAuth(): void {
@@ -110,6 +119,9 @@ export class AuthStore {
           isLoading: false,
           error: null
         });
+        
+        // 🔌 Conectar WebSocket si hay token válido al iniciar la app
+        this.getChatStore().connectWebSocket();
       } catch (error) {
         this.clearAuthData();
       }
@@ -194,6 +206,9 @@ export class AuthStore {
             error: null,
             registrationPending: null
           });
+          
+          // 🔌 Conectar WebSocket después de login exitoso
+          this.getChatStore().connectWebSocket();
         }),
         catchError(error => this.handleError(error))
       );
@@ -246,6 +261,9 @@ export class AuthStore {
             error: null,
             registrationPending: null
           });
+          
+          // 🔌 Conectar WebSocket después de Google auth exitoso
+          this.getChatStore().connectWebSocket();
         }),
         catchError(error => this.handleError(error))
       );
@@ -262,6 +280,9 @@ export class AuthStore {
    * Cierra la sesión del usuario
    */
   logout(): void {
+    // 🔌 Desconectar WebSocket al hacer logout
+    this.getChatStore().disconnectWebSocket();
+    
     this.clearAuthData();
     this.updateAuthState({
       user: null,
@@ -279,6 +300,16 @@ export class AuthStore {
   getAccessToken(): string | null {
     return localStorage.getItem('accessToken');
   }
+
+  /**
+   * 🔗 Signal público para que chat-store pueda acceder al token
+   */
+  public readonly token = computed(() => localStorage.getItem('accessToken'));
+
+  /**
+   * 🔗 Signal público para que chat-store pueda acceder al usuario actual
+   */
+  public readonly currentUser = computed(() => this._authState().user);
 
   /**
    * Obtiene el token de refresh almacenado

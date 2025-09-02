@@ -421,6 +421,53 @@ export class SocialStore {
   }
 
   /**
+   * 💬 Actualizar estado de mensajes nuevos para un contacto
+   * Llamado desde ChatStore cuando llegan mensajes WebSocket
+   * Busca en friends, incomingRequests y outgoingRequests
+   */
+  setNewMessages(userId: string, hasNewMessages: boolean): void {
+    const currentState = this._socialState();
+    let stateUpdate: Partial<SocialState> = {};
+
+    // 1. Actualizar friends
+    const updatedFriends = currentState.friends.map(friend => 
+      friend.user.userId === userId 
+        ? { ...friend, newMessages: hasNewMessages }
+        : friend
+    );
+
+    // 2. Actualizar incoming requests
+    const updatedIncomingRequests = currentState.incomingRequests.map(request => 
+      request.contactUser.user.userId === userId 
+        ? { ...request, contactUser: { ...request.contactUser, newMessages: hasNewMessages } }
+        : request
+    );
+
+    // 3. Actualizar outgoing requests
+    const updatedOutgoingRequests = currentState.outgoingRequests.map(request => 
+      request.contactUser.user.userId === userId 
+        ? { ...request, contactUser: { ...request.contactUser, newMessages: hasNewMessages } }
+        : request
+    );
+
+    // Solo actualizar si hubo cambios
+    if (updatedFriends !== currentState.friends) {
+      stateUpdate.friends = updatedFriends;
+    }
+    if (updatedIncomingRequests !== currentState.incomingRequests) {
+      stateUpdate.incomingRequests = updatedIncomingRequests;
+    }
+    if (updatedOutgoingRequests !== currentState.outgoingRequests) {
+      stateUpdate.outgoingRequests = updatedOutgoingRequests;
+    }
+
+    if (Object.keys(stateUpdate).length > 0) {
+      this.updateSocialState(stateUpdate);
+      console.log(`💬 Usuario ${userId} actualizado con newMessages: ${hasNewMessages}`);
+    }
+  }
+
+  /**
    * 🔄 Refrescar todos los datos sociales
    * Método de conveniencia para recargar todo
    */
