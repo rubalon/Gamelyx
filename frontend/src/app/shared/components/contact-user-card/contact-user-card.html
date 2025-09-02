@@ -253,3 +253,12 @@
     (cancel)="onCancelDelete()">
   </app-confirmation-modal>
 }
+
+<!-- Modal de chat -->
+@if (showChatModal() && chatData()) {
+  <app-chat-modal
+    [isOpen]="showChatModal()"
+    [userData]="chatData()!"
+    (close)="onCloseChatModal()">
+  </app-chat-modal>
+}

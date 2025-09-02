@@ -1,0 +1,127 @@
+<!-- Modal Backdrop -->
+@if (isOpen()) {
+  <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-[0.25rem]"
+         (click)="onClose()"></div>
+    
+    <!-- Modal Container -->
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-gray-800 rounded-lg shadow-xl w-full max-w-md lg:max-w-lg xl:max-w-xl h-[37.5rem] lg:h-[43.75rem] flex flex-col"
+           (click)="$event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-700 flex-shrink-0">
+          <div class="flex items-center space-x-3">
+            <app-avatar 
+              [username]="userData().username" 
+              [sizeClasses]="'w-8 h-8 text-sm'">
+            </app-avatar>
+            
+            <div class="flex flex-col">
+              <h3 class="font-semibold text-white">{{ userData().username }}</h3>
+            </div>
+          </div>
+          
+          <button
+            (click)="onClose()"
+            class="text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg p-2 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Messages Area -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700">
+          @if (hasMessages()) {
+            @for (message of messages(); track message.id) {
+              <div class="flex" [class.justify-end]="message.senderId === 'me'">
+                <div class="max-w-xs lg:max-w-md">
+                  <!-- Message Bubble -->
+                  <div class="rounded-lg px-4 py-2 text-sm"
+                       [class.bg-purple-600]="message.senderId === 'me'"
+                       [class.text-white]="message.senderId === 'me'"
+                       [class.bg-gray-700]="message.senderId !== 'me'"
+                       [class.text-gray-100]="message.senderId !== 'me'">
+                    {{ message.content }}
+                  </div>
+                  
+                  <!-- Timestamp -->
+                  <div class="text-xs text-gray-400 mt-1"
+                       [class.text-right]="message.senderId === 'me'">
+                    {{ formatTime(message.timestamp) }}
+                    
+                    @if (message.senderId === 'me') {
+                      <!-- Read status for sent messages -->
+                      @if (message.isRead) {
+                        <span class="text-green-400 ml-1">✓✓</span>
+                      } @else {
+                        <span class="text-gray-400 ml-1">✓</span>
+                      }
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          } @else {
+            <!-- Empty state -->
+            <div class="flex flex-col items-center justify-center h-full text-center py-8">
+              <div class="text-4xl mb-3">💬</div>
+              <p class="text-gray-400 mb-2">¡Inicia la conversación!</p>
+              <p class="text-gray-500 text-sm">Envía tu primer mensaje a {{ userData().username }}</p>
+            </div>
+          }
+          
+          <!-- Typing indicator -->
+          @if (isTyping()) {
+            <div class="flex">
+              <div class="max-w-xs lg:max-w-md">
+                <div class="bg-gray-700 text-gray-100 rounded-lg px-4 py-2 text-sm">
+                  <div class="flex items-center space-x-1">
+                    <div class="flex space-x-1">
+                      <div class="w-1 h-1 bg-gray-400 rounded-full typing-dot-1"></div>
+                      <div class="w-1 h-1 bg-gray-400 rounded-full typing-dot-2"></div>
+                      <div class="w-1 h-1 bg-gray-400 rounded-full typing-dot-3"></div>
+                    </div>
+                    <span class="text-xs text-gray-400 ml-2">escribiendo...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        
+        <!-- Message Input -->
+        <div class="p-4 border-t border-gray-700 flex-shrink-0">
+          <div class="flex items-end space-x-3">
+            <div class="flex-1">
+              <textarea
+                [(ngModel)]="messageText"
+                (keydown)="onKeyDown($event)"
+                placeholder="Escribe un mensaje..."
+                rows="1"
+                class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:outline-none scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700"
+                style="max-height: 120px; min-height: 40px;"></textarea>
+            </div>
+            
+            <button
+              (click)="onSendMessage()"
+              [disabled]="!canSend()"
+              class="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Character count / tips -->
+          <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+            <span>Presiona Enter para enviar, Shift+Enter para nueva línea</span>
+            <span>{{ messageText().length }}/500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { StarRating } from '@shared/components/star-rating/star-rating';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal';
+import { ChatModalComponent, ChatModalData } from '@shared/components/chat-modal/chat-modal';
 import { SocialStore } from '@core/stores/social-store';
 import { RequestSource } from '@core/services/social-api';
 
@@ -36,7 +37,8 @@ export interface ContactUserData {
     CommonModule,
     AvatarComponent,
     StarRating,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    ChatModalComponent
   ],
   templateUrl: './contact-user-card.html',
   styleUrl: './contact-user-card.scss'
@@ -52,9 +54,13 @@ export class ContactUserCard {
   // Para notificar que necesita nueva sugerencia
   requestNewSuggestion = output<void>();
   
-  // 🚀 Estado interno para modal de confirmación (solo para friend)
+  // 🚀 Estado interno para modales
   showDeleteModal = signal(false);
   friendToDelete = signal<{ id: string; username: string } | null>(null);
+  
+  // 💬 Estado para modal de chat
+  showChatModal = signal(false);
+  chatData = signal<ChatModalData | null>(null);
 
    /****************************************************************************
    * BOTONES PARA INCOMING Y OUTGOING-PENDING
@@ -64,8 +70,12 @@ export class ContactUserCard {
     const userData = this.userData();
     if (!userData) return;
     
-    console.log('💬 Open chat with:', userData.contactUser.user.username, userData.contactUser.user.userId);
-    // TODO: Implementar funcionalidad de chat
+    // Configurar datos del chat y abrir modal
+    this.chatData.set({
+      userId: userData.contactUser.user.userId,
+      username: userData.contactUser.user.username
+    });
+    this.showChatModal.set(true);
   }
 
   /****************************************************************************
@@ -117,6 +127,18 @@ export class ContactUserCard {
   private closeDeleteModal(): void {
     this.showDeleteModal.set(false);
     this.friendToDelete.set(null);
+  }
+
+  /****************************************************************************
+   * MÉTODOS PARA CHAT MODAL
+   * ***************************************************************************/
+
+  /**
+   * ❌ Cerrar modal de chat
+   */
+  onCloseChatModal(): void {
+    this.showChatModal.set(false);
+    this.chatData.set(null);
   }
 
    /****************************************************************************
