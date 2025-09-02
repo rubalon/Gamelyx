@@ -80,7 +80,6 @@ export class FriendFinderComponent {
           userId: suggestion.user.userId,
           username: suggestion.user.username
         },
-        chatId: null,
         newMessages: false
       },
       receivedAt: new Date().toISOString(), // Tiempo actual

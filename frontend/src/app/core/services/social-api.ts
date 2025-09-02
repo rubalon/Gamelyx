@@ -25,7 +25,6 @@ export interface UserDto {
 
 export interface ContactUserDto {
   user: UserDto;
-  chatId: string | null; // UUID como string, null si no hay chat
   newMessages: boolean;
 }
 

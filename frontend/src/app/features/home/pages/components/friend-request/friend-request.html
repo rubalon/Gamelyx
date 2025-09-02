@@ -119,7 +119,7 @@
           <app-contact-user-card
             [userData]="request"
             [cardType]="getCardType()"
-            (chatClick)="onOpenChat($event.chatId, $event.username)"
+            (chatClick)="onOpenChat($event.userId, $event.username)"
             (acceptClick)="onAcceptRequest($event.requestId, $event.username)"
             (rejectClick)="onRejectRequest($event.requestId, $event.username)">
           </app-contact-user-card>

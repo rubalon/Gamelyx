@@ -71,10 +71,9 @@ export class FriendRequestComponent {
   /**
    * 💬 Abrir chat con usuario (delegado desde la card)
    */
-  onOpenChat(chatId: string, username: string): void {
-    console.log('💬 Opening chat with:', username, 'ChatId:', chatId);
+  onOpenChat(userId: string, username: string): void {
+    console.log('💬 Opening chat with:', username, 'UserId:', userId);
     // TODO: Implementar navegación al chat
-    // router.navigate(['/chat', chatId]);
   }
 
   /**

@@ -14,7 +14,6 @@ export interface ContactUserData {
       userId: string;
       username: string;
     };
-    chatId?: string | null;
     newMessages: boolean;
   };
   receivedAt: string;
@@ -28,7 +27,7 @@ export interface ContactUserData {
 }
 
 export interface CardActions {
-  onOpenChat: (chatId: string, username: string) => void;
+  onOpenChat: (userId: string, username: string) => void;
   onAcceptRequest: (requestId: string, username: string) => void;
   onRejectRequest: (requestId: string, username: string) => void;
 }
@@ -52,7 +51,7 @@ export class ContactUserCard {
   cardType = input.required<CardType>();
   
   // 📤 Outputs modernos
-  chatClick = output<{chatId: string, username: string}>();
+  chatClick = output<{userId: string, username: string}>();
   acceptClick = output<{requestId: string, username: string}>();
   rejectClick = output<{requestId: string, username: string}>();
   
@@ -68,7 +67,7 @@ export class ContactUserCard {
     if (!userData) return;
     
     this.chatClick.emit({
-      chatId: userData.contactUser.chatId ?? '',
+      userId: userData.contactUser.user.userId,
       username: userData.contactUser.user.username
     });
   }
