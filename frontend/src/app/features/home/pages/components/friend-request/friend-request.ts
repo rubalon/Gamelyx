@@ -68,27 +68,6 @@ export class FriendRequestComponent {
     return this.socialStore.outgoingRequests().length; // 👈 Total sin filtrar
   }
 
-  /**
-   * 💬 Abrir chat con usuario (delegado desde la card)
-   */
-  onOpenChat(userId: string, username: string): void {
-    console.log('💬 Opening chat with:', username, 'UserId:', userId);
-    // TODO: Implementar navegación al chat
-  }
-
-  /**
-   * ✅ Aceptar solicitud de amistad (delegado desde la card)
-   */
-  onAcceptRequest(requestId: string, username: string): void {
-    console.log('✅ Accept request from:', username, requestId);
-    // TODO: Implementar funcionalidad
-  }
-
-  /**
-   * ❌ Rechazar solicitud de amistad (delegado desde la card)
-   */
-  onRejectRequest(requestId: string, username: string): void {
-    console.log('❌ Reject request from:', username, requestId);
-    // TODO: Implementar funcionalidad
-  }
+  // ✅ Toda la lógica de interacción ahora está en contact-user-card
+  // No necesitamos métodos de delegación aquí
 }

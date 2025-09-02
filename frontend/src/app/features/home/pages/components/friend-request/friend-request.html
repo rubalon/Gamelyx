@@ -118,10 +118,7 @@
         @for (request of currentRequests; track request.requestId) {
           <app-contact-user-card
             [userData]="request"
-            [cardType]="getCardType()"
-            (chatClick)="onOpenChat($event.userId, $event.username)"
-            (acceptClick)="onAcceptRequest($event.requestId, $event.username)"
-            (rejectClick)="onRejectRequest($event.requestId, $event.username)">
+            [cardType]="getCardType()">
           </app-contact-user-card>
         }
       </div>

@@ -1,14 +1,15 @@
-import { Component, input, output, inject } from '@angular/core';
+import { Component, input, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { StarRating } from '@shared/components/star-rating/star-rating';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal';
 import { SocialStore } from '@core/stores/social-store';
 import { RequestSource } from '@core/services/social-api';
 
-export type CardType = 'incoming' | 'outgoing-pending' | 'outgoing-completed' | 'suggestion' | 'empty-result';
+export type CardType = 'incoming' | 'outgoing-pending' | 'outgoing-completed' | 'suggestion' | 'empty-result' | 'friend';
 
 export interface ContactUserData {
-  requestId: string;
+  requestId?: string;  // Opcional para 'friend'
   contactUser: {
     user: {
       userId: string;
@@ -16,8 +17,8 @@ export interface ContactUserData {
     };
     newMessages: boolean;
   };
-  receivedAt: string;
-  status: string;
+  receivedAt?: string;  // Opcional para 'friend'
+  status?: string;      // Opcional para 'friend'
   sharedGame?: {
     gameSlug: string;
     gameName: string;
@@ -26,11 +27,7 @@ export interface ContactUserData {
   } | null;
 }
 
-export interface CardActions {
-  onOpenChat: (userId: string, username: string) => void;
-  onAcceptRequest: (requestId: string, username: string) => void;
-  onRejectRequest: (requestId: string, username: string) => void;
-}
+// Interface removida ya que contact-user-card maneja todo directamente con el store
 
 @Component({
   selector: 'app-contact-user-card',
@@ -38,7 +35,8 @@ export interface CardActions {
   imports: [
     CommonModule,
     AvatarComponent,
-    StarRating
+    StarRating,
+    ConfirmationModalComponent
   ],
   templateUrl: './contact-user-card.html',
   styleUrl: './contact-user-card.scss'
@@ -50,13 +48,13 @@ export class ContactUserCard {
   userData = input<ContactUserData | null>(null);  // Opcional para 'empty-result'
   cardType = input.required<CardType>();
   
-  // 📤 Outputs modernos
-  chatClick = output<{userId: string, username: string}>();
-  acceptClick = output<{requestId: string, username: string}>();
-  rejectClick = output<{requestId: string, username: string}>();
-  
+  // 📤 Outputs modernos - Solo los necesarios
   // Para notificar que necesita nueva sugerencia
   requestNewSuggestion = output<void>();
+  
+  // 🚀 Estado interno para modal de confirmación (solo para friend)
+  showDeleteModal = signal(false);
+  friendToDelete = signal<{ id: string; username: string } | null>(null);
 
    /****************************************************************************
    * BOTONES PARA INCOMING Y OUTGOING-PENDING
@@ -66,10 +64,59 @@ export class ContactUserCard {
     const userData = this.userData();
     if (!userData) return;
     
-    this.chatClick.emit({
-      userId: userData.contactUser.user.userId,
-      username: userData.contactUser.user.username
+    console.log('💬 Open chat with:', userData.contactUser.user.username, userData.contactUser.user.userId);
+    // TODO: Implementar funcionalidad de chat
+  }
+
+  /****************************************************************************
+   * BOTONES PARA FRIEND
+   * ***************************************************************************/
+
+  /**
+   * 🗑️ Mostrar modal de confirmación para eliminar amigo
+   */
+  onDeleteFriendClick(): void {
+    const userData = this.userData();
+    if (!userData) return;
+    
+    this.friendToDelete.set({ 
+      id: userData.contactUser.user.userId, 
+      username: userData.contactUser.user.username 
     });
+    this.showDeleteModal.set(true);
+  }
+
+  /**
+   * ✅ Confirmar eliminación de amigo
+   */
+  onConfirmDelete(): void {
+    const friend = this.friendToDelete();
+    if (friend) {
+      this.socialStore.deleteFriend(friend.id).subscribe({
+        next: (response) => {
+          console.log('✅ Friend deleted successfully:', response);
+        },
+        error: (error) => {
+          console.error('❌ Error deleting friend:', error);
+        }
+      });
+    }
+    this.closeDeleteModal();
+  }
+
+  /**
+   * ❌ Cancelar eliminación de amigo
+   */
+  onCancelDelete(): void {
+    this.closeDeleteModal();
+  }
+
+  /**
+   * 🔒 Cerrar modal y limpiar estado
+   */
+  private closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+    this.friendToDelete.set(null);
   }
 
    /****************************************************************************
@@ -78,7 +125,7 @@ export class ContactUserCard {
 
   onAcceptClick(): void {
     const userData = this.userData();
-    if (!userData) return;
+    if (!userData || !userData.requestId) return;
     
     // Para incoming: aceptar solicitud a través del store
     this.socialStore.respondToFriendRequest(userData.requestId, 'ACCEPT').subscribe({
@@ -93,7 +140,7 @@ export class ContactUserCard {
 
   onRejectClick(): void {
     const userData = this.userData();
-    if (!userData) return;
+    if (!userData || !userData.requestId) return;
     
     // Para incoming: rechazar solicitud a través del store
     this.socialStore.respondToFriendRequest(userData.requestId, 'REJECT').subscribe({
@@ -115,7 +162,7 @@ export class ContactUserCard {
    */
   onMarkAsNotified(): void {
     const userData = this.userData();
-    if (!userData) return;
+    if (!userData || !userData.requestId) return;
     
     this.socialStore.markAsNotified(userData.requestId).subscribe({
       next: () => {
