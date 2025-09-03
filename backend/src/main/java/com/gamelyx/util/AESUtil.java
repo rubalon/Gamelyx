@@ -18,7 +18,22 @@ public class AESUtil {
 
     public static String encrypt(String content, String key) {
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
+            // Asegurar que la clave tenga exactamente 32 bytes para AES-256
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            if (keyBytes.length != 32) {
+                // Ajustar clave a exactamente 32 bytes
+                byte[] fixedKey = new byte[32];
+                if (keyBytes.length < 32) {
+                    // Rellenar con ceros si es más corta
+                    System.arraycopy(keyBytes, 0, fixedKey, 0, keyBytes.length);
+                } else {
+                    // Truncar si es más larga
+                    System.arraycopy(keyBytes, 0, fixedKey, 0, 32);
+                }
+                keyBytes = fixedKey;
+            }
+            
+            SecretKeySpec secretKey = new SecretKeySpec(keyBytes, ALGORITHM);
             
             byte[] iv = new byte[GCM_IV_LENGTH];
             new SecureRandom().nextBytes(iv);
@@ -43,7 +58,22 @@ public class AESUtil {
 
     public static String decrypt(String encryptedContent, String key) {
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
+            // Asegurar que la clave tenga exactamente 32 bytes para AES-256
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            if (keyBytes.length != 32) {
+                // Ajustar clave a exactamente 32 bytes
+                byte[] fixedKey = new byte[32];
+                if (keyBytes.length < 32) {
+                    // Rellenar con ceros si es más corta
+                    System.arraycopy(keyBytes, 0, fixedKey, 0, keyBytes.length);
+                } else {
+                    // Truncar si es más larga
+                    System.arraycopy(keyBytes, 0, fixedKey, 0, 32);
+                }
+                keyBytes = fixedKey;
+            }
+            
+            SecretKeySpec secretKey = new SecretKeySpec(keyBytes, ALGORITHM);
             
             byte[] decodedContent = Base64.getDecoder().decode(encryptedContent);
             

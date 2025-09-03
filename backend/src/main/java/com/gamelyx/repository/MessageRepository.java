@@ -15,7 +15,6 @@ import java.util.UUID;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    List<Message> findByConversationIdOrderBySentAtAsc(UUID conversationId);
 
     @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId ORDER BY m.sentAt DESC")
     List<Message> findTop20ByConversationIdOrderBySentAtDesc(
