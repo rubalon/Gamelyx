@@ -35,12 +35,13 @@ export class ChatStore {
     this.chatWs.onNewMessage((wsMessage) => this.handleNewMessage(wsMessage));
     this.chatWs.onReadReceipt((receipt) => this.handleReadReceipt(receipt));
 
-    // 🔄 Observar cambios de autenticación para auto-conectar/desconectar WebSocket
+    // 🔄 Observar cambios de autenticación Y usuario para auto-conectar/desconectar WebSocket
     effect(() => {
       const isAuthenticated = this.authStore.isAuthenticated();
+      const currentUser = this.authStore.user(); // También observar cambios de usuario
       
-      if (isAuthenticated) {
-        console.log('🔌 Usuario autenticado - conectando WebSocket automáticamente');
+      if (isAuthenticated && currentUser) {
+        console.log(`🔌 Usuario autenticado (${currentUser.username}) - conectando WebSocket automáticamente`);
         this.connectWebSocket();
       } else {
         console.log('❌ Usuario no autenticado - desconectando WebSocket automáticamente');

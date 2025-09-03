@@ -176,6 +176,7 @@ export class ChatWebSocket {
     if (this.client?.active) {
       this.client.deactivate();
     }
+    this.client = null; // Limpiar referencia para forzar recreación en próximo connect()
     this.isConnected.set(false);
     this.isConnecting.set(false);
     this.connectionError.set(null);

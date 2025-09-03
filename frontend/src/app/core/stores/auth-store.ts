@@ -80,6 +80,9 @@ export class AuthStore {
     registrationPending: null
   });
 
+  // Token como signal interno para que se actualice correctamente
+  private _token = signal<string | null>(null);
+
   // Estado público readonly
   public readonly authState = this._authState.asReadonly();
 
@@ -110,6 +113,9 @@ export class AuthStore {
           isLoading: false,
           error: null
         });
+        
+        // Inicializar signal interno del token desde localStorage
+        this._token.set(accessToken);
       } catch (error) {
         this.clearAuthData();
       }
@@ -138,6 +144,9 @@ export class AuthStore {
       email: response.email,
       emailVerified: true
     }));
+    
+    // Actualizar signal interno del token
+    this._token.set(response.accessToken);
   }
 
   /**
@@ -147,6 +156,9 @@ export class AuthStore {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userData');
+    
+    // Limpiar signal interno del token
+    this._token.set(null);
   }
 
   /**
@@ -283,7 +295,7 @@ export class AuthStore {
   /**
    * 🔗 Signal público para que chat-store pueda acceder al token
    */
-  public readonly token = computed(() => localStorage.getItem('accessToken'));
+  public readonly token = this._token.asReadonly();
 
   /**
    * 🔗 Signal público para que chat-store pueda acceder al usuario actual
