@@ -131,6 +131,9 @@ export class ChatStore {
 
     console.log('👁️ Marcando mensajes como leídos para:', otherUserId);
     this.chatWs.markMessagesAsRead({ otherUserId });
+    
+    // Quitar notificación de nuevos mensajes en social-store
+    this.socialStore.setNewMessages(otherUserId, false);
   }
 
   /**
