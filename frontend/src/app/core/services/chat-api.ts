@@ -33,7 +33,7 @@ export class ChatApi {
    * 📥 Cargar historial de conversación con otro usuario
    * Endpoint: GET /api/chat/messages?otherUserId={uuid}&page={n}&limit={n}
    */
-  getMessages(otherUserId: string, page: number = 0, limit: number = 20): Observable<ConversationMessagesDto> {
+  getMessages(otherUserId: string, page: number = 0, limit: number = 25): Observable<ConversationMessagesDto> {
     return this.http.get<ConversationMessagesDto>(`${this.baseUrl}/messages`, {
       params: {
         otherUserId,

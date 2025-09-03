@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed, inject, effect } from '@angular/core';
+import { Component, input, output, signal, computed, inject, effect, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
@@ -20,8 +20,11 @@ export interface ChatModalData {
   templateUrl: './chat-modal.html',
   styleUrl: './chat-modal.scss'
 })
-export class ChatModalComponent {
+export class ChatModalComponent implements AfterViewInit {
   private chatStore = inject(ChatStore);
+  
+  // 📜 ViewChild para el contenedor de mensajes
+  @ViewChild('messagesContainer') messagesContainer!: ElementRef<HTMLDivElement>;
   
   // 📥 Inputs
   isOpen = input<boolean>(false);
@@ -43,7 +46,19 @@ export class ChatModalComponent {
   
   // 📊 Computed
   hasMessages = computed(() => this.messages().length > 0);
-  canSend = computed(() => this.messageText().trim().length > 0 && this.wsConnected());
+  
+  // 📊 Contador de mensajes total en la conversación (para límite de 25)
+  totalMessagesCount = computed(() => this.messages().length);
+  
+  // 🚫 Límite de mensajes alcanzado
+  messageLimitReached = computed(() => this.totalMessagesCount() >= 25);
+  
+  // ✅ Puede enviar mensaje (considerando límite)
+  canSend = computed(() => 
+    this.messageText().trim().length > 0 && 
+    this.wsConnected() && 
+    !this.messageLimitReached()
+  );
   
   // 🛡️ Helper seguro para obtener el userId del otro usuario
   otherUserId = computed(() => this.activeConversation()?.otherUser?.userId ?? 'unknown');
@@ -60,15 +75,31 @@ export class ChatModalComponent {
       }
     });
 
-    // 🔄 Cerrar conversación cuando se cierra el modal
+    // 🔄 Conversación se cierra desde ContactUserCard cuando se cierra el modal
+    
+    // 📜 Effect para hacer scroll al final cuando cambian los mensajes
     effect(() => {
-      const isOpen = this.isOpen();
-      
-      if (!isOpen) {
-        console.log('❌ Cerrando conversación');
-        this.chatStore.closeConversation();
+      const messages = this.messages();
+      if (messages.length > 0) {
+        // Usar setTimeout para que el DOM se actualice primero
+        setTimeout(() => this.scrollToBottom(), 0);
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Scroll inicial cuando se inicializa la vista
+    setTimeout(() => this.scrollToBottom(), 100);
+  }
+
+  /**
+   * 📜 Hacer scroll al final del área de mensajes
+   */
+  private scrollToBottom(): void {
+    if (this.messagesContainer) {
+      const element = this.messagesContainer.nativeElement;
+      element.scrollTop = element.scrollHeight;
+    }
   }
   
   /**
@@ -95,12 +126,15 @@ export class ChatModalComponent {
   }
   
   /**
-   * ⌨️ Manejar Enter en textarea
+   * ⌨️ Manejar Enter en textarea (respetando límite de mensajes)
    */
   onKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      this.onSendMessage();
+      // Solo enviar si se puede (respeta límite de mensajes)
+      if (this.canSend()) {
+        this.onSendMessage();
+      }
     }
   }
   

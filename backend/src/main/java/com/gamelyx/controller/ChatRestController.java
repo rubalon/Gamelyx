@@ -40,6 +40,8 @@ public class ChatRestController {
             @RequestParam UUID otherUserId,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer limit,
+            //Existe un bug con el limit porque al poner limit te recupera empezando por los primeros mensajes enviados en lugar de por los ultimos.
+            // Como vamos a poner un maximo de 25 mensajes por chat para que no nos colapsen la app este bug se soluciona solo pero si esto se quita habria que arreglarlo.
             Authentication authentication) {
 
         String currentUsername = authentication.getName();

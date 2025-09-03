@@ -5,6 +5,7 @@ import { StarRating } from '@shared/components/star-rating/star-rating';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal';
 import { ChatModalComponent, ChatModalData } from '@shared/components/chat-modal/chat-modal';
 import { SocialStore } from '@core/stores/social-store';
+import { ChatStore } from '@core/stores/chat-store';
 import { RequestSource } from '@core/services/social-api';
 
 export type CardType = 'incoming' | 'outgoing-pending' | 'outgoing-completed' | 'suggestion' | 'empty-result' | 'friend';
@@ -45,6 +46,7 @@ export interface ContactUserData {
 })
 export class ContactUserCard {
   private socialStore = inject(SocialStore);
+  private chatStore = inject(ChatStore);
   
   // 📥 Inputs modernos
   userData = input<ContactUserData | null>(null);  // Opcional para 'empty-result'
@@ -139,6 +141,9 @@ export class ContactUserCard {
   onCloseChatModal(): void {
     this.showChatModal.set(false);
     this.chatData.set(null);
+    
+    // Cerrar conversación en ChatStore (el effect del modal no se ejecuta por el timing)
+    this.chatStore.closeConversation();
   }
 
    /****************************************************************************
