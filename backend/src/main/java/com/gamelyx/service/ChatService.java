@@ -98,11 +98,11 @@ public class ChatService {
                 validation.getCallerUser().getId(), 
                 validation.getTargetUser().getId());
 
-        // 3. Obtener mensajes paginados (más recientes primero)
+        // 3. Obtener mensajes paginados (más antiguos primero para orden correcto en chat)
         Pageable pageable = PageRequest.of(
                 request.page(), 
                 request.limit(), 
-                Sort.by(Sort.Direction.DESC, "sentAt"));
+                Sort.by(Sort.Direction.ASC, "sentAt"));
         
         Page<Message> messagesPage = messageRepository.findByConversationId(conversation.getId(), pageable);
         List<Message> messages = messagesPage.getContent();
