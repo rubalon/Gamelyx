@@ -142,7 +142,7 @@ public class ChatService {
                 conversation.getId(), 
                 validation.getCallerUser().getId());
 
-        return chatMapper.toMarkAsReadResponseDto(true, markedCount);
+        return chatMapper.toMarkAsReadResponseDto(true, markedCount, validation.getCallerUser().getId());
     }
 
     // ================================================

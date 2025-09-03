@@ -114,10 +114,11 @@ public class ChatMapper {
      * 
      * @param success Si la operación fue exitosa
      * @param markedCount Número de mensajes que se marcaron como leídos
+     * @param readByUserId ID del usuario que leyó los mensajes
      * @return MarkAsReadResponseDto con resultado de la operación
      */
-    public MarkAsReadResponseDto toMarkAsReadResponseDto(boolean success, int markedCount) {
-        return new MarkAsReadResponseDto(success, markedCount);
+    public MarkAsReadResponseDto toMarkAsReadResponseDto(boolean success, int markedCount, UUID readByUserId) {
+        return new MarkAsReadResponseDto(success, markedCount, readByUserId);
     }
 
     /**

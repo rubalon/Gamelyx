@@ -166,6 +166,12 @@ export class ChatStore {
           ...activeConv,
           messages: [...activeConv.messages, message]
         });
+        
+        // Solo marcar como leído si el mensaje NO es nuestro
+        if (message.senderId !== currentUserId) {
+          this.markMessagesAsRead(activeConv.otherUser.userId);
+        }
+        
         return;
       }
     }

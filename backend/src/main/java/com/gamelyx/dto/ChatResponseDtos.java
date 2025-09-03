@@ -56,7 +56,8 @@ public class ChatResponseDtos {
      */
     public record MarkAsReadResponseDto(
             Boolean success,
-            Integer markedCount
+            Integer markedCount,
+            UUID readByUserId
     ) {}
 
     /**

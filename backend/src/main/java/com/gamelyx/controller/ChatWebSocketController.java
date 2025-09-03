@@ -90,7 +90,7 @@ public class ChatWebSocketController {
         // 3. Crear notificación para WebSocket
         WebSocketReadReceiptDto readReceipt = new WebSocketReadReceiptDto(
                 "MESSAGES_READ",
-                request.otherUserId(),
+                response.readByUserId(),
                 response.markedCount()
         );
 
