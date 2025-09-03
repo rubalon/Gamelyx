@@ -1,9 +1,12 @@
 package com.gamelyx.config;
 
+import com.gamelyx.security.jwt.JwtUtil;
 import com.gamelyx.security.websocket.WebSocketAuthInterceptor;
+import com.gamelyx.security.websocket.WebSocketHandshakeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -13,9 +16,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketAuthInterceptor webSocketAuthInterceptor;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
-    public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor) {
+    public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor, 
+                          JwtUtil jwtUtil, 
+                          UserDetailsService userDetailsService) {
         this.webSocketAuthInterceptor = webSocketAuthInterceptor;
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -32,8 +41,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Endpoint principal para conexiones WebSocket
         // CORS se maneja en SecurityConfig, no duplicamos configuración aquí
         registry.addEndpoint("/ws")
-                // Habilitar SockJS para fallback en navegadores sin WebSocket nativo
-                .withSockJS();
+                // Agregar interceptor de handshake para autenticación HTTP inicial
+                .addInterceptors(new WebSocketHandshakeInterceptor(jwtUtil, userDetailsService))
+                // Permitir conexiones desde localhost (desarrollo)  
+                .setAllowedOrigins("http://localhost:4200");
     }
 
     @Override

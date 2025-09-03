@@ -37,8 +37,21 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // Solo autenticar en el CONNECT inicial
-            authenticateUser(accessor);
+            System.out.println("🔌 WebSocketAuthInterceptor: CONNECT command detected");
+            System.out.println("🔌 All native headers: " + accessor.toNativeHeaderMap());
+            
+            // Verificar si ya existe autenticación del handshake
+            Object springSecurityContext = accessor.getSessionAttributes().get("SPRING_SECURITY_CONTEXT");
+            Object username = accessor.getSessionAttributes().get("username");
+            
+            if (springSecurityContext != null && username != null) {
+                System.out.println("✅ Using authentication from handshake for user: " + username);
+                accessor.setUser((Authentication) springSecurityContext);
+            } else {
+                System.out.println("🔍 No handshake authentication found, trying STOMP headers...");
+                // Fallback: intentar autenticar usando headers STOMP
+                authenticateUser(accessor);
+            }
         }
         
         return message;

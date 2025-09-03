@@ -58,9 +58,9 @@ export class ChatWebSocket {
 
     // Crear cliente STOMP con WebSocket nativo
     this.client = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: `ws://localhost:8080/ws?token=${token}`, // Token en query string para handshake HTTP
       connectHeaders: {
-        Authorization: `Bearer ${token}` // Como espera WebSocketAuthInterceptor
+        Authorization: `Bearer ${token}` // Token en headers STOMP para el CONNECT command
       },
       debug: (str) => console.log('🔌 STOMP:', str),
       reconnectDelay: 5000,
