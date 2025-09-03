@@ -8,6 +8,8 @@ import com.gamelyx.repository.FriendRequestRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Mapper para convertir entidades del sistema social a DTOs.
@@ -23,18 +25,18 @@ public class SocialMapper {
     /**
      * Convierte lista de Users a lista de ContactUserDto
      */
-    public List<ContactUserDto> toContactUserDtoList(List<User> users) {
+    public List<ContactUserDto> toContactUserDtoList(List<User> users, Map<UUID, Boolean> newMessagesMap) {
         return users.stream()
-                .map(this::toContactUserDto)
+                .map(user -> toContactUserDto(user, newMessagesMap.getOrDefault(user.getId(), false)))
                 .toList();
     }
 
     /**
      * Convierte lista de FriendRequests a DTOs
      */
-    public List<FriendRequestDto> toFriendRequestDtoList(List<FriendRequestRepository.FriendRequestProjection> projections) {
+    public List<FriendRequestDto> toFriendRequestDtoList(List<FriendRequestRepository.FriendRequestProjection> projections, Map<UUID, Boolean> newMessagesMap) {
         return projections.stream()
-                .map(this::toFriendRequestDto)
+                .map(projection -> toFriendRequestDto(projection, newMessagesMap))
                 .toList();
     }
 
@@ -54,7 +56,7 @@ public class SocialMapper {
     /**
      * Convierte FriendRequest a IncomingRequestDto
      */
-    public FriendRequestDto toFriendRequestDto(FriendRequestRepository.FriendRequestProjection projection) {
+    public FriendRequestDto toFriendRequestDto(FriendRequestRepository.FriendRequestProjection projection, Map<UUID, Boolean> newMessagesMap) {
 
         // 1. Crear ContactUserDto del sender usando los datos de la projection
         UserDto senderUserDto = new UserDto(
@@ -63,7 +65,7 @@ public class SocialMapper {
         );
         ContactUserDto contactUserDto = new ContactUserDto(
                 senderUserDto,
-                false
+                newMessagesMap.getOrDefault(projection.getContactId(), false)
         );
 
         // 2. Crear SharedGameInfoDto solo si hay juego sugerido
@@ -146,11 +148,11 @@ public class SocialMapper {
      * Convierte FriendRequest entity directamente a FriendRequestDto
      * Para respuestas de envío de solicitud con ratings
      */
-    public FriendRequestDto toFriendRequestDto(FriendRequest friendRequest, Integer yourRating, Integer theirRating) {
+    public FriendRequestDto toFriendRequestDto(FriendRequest friendRequest, Integer yourRating, Integer theirRating, Map<UUID, Boolean> newMessagesMap) {
         // Para outgoing requests, el contactUser es el receiver
         ContactUserDto contactUser = new ContactUserDto(
                 new UserDto(friendRequest.getReceiver().getId(), friendRequest.getReceiver().getUsername()),
-                false // siempre son false de momento
+                newMessagesMap.getOrDefault(friendRequest.getReceiver().getId(), false)
         );
 
         SharedGameInfoDto sharedGameInfo = null;
@@ -176,10 +178,10 @@ public class SocialMapper {
     /**
      * Convierte User a ContactUserDto (para nuevo amigo tras aceptar solicitud).
      */
-    public ContactUserDto toContactUserDto(User user) {
+    public ContactUserDto toContactUserDto(User user, boolean newMessages) {
         UserDto userDto = new UserDto(user.getId(), user.getUsername());
 
-        return new ContactUserDto(userDto, false);
+        return new ContactUserDto(userDto, newMessages);
     }
 
     /**

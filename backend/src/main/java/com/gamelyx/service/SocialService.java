@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +32,8 @@ public class SocialService {
     private final GameRepository gameRepository;
     private final UserGameDetailsRepository userGameDetailsRepository;
     private final SuggestionRejectionRepository suggestionRejectionRepository;
+    private final MessageRepository messageRepository;
+    private final ConversationRepository conversationRepository;
     private final SocialMapper socialMapper;
     private final SocialValidator socialValidator;
     private final Logger logger = LoggerFactory.getLogger(SocialService.class);
@@ -40,7 +43,11 @@ public class SocialService {
             UserRepository userRepository,
             FriendshipRepository friendshipRepository,
             FriendRequestRepository friendRequestRepository,
-            GameRepository gameRepository, UserGameDetailsRepository userGameDetailsRepository, SuggestionRejectionRepository suggestionRejectionRepository,
+            GameRepository gameRepository, 
+            UserGameDetailsRepository userGameDetailsRepository, 
+            SuggestionRejectionRepository suggestionRejectionRepository,
+            MessageRepository messageRepository,
+            ConversationRepository conversationRepository,
             SocialMapper socialMapper,
             SocialValidator socialValidator) {
 
@@ -50,6 +57,8 @@ public class SocialService {
         this.gameRepository = gameRepository;
         this.userGameDetailsRepository = userGameDetailsRepository;
         this.suggestionRejectionRepository = suggestionRejectionRepository;
+        this.messageRepository = messageRepository;
+        this.conversationRepository = conversationRepository;
         this.socialMapper = socialMapper;
         this.socialValidator = socialValidator;
     }
@@ -73,28 +82,50 @@ public class SocialService {
 
         // 2. Obtener amigos con información de contacto
         List<User> friendUsers = friendshipRepository.findFriendsByUserId(callerUser.getId());
-        List<ContactUserDto> friends = socialMapper.toContactUserDtoList(friendUsers);
 
         // 3. Obtener solicitudes entrantes pendientes
         List<FriendRequestRepository.FriendRequestProjection> incomingRequests = friendRequestRepository.findPendingRequestsReceivedBy(
                 callerUser.getId(),
                 FriendRequest.FriendRequestStatus.PENDING
         );
-        List<FriendRequestDto> incomingRequestDtos = socialMapper.toFriendRequestDtoList(incomingRequests);
 
         // 4. Obtener solicitudes salientes pendientes
         List<FriendRequestRepository.FriendRequestProjection> outgoingRequests = friendRequestRepository.findRequestsSentBy(
                 callerUser.getId()
         );
-        List<FriendRequestDto> outgoingRequestDtos = socialMapper.toFriendRequestDtoList(outgoingRequests);
 
-        // 5. Obtener juegos preferidos del usuario (rating >= 7)
+        // 5. Construir Map de mensajes nuevos para TODOS los usuarios (amigos + solicitudes)
+        Map<UUID, Boolean> newMessagesMap = new HashMap<>();
+        
+        // Añadir amigos al map
+        friendUsers.forEach(friend -> 
+            newMessagesMap.put(friend.getId(), hasUnreadMessagesFrom(callerUser.getId(), friend.getId()))
+        );
+        
+        // Añadir usuarios de solicitudes entrantes al map
+        incomingRequests.forEach(request -> 
+            newMessagesMap.put(request.getContactId(), hasUnreadMessagesFrom(callerUser.getId(), request.getContactId()))
+        );
+        
+        // Añadir usuarios de solicitudes salientes al map (solo PENDING)
+        outgoingRequests.stream()
+                .filter(request -> FriendRequest.FriendRequestStatus.PENDING.equals(request.getStatus()))
+                .forEach(request -> 
+                    newMessagesMap.put(request.getContactId(), hasUnreadMessagesFrom(callerUser.getId(), request.getContactId()))
+                );
+        
+        // 6. Mapear con el estado real de mensajes nuevos
+        List<ContactUserDto> friends = socialMapper.toContactUserDtoList(friendUsers, newMessagesMap);
+        List<FriendRequestDto> incomingRequestDtos = socialMapper.toFriendRequestDtoList(incomingRequests, newMessagesMap);
+        List<FriendRequestDto> outgoingRequestDtos = socialMapper.toFriendRequestDtoList(outgoingRequests, newMessagesMap);
+
+        // 7. Obtener juegos preferidos del usuario (rating >= 7)
         List<UserGameDetails> preferredGames = userGameDetailsRepository.findPreferredGamesByUserId(
                 callerUser.getId()
         );
         List<PreferredGameDto> preferredGameDtos = socialMapper.toPreferredGameDtoList(preferredGames);
 
-        // 6. Construir respuesta completa
+        // 8. Construir respuesta completa
         return new HomeSocialDataDto(
                 friends,
                 incomingRequestDtos,
@@ -143,8 +174,15 @@ public class SocialService {
             ).map(UserGameDetails::getRating).orElse(null);
         }
         
-        // 5. Convertir a DTO usando el mapper con ratings
-        return socialMapper.toFriendRequestDto(savedRequest, yourRating, theirRating);
+        // 5. Crear map de newMessages para el usuario receptor
+        Map<UUID, Boolean> newMessagesMap = new HashMap<>();
+        newMessagesMap.put(
+            savedRequest.getReceiver().getId(), 
+            hasUnreadMessagesFrom(savedRequest.getSender().getId(), savedRequest.getReceiver().getId())
+        );
+        
+        // 6. Convertir a DTO usando el mapper con ratings y newMessages
+        return socialMapper.toFriendRequestDto(savedRequest, yourRating, theirRating, newMessagesMap);
     }
 
     /**
@@ -177,8 +215,12 @@ public class SocialService {
             Friendship friendship2 = new Friendship(friendRequest.getSender(), friendRequest.getReceiver());
             friendshipRepository.saveAll(List.of(friendship1, friendship2));
 
-            // Retornar nuevo amigo
-            ContactUserDto newFriend = socialMapper.toContactUserDto(friendRequest.getSender());
+            // Retornar nuevo amigo con estado real de newMessages
+            boolean hasNewMessages = hasUnreadMessagesFrom(
+                friendRequest.getReceiver().getId(), 
+                friendRequest.getSender().getId()
+            );
+            ContactUserDto newFriend = socialMapper.toContactUserDto(friendRequest.getSender(), hasNewMessages);
             return new FriendRequestResponseDto(true, newFriend);
 
         } else {
@@ -474,5 +516,29 @@ public class SocialService {
      */
     private boolean areAlreadyFriendsMock(String user1, String user2) {
         return false;
+    }
+
+    /**
+     * Verifica si hay mensajes no leídos de un amigo específico.
+     * Busca la conversación entre los dos usuarios y cuenta mensajes no leídos.
+     * 
+     * @param currentUserId ID del usuario actual
+     * @param friendId ID del amigo del cual verificar mensajes
+     * @return true si hay mensajes no leídos del amigo
+     */
+    private boolean hasUnreadMessagesFrom(UUID currentUserId, UUID friendId) {
+        // Obtener conversación entre los dos usuarios (si existe)
+        UUID smallerId = currentUserId.compareTo(friendId) < 0 ? currentUserId : friendId;
+        UUID largerId = currentUserId.compareTo(friendId) < 0 ? friendId : currentUserId;
+        
+        return conversationRepository.findByUserOneIdAndUserTwoId(smallerId, largerId)
+                .map(conversation -> {
+                    Long unreadCount = messageRepository.countUnreadMessagesInConversation(
+                            conversation.getId(), 
+                            currentUserId
+                    );
+                    return unreadCount > 0;
+                })
+                .orElse(false); // Si no hay conversación, no hay mensajes nuevos
     }
 }
