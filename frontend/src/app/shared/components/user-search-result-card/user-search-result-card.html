@@ -1,0 +1,82 @@
+<!-- src/app/shared/components/user-search-result-card/user-search-result-card.html -->
+<div class="flex items-center justify-between p-4 hover:bg-gray-700 transition-colors border-b border-gray-700/50 last:border-b-0">
+  <div class="flex items-center space-x-3">
+    <!-- Avatar -->
+    <app-avatar 
+      [username]="searchedUser().user.username" 
+      sizeClasses="w-10 h-10 text-lg">
+    </app-avatar>
+    
+    <!-- User Info -->
+    <div>
+      <p class="text-white font-medium text-lg">{{ searchedUser().user.username }}</p>
+      <div class="flex space-x-2 text-sm mt-1">
+        @if (searchedUser().isFriend) {
+          <span class="text-green-400 flex items-center">
+            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            {{ 'social.status.friend' | translate }}
+          </span>
+        }
+        @if (searchedUser().hasPendingRequest) {
+          <span class="text-yellow-400 flex items-center">
+            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            </svg>
+            {{ 'social.status.requestSent' | translate }}
+          </span>
+        }
+        @if (searchedUser().hasRejectedRequest) {
+          <span class="text-red-400 flex items-center">
+            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            {{ 'social.status.rejected' | translate }}
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+  
+  <!-- Action Button o Estado -->
+  <div class="flex-shrink-0">
+    @if (canSendRequest()) {
+      <!-- Botón para enviar solicitud -->
+      <button
+        (click)="onSendFriendRequest()"
+        class="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
+               text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 
+               focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+        <svg class="h-4 w-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        {{ 'social.actions.addFriend' | translate }}
+      </button>
+    } @else if (searchedUser().isFriend) {
+      <!-- Ya son amigos -->
+      <div class="px-4 py-2 bg-green-600/20 border border-green-600/50 text-green-300 rounded-lg text-sm font-medium">
+        <svg class="h-4 w-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+        {{ 'social.status.alreadyFriends' | translate }}
+      </div>
+    } @else if (searchedUser().hasPendingRequest) {
+      <!-- Solicitud pendiente -->
+      <div class="px-4 py-2 bg-yellow-600/20 border border-yellow-600/50 text-yellow-300 rounded-lg text-sm font-medium">
+        <svg class="h-4 w-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+        </svg>
+        {{ 'social.status.requestPending' | translate }}
+      </div>
+    } @else if (searchedUser().hasRejectedRequest) {
+      <!-- Solicitud rechazada -->
+      <div class="px-4 py-2 bg-red-600/20 border border-red-600/50 text-red-300 rounded-lg text-sm font-medium">
+        <svg class="h-4 w-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        {{ 'social.status.notAvailable' | translate }}
+      </div>
+    }
+  </div>
+</div>

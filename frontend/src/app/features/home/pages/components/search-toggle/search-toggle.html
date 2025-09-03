@@ -1,0 +1,37 @@
+<!-- src/app/features/home/components/search-toggle/search-toggle.html -->
+<div class="search-toggle-container bg-gray-800 rounded-lg p-6">
+  
+  <!-- Toggle Tabs - Versión compacta y moderna -->
+  <div class="flex mb-6 bg-gray-700 rounded-lg p-1 w-fit">
+    <button
+      (click)="searchType.set('games')"
+      [class]="searchType() === 'games' 
+        ? 'bg-purple-600 text-white shadow-lg' 
+        : 'text-gray-300 hover:text-white hover:bg-gray-600'"
+      class="px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm flex items-center space-x-2">
+      <span>🎮</span>
+      <span>Buscar Juegos</span>
+    </button>
+    <button
+      (click)="searchType.set('users')"
+      [class]="searchType() === 'users' 
+        ? 'bg-purple-600 text-white shadow-lg' 
+        : 'text-gray-300 hover:text-white hover:bg-gray-600'"
+      class="px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm flex items-center space-x-2">
+      <span>👥</span>
+      <span>Buscar Personas</span>
+    </button>
+  </div>
+
+  <!-- Search Content -->
+  <div class="search-content">
+    @if (searchType() === 'games') {
+      <!-- Búsqueda de juegos -->
+      <app-game-search-bar></app-game-search-bar>
+    } @else {
+      <!-- Búsqueda de usuarios - NUEVO COMPONENTE -->
+      <app-user-search-bar></app-user-search-bar>
+    }
+  </div>
+
+</div>

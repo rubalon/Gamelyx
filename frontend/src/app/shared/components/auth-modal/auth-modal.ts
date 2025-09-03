@@ -34,6 +34,11 @@ export class AuthModal implements OnInit, OnDestroy {
   isGoogleLoading = false;
   isTraditionalLoading = false;
 
+  // 👁️ Estados de visibilidad de contraseñas
+  showLoginPassword = false;
+  showRegisterPassword = false;
+  showRegisterConfirmPassword = false;
+
   // Formularios reactivos
   loginForm!: FormGroup;
   registerForm!: FormGroup;
@@ -268,5 +273,18 @@ export class AuthModal implements OnInit, OnDestroy {
 
   get registrationPending() {
     return this.authStore.registrationPending();
+  }
+
+  // 👁️ Métodos para toggle de visibilidad de contraseñas
+  toggleLoginPasswordVisibility(): void {
+    this.showLoginPassword = !this.showLoginPassword;
+  }
+
+  toggleRegisterPasswordVisibility(): void {
+    this.showRegisterPassword = !this.showRegisterPassword;
+  }
+
+  toggleRegisterConfirmPasswordVisibility(): void {
+    this.showRegisterConfirmPassword = !this.showRegisterConfirmPassword;
   }
 }

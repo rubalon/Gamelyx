@@ -1,0 +1,81 @@
+/* src/app/features/home/components/search-toggle/search-toggle.scss */
+
+.search-toggle-container {
+  width: 100%;
+}
+
+/* Estilos mejorados para los tabs */
+.toggle-tabs {
+  background-color: rgb(55, 65, 81); /* bg-gray-700 */
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  width: fit-content;
+  
+  button {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover:not(.active) {
+      background-color: rgb(75, 85, 99); /* bg-gray-600 */
+      color: white;
+    }
+    
+    &.active {
+      background-color: rgb(147, 51, 234); /* bg-purple-600 */
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+    }
+    
+    /* Animación suave para el icono */
+    span {
+      transition: transform 0.2s ease-in-out;
+    }
+    
+    &:hover span:first-child {
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Hover effects for better UX */
+.user-search {
+  .search-result-item:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Custom scrollbar for search results */
+.max-h-60 {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background-color: rgb(31, 41, 55); /* bg-gray-800 */
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgb(75, 85, 99); /* bg-gray-600 */
+    border-radius: 9999px; /* rounded-full */
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(107, 114, 128); /* bg-gray-500 */
+  }
+}
+
+/* Mejoras adicionales para el diseño compacto */
+.search-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

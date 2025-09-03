@@ -1,0 +1,72 @@
+// src/app/shared/components/user-search-bar/user-search-bar.scss
+
+/* Animación adicional para el input focus */
+input:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(147, 51, 234, 0.2);
+}
+
+/* Efecto hover en el botón */
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(147, 51, 234, 0.3);
+}
+
+/* Animación del spinner */
+@keyframes spin {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+/* Smooth scroll para los resultados */
+.max-h-60 {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(147, 51, 234, 0.5) rgba(55, 65, 81, 0.5);
+}
+
+.max-h-60::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-60::-webkit-scrollbar-track {
+  background: rgba(55, 65, 81, 0.5);
+  border-radius: 3px;
+}
+
+.max-h-60::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.5);
+  border-radius: 3px;
+}
+
+.max-h-60::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.8);
+}
+
+/* Animaciones de entrada para los resultados */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Aplicar animación al dropdown de resultados */
+.absolute.top-full {
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Hover effect para los items de resultado */
+.hover\:bg-gray-700:hover {
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Efecto de focus mejorado para botones */
+button:focus-visible {
+  outline: 2px solid rgba(147, 51, 234, 0.5);
+  outline-offset: 2px;
+}

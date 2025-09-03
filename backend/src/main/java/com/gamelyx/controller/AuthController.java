@@ -10,7 +10,6 @@ import com.gamelyx.dto.AuthDtos.RefreshTokenRequest;
 import com.gamelyx.service.AuthService;
 import com.gamelyx.service.EmailService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,11 +22,13 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final EmailService emailService;
 
-    @Autowired
-    private EmailService emailService;
+    public AuthController(AuthService authService, EmailService emailService) {
+        this.authService = authService;
+        this.emailService = emailService;
+    }
 
     /**
      * Endpoint para registrar nuevos usuarios

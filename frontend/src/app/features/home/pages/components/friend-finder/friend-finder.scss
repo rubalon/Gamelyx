@@ -1,0 +1,236 @@
+/* src/app/features/home/components/friend-finder/friend-finder.scss */
+/* 🎯 SIMPLIFICADO - Ya no contiene estilos del result que se movieron al nuevo componente */
+
+.friend-finder-container {
+  width: 100%;
+  
+  /* Asegurar que el componente tenga límites visuales claros */
+  border-radius: 0.75rem;
+  border: 0.0625rem solid #374151; /* 1px → 0.0625rem */
+  background-color: #1f2937;
+  padding: 1.5rem;
+  
+  /* Shadow para separar visualmente del resto */
+  box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.1), 
+              0 0.125rem 0.25rem -0.0625rem rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   FLECHA OPTIMIZADA - MANTENIDA
+   ======================================== */
+
+/* Contenedor de la flecha */
+.arrow-container {
+  min-height: 3.75rem; /* 60px → 3.75rem en móvil */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 64rem) { /* 1024px → 64rem */
+  .arrow-container {
+    min-height: 7.5rem; /* 120px → 7.5rem en desktop */
+  }
+}
+
+/* Flecha Horizontal (Desktop) - Optimizada */
+.arrow-connector-optimized {
+  position: relative;
+  width: 3.75rem; /* 60px → 3.75rem */
+  height: 1.875rem; /* 30px → 1.875rem */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-line-optimized {
+  width: 2.1875rem; /* 35px → 2.1875rem */
+  height: 0.375rem; /* 6px → 0.375rem */
+  background: linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%);
+  border-radius: 0.1875rem; /* 3px → 0.1875rem */
+  animation: flow-pulse-optimized 2s infinite;
+}
+
+.arrow-head-optimized {
+  width: 0;
+  height: 0;
+  border-left: 1.125rem solid #3b82f6; /* 18px → 1.125rem */
+  border-top: 0.75rem solid transparent; /* 12px → 0.75rem */
+  border-bottom: 0.75rem solid transparent; /* 12px → 0.75rem */
+  filter: drop-shadow(0 0 0.375rem rgba(59, 130, 246, 0.6)); /* 6px → 0.375rem */
+  animation: arrow-head-pulse-optimized 2s infinite;
+  margin-left: -0.125rem; /* -2px → -0.125rem */
+}
+
+/* Flecha Vertical (Mobile) */
+.arrow-connector-vertical {
+  position: relative;
+  width: 1.875rem; /* 30px → 1.875rem */
+  height: 3.75rem; /* 60px → 3.75rem */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-line-vertical {
+  width: 0.375rem; /* 6px → 0.375rem */
+  height: 2.1875rem; /* 35px → 2.1875rem */
+  background: linear-gradient(180deg, #8b5cf6 0%, #3b82f6 100%);
+  border-radius: 0.1875rem; /* 3px → 0.1875rem */
+  animation: flow-pulse-optimized 2s infinite;
+}
+
+.arrow-head-vertical {
+  width: 0;
+  height: 0;
+  border-top: 1.125rem solid #3b82f6; /* 18px → 1.125rem */
+  border-left: 0.75rem solid transparent; /* 12px → 0.75rem */
+  border-right: 0.75rem solid transparent; /* 12px → 0.75rem */
+  filter: drop-shadow(0 0 0.375rem rgba(59, 130, 246, 0.6)); /* 6px → 0.375rem */
+  animation: arrow-head-pulse-optimized 2s infinite;
+  margin-top: -0.125rem; /* -2px → -0.125rem */
+}
+
+/* 🎯 RESPONSIVE CON CSS NATIVO */
+/* Desktop: Mostrar horizontal, ocultar vertical */
+.arrow-desktop {
+  display: flex;
+}
+
+.arrow-mobile {
+  display: none;
+}
+
+/* Mobile: Ocultar horizontal, mostrar vertical */
+@media (max-width: 63.9375rem) { /* 1023px → 63.9375rem */
+  .arrow-desktop {
+    display: none !important;
+  }
+  
+  .arrow-mobile {
+    display: flex !important;
+  }
+}
+
+/* Animaciones optimizadas */
+@keyframes flow-pulse-optimized {
+  0%, 100% { 
+    opacity: 0.8; 
+    transform: scaleY(1);
+    box-shadow: 0 0 0.25rem rgba(139, 92, 246, 0.4); /* 4px → 0.25rem */
+  }
+  50% { 
+    opacity: 1; 
+    transform: scaleY(1.3);
+    box-shadow: 0 0 0.5rem rgba(139, 92, 246, 0.8); /* 8px → 0.5rem */
+  }
+}
+
+@keyframes arrow-head-pulse-optimized {
+  0%, 100% { 
+    opacity: 0.8;
+    filter: drop-shadow(0 0 0.375rem rgba(59, 130, 246, 0.6)) brightness(1); /* 6px → 0.375rem */
+  }
+  50% { 
+    opacity: 1;
+    filter: drop-shadow(0 0 0.75rem rgba(59, 130, 246, 0.9)) brightness(1.2); /* 12px → 0.75rem */
+  }
+}
+
+/* ========================================
+   ESTILOS DEL COMPONENTE PRINCIPAL - SIMPLIFICADOS
+   ======================================== */
+
+.finder-content {
+  .ready-state {
+    /* Layout mejorado para el diseño horizontal */
+    .flex {
+      align-items: center;
+      min-height: 3.75rem; /* 60px → 3.75rem en móvil */
+    }
+    
+    @media (min-width: 64rem) { /* 1024px → 64rem */
+      .flex {
+        min-height: 7.5rem; /* 120px → 7.5rem en desktop */
+      }
+    }
+    
+    /* Botón principal con proporciones optimizadas */
+    .find-friends-btn {
+      transition: all 0.3s ease;
+      width: 100%;
+      min-width: 15rem; /* 240px → 15rem - Reducido para ser menos gordo */
+      line-height: 1.3; /* Mejor espaciado entre líneas del <br> */
+      
+      &:hover {
+        transform: scale(1.02) translateY(-0.0625rem); /* -1px → -0.0625rem */
+        box-shadow: 0 0.5rem 1.5625rem rgba(147, 51, 234, 0.4); /* 8px 25px → 0.5rem 1.5625rem */
+      }
+      
+      &:active {
+        transform: scale(0.98);
+      }
+      
+      /* Gradient animation */
+      background-size: 200% 200%;
+      animation: gradient-shift 3s ease infinite;
+      
+      &:hover {
+        animation-duration: 1.5s;
+      }
+    }
+  }
+}
+
+/* Keyframes para animaciones del botón */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Estado sin juegos */
+.no-games-state {
+  .text-6xl {
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.625rem); /* -10px → -0.625rem */
+  }
+}
+
+/* Estados de carga */
+.animate-spin {
+  filter: drop-shadow(0 0 0.5rem rgba(147, 51, 234, 0.5)); /* 8px → 0.5rem */
+}
+
+/* Help text */
+.help-text {
+  .text-xs {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 48rem) { /* 768px → 48rem */
+  .friend-finder-container {
+    padding: 1rem;
+  }
+  
+  .finder-content .ready-state .flex {
+    flex-direction: column;
+    text-align: center;
+  }
+}

@@ -1,0 +1,101 @@
+<!-- src/app/features/home/components/friend-finder/friend-finder.html -->
+<div class="friend-finder-container">
+  
+  <!-- Header -->
+  <div class="text-left mb-6">
+    <h2 class="text-xl font-bold text-white">🔍 Buscar Amigos</h2>
+  </div>
+
+  <!-- Main Content -->
+  <div class="finder-content">
+    @if (isLoading) {
+      <!-- Loading State -->
+      <div class="text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+        <p class="text-gray-400">Cargando tus gustos...</p>
+      </div>
+    } @else if (totalPreferredGames === 0) {
+      <!-- No Preferred Games -->
+      <div class="no-games-state text-center py-8">
+        <div class="text-6xl mb-4">🎮</div>
+        <p class="text-gray-400 mb-2 pt-2">Aún no tienes juegos valorados</p>
+        <p class="text-gray-500 text-sm mb-4 pt-5.5">Valora algunos juegos para encontrar amigos con gustos similares</p>
+      
+      </div>
+    } @else if (isFirstAttemptExhausted) {
+      <!-- First Attempt Exhausted - No suggestions found initially -->
+      <div class="no-games-state text-center pt-5.5 pb-2">
+        <div class="text-6xl mb-4">😔</div>
+        <p class="text-gray-400 mb-2">No se encontraron amigos con gustos similares</p>
+        <p class="text-gray-500 text-sm mb-4 lg:mx-16">Hemos buscado en todos tus juegos favoritos pero no hay sugerencias disponibles en este momento, Valora más juegos para ampliar las opciones de búsqueda</p>
+        <button 
+          (click)="onFindFriends()"
+          class="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all">
+          🔄 Intentar de nuevo
+        </button>
+      </div>
+    } @else if (hasExhaustedAfterProcessing) {
+      <!-- Exhausted After Processing Suggestions -->
+      <div class="no-games-state text-center pt-5.5 pb-2">
+        <div class="text-6xl mb-4">🎯</div>
+        <p class="text-gray-400 mb-2">No se encontraron más amigos con gustos similares</p>
+        <p class="text-gray-500 text-sm mb-4 lg:mx-16">Hemos buscado en todos tus juegos favoritos pero no hay más sugerencias disponibles en este momento, Valora más juegos para ampliar las opciones de búsqueda</p>
+        <button 
+          (click)="onFindFriends()"
+          class="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all">
+          🔄 Intentar de nuevo
+        </button>
+      </div>
+    } @else {
+      <!-- Ready to Find Friends - Layout Horizontal -->
+      <div class="ready-state">
+        
+        <!-- Layout Horizontal: Botón + Flecha + Result Component -->
+        <div class="flex flex-col lg:flex-row items-center gap-4 lg:gap-6 min-h-[60px] lg:min-h-[120px]">
+          
+          <!-- Columna Izquierda: Botón Principal -->
+          <div class="w-full lg:w-2/5 flex-shrink-0 flex flex-col justify-center">
+            <button 
+              (click)="onFindFriends()"
+              class="find-friends-btn w-full px-4 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg text-center">
+              Buscar amigos que<br>compartan mis gustos
+            </button>
+          </div>
+
+          <!-- Flecha Optimizada Separadora -->
+          <div class="flex-shrink-0 flex items-center justify-center arrow-container">
+            <!-- Versión Desktop: Horizontal -->
+            <div class="arrow-connector-optimized arrow-desktop">
+              <div class="arrow-line-optimized"></div>
+              <div class="arrow-head-optimized"></div>
+            </div>
+            <!-- Versión Mobile: Vertical -->
+            <div class="arrow-connector-vertical arrow-mobile">
+              <div class="arrow-line-vertical"></div>
+              <div class="arrow-head-vertical"></div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Contact User Card -->
+          <div class="w-full lg:w-3/5 flex-grow">
+            <app-contact-user-card
+              [userData]="suggestionAsContactData()"
+              [cardType]="suggestionAsContactData() ? 'suggestion' : 'empty-result'"
+              (requestNewSuggestion)="onRequestNewSuggestion()">
+            </app-contact-user-card>
+          </div>
+          
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <!-- Help Text -->
+  <div class="help-text text-center mt-6 pt-4 border-t border-gray-600">
+    <p class="text-gray-500 text-xs">
+      💡 El sistema buscará usuarios que hayan valorado positivamente los mismos juegos que tú
+    </p>
+  </div>
+
+</div>

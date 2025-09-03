@@ -1,0 +1,156 @@
+<!-- src/app/features/home/components/friend-request/friend-request.html -->
+<div class="w-full bg-gray-800/90 rounded-xl border border-gray-700/50">
+  
+  <!-- Header with Toggle -->
+  <div class="p-6 border-b border-gray-700/50">
+    <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+      <span class="text-2xl mr-3">📨</span>
+      Solicitudes de amistad
+    </h2>
+    
+    <!-- Toggle Tabs -->
+    <div class="flex bg-gray-900/50 rounded-lg p-1 max-w-md">
+      <button
+        (click)="requestType.set('incoming')"
+        [class]="requestType() === 'incoming' 
+          ? 'bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-lg shadow-purple-600/25' 
+          : 'text-gray-300 hover:text-white hover:bg-gray-700/50'"
+        class="flex-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center text-sm">
+        <span class="mr-2">📥</span>
+        Entrantes
+        @if (totalIncoming > 0) {
+          <span class="ml-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center animate-pulse">
+            {{ totalIncoming }}
+          </span>
+        }
+      </button>
+      <button
+        (click)="requestType.set('outgoing')"
+        [class]="requestType() === 'outgoing' 
+          ? 'bg-gradient-to-br from-sky-600 via-blue-500 to-cyan-600 text-white shadow-lg shadow-sky-600/25' 
+          : 'text-gray-300 hover:text-white hover:bg-gray-700/50'"
+        class="flex-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 relative flex items-center justify-center text-sm">
+        <span class="mr-2">📤</span>
+        Enviadas
+        @if (totalOutgoing > 0) {
+          <span class="ml-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center">
+            {{ totalOutgoing }}
+          </span>
+        }
+      </button>
+    </div>
+    
+    <!-- Sub-selector para solicitudes enviadas -->
+    @if (requestType() === 'outgoing') {
+      <div class="mt-3">
+        <div class="flex bg-gray-900/50 rounded-md p-1 text-xs max-w-md">
+          <button
+            (click)="outgoingStatus.set('PENDING')"
+            [class]="outgoingStatus() === 'PENDING' 
+              ? 'bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-extrabold shadow-md border border-yellow-400/30' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800/50'"
+            class="flex-1 px-3 py-1.5 rounded-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-1">
+            <span>⏳</span>
+            <span class="text-xs">Pendientes</span>
+          </button>
+          <button
+            (click)="outgoingStatus.set('ACCEPTED')"
+            [class]="outgoingStatus() === 'ACCEPTED' 
+              ? 'bg-gradient-to-br from-green-500 to-emerald-500 text-white font-extrabold shadow-md border border-green-400/30' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800/50'"
+            class="flex-1 px-3 py-1.5 rounded-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-1">
+            <span>✅</span>
+            <span class="text-xs">Aceptadas</span>
+          </button>
+          <button
+            (click)="outgoingStatus.set('REJECTED')"
+            [class]="outgoingStatus() === 'REJECTED' 
+              ? 'bg-gradient-to-br from-red-500 to-pink-500 text-white font-extrabold shadow-md border border-red-400/30' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-800/50'"
+            class="flex-1 px-3 py-1.5 rounded-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-1">
+            <span>❌</span>
+            <span class="text-xs">Rechazadas</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Requests Content -->
+  <div class="p-6">
+    @if (isLoading) {
+      <!-- Loading State -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (item of [1,2,3,4,5,6]; track $index) {
+          <div class="bg-gray-700/50 rounded-xl p-4 animate-pulse min-h-[240px]">
+            <!-- Avatar y header -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gray-600/50 rounded-full"></div>
+                <div>
+                  <div class="h-4 bg-gray-600/50 rounded w-20 mb-1"></div>
+                  <div class="h-3 bg-gray-600/50 rounded w-16"></div>
+                </div>
+              </div>
+              <div class="flex space-x-2">
+                <div class="w-8 h-8 bg-gray-600/50 rounded-lg"></div>
+                <div class="w-8 h-8 bg-gray-600/50 rounded-lg"></div>
+                <div class="w-8 h-8 bg-gray-600/50 rounded-lg"></div>
+              </div>
+            </div>
+            <!-- Badge -->
+            <div class="w-20 h-6 bg-gray-600/50 rounded-full mb-3"></div>
+            <!-- Shared game -->
+            <div class="bg-gray-600/30 rounded-lg p-3 mb-4">
+              <div class="h-3 bg-gray-600/50 rounded w-full mb-2"></div>
+              <div class="h-4 bg-gray-600/50 rounded w-3/4 mb-2"></div>
+              <div class="flex justify-between">
+                <div class="h-3 bg-gray-600/50 rounded w-12"></div>
+                <div class="h-3 bg-gray-600/50 rounded w-12"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (currentRequests.length > 0) {
+      <!-- Requests Grid usando las nuevas cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (request of currentRequests; track request.requestId) {
+          <app-contact-user-card
+            [userData]="request"
+            [cardType]="getCardType()">
+          </app-contact-user-card>
+        }
+      </div>
+    } @else {
+      <!-- Empty States -->
+      <div class="text-center py-16">
+        @if (requestType() === 'incoming') {
+          <!-- Empty Incoming -->
+          <div class="text-8xl mb-6 opacity-40 animate-bounce">📥</div>
+          <h3 class="text-2xl font-bold text-gray-300 mb-3">No tienes solicitudes pendientes</h3>
+          <p class="text-gray-500 text-lg">Las nuevas solicitudes de amistad aparecerán aquí</p>
+        } @else {
+          <!-- Empty Outgoing States -->
+          @if (outgoingStatus() === 'PENDING') {
+            <!-- Empty Pending -->
+            <div class="text-8xl mb-6 opacity-40 animate-pulse">⏳</div>
+            <h3 class="text-2xl font-bold text-gray-300 mb-3">No tienes solicitudes pendientes</h3>
+            <p class="text-gray-500 text-lg">Busca usuarios para enviar solicitudes de amistad</p>
+          } @else if (outgoingStatus() === 'ACCEPTED') {
+            <!-- Empty Accepted -->
+            <div class="text-8xl mb-6 opacity-40 animate-bounce">✅</div>
+            <h3 class="text-2xl font-bold text-gray-300 mb-3">No tienes solicitudes aceptadas por revisar</h3>
+            <p class="text-gray-500 text-lg">Cuando alguien acepte tu solicitud, aparecerá aquí hasta que la marques como vista</p>
+          } @else if (outgoingStatus() === 'REJECTED') {
+            <!-- Empty Rejected -->
+            <div class="text-8xl mb-6 opacity-40 animate-pulse">❌</div>
+            <h3 class="text-2xl font-bold text-gray-300 mb-3">No tienes solicitudes rechazadas</h3>
+            <p class="text-gray-500 text-lg">Las solicitudes rechazadas aparecerán aquí hasta que las marques como vistas</p>
+          }
+        }
+      </div>
+    }
+  </div>
+
+</div>

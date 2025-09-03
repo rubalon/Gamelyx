@@ -1,0 +1,75 @@
+/* src/app/features/home/components/friend-request/friend-request.scss */
+
+/* Animaciones adicionales que Tailwind no cubre */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-bounce {
+  animation: float 3s ease-in-out infinite;
+}
+
+
+/* Efectos de focus para accesibilidad */
+button {
+  &:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
+  }
+}
+
+/* Mejora visual para badges */
+.inline-flex {
+  backdrop-filter: blur(8px);
+}
+
+/* Utilidad para truncar texto en múltiples líneas */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.3;
+  max-height: 2.6em;
+}
+
+/* Asegurar que el grid mantenga altura consistente pero más compacta */
+.grid > div {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hacer que los botones siempre estén en la parte inferior */
+.group {
+  > div:last-child {
+    margin-top: auto;
+  }
+}
+
+/* Mejoras responsive para el grid */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}

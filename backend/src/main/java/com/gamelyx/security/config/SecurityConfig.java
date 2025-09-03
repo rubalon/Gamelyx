@@ -2,7 +2,6 @@ package com.gamelyx.security.config;
 
 import com.gamelyx.security.jwt.JwtAuthenticationFilter;
 import com.gamelyx.security.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,15 +29,18 @@ import java.util.ArrayList;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomUserDetailsService userDetailsService;
 
     // AÑADIDO: Variable de configuración dinámica
     @Value("${app.frontend.url:http://localhost:4200}")
     private String frontendUrl;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          CustomUserDetailsService userDetailsService) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -88,6 +90,16 @@ public class SecurityConfig {
                         .requestMatchers("GET", "/api/games/game/*").authenticated()
                         .requestMatchers("PUT", "/api/games/game/*/my-game-details").authenticated()
                         .requestMatchers("GET","/api/games/my-reviews").authenticated()
+
+                        //Enpoints de social ( necesitan autentificacion)ç
+                        .requestMatchers("GET","/api/social/home-social-data").authenticated()
+                        .requestMatchers("GET","/api/social/search/users").authenticated()
+                        .requestMatchers("POST","/api/social/friend-requests").authenticated()
+                        .requestMatchers("PUT","/api/social/friend-requests/*/respond").authenticated()
+                        .requestMatchers("PUT","/api/social/friend-requests/*/mark-notified").authenticated()
+                        .requestMatchers("DELETE","/api/social/friends/*").authenticated()
+                        .requestMatchers("GET","/api/social/friend-suggestion/by-game").authenticated()
+                        .requestMatchers("POST","/api/social/friend-suggestion/reject").authenticated()
 
                         // Swagger y documentación (opcional para desarrollo)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

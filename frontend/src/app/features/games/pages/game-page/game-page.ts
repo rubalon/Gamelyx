@@ -5,12 +5,13 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
 
-import { Header } from '../../../../shared/components/header/header';
+import { Header } from '@shared/components/header/header';
+import { FooterComponent } from '@shared/components/footer/footer';
 import { GameApiService, GameDetails as GameDetailsInterface, UpdateReviewResponse } from '@core/services/game-api';
-import { AuthStore } from '../../../../core/stores/auth-store';
+import { AuthStore } from '@core/stores/auth-store';
 import { GameReviewsSection } from './components/game-reviews-section/game-reviews-section';
 import { GameStatusSelector } from './components/game-status-selector/game-status-selector';
-
+import { StarRating } from '@shared/components/star-rating/star-rating';
 @Component({
   selector: 'app-game-page',
   standalone: true,
@@ -18,8 +19,10 @@ import { GameStatusSelector } from './components/game-status-selector/game-statu
     CommonModule,
     TranslateModule,
     Header,
+    FooterComponent,
     GameReviewsSection,
-    GameStatusSelector
+    GameStatusSelector,
+    StarRating
   ],
   templateUrl: './game-page.html',
   styleUrl: './game-page.scss'
@@ -202,31 +205,6 @@ export class GamePage implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * ⭐ Generar array para mostrar estrellas de rating con fracciones
-   */
-  getRatingStars(rating: number): { filled: number }[] {
-    const stars = [];
-    const maxStars = 5;
-    const scaledRating = rating / 2; // Rating de 10 a 5 estrellas
-    
-    for (let i = 0; i < maxStars; i++) {
-        const starValue = scaledRating - i;
-        
-        if (starValue >= 1) {
-        // Estrella completamente llena
-        stars.push({ filled: 1 });
-        } else if (starValue > 0) {
-        // Estrella parcialmente llena
-        stars.push({ filled: starValue });
-        } else {
-        // Estrella vacía
-        stars.push({ filled: 0 });
-        }
-    }
-    
-    return stars;
-  }
 
   /**
    * 🎨 Obtener color del score metacritic

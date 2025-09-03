@@ -1,0 +1,246 @@
+package com.gamelyx.mapper;
+
+import com.gamelyx.dto.SocialResponseDtos.*;
+import com.gamelyx.entity.FriendRequest;
+import com.gamelyx.entity.User;
+import com.gamelyx.entity.UserGameDetails;
+import com.gamelyx.repository.FriendRequestRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Mapper para convertir entidades del sistema social a DTOs.
+ * Mantiene la lógica de mapping separada del Service.
+ */
+@Component
+public class SocialMapper {
+
+    // ================================================
+    // MAPPERS PARA LISTAS - HOME SOCIAL
+    // ================================================
+
+    /**
+     * Convierte lista de Users a lista de ContactUserDto
+     */
+    public List<ContactUserDto> toContactUserDtoList(List<User> users, Map<UUID, Boolean> newMessagesMap) {
+        return users.stream()
+                .map(user -> toContactUserDto(user, newMessagesMap.getOrDefault(user.getId(), false)))
+                .toList();
+    }
+
+    /**
+     * Convierte lista de FriendRequests a DTOs
+     */
+    public List<FriendRequestDto> toFriendRequestDtoList(List<FriendRequestRepository.FriendRequestProjection> projections, Map<UUID, Boolean> newMessagesMap) {
+        return projections.stream()
+                .map(projection -> toFriendRequestDto(projection, newMessagesMap))
+                .toList();
+    }
+
+    /**
+     * Convierte lista de UserGameDetails a PreferredGameDto
+     */
+    public List<PreferredGameDto> toPreferredGameDtoList(List<UserGameDetails> gameDetails) {
+        return gameDetails.stream()
+                .map(this::toPreferredGameDto)
+                .toList();
+    }
+
+// ================================================
+// MAPPERS INDIVIDUALES QUE NECESITARÁS
+// ================================================
+
+    /**
+     * Convierte FriendRequest a IncomingRequestDto
+     */
+    public FriendRequestDto toFriendRequestDto(FriendRequestRepository.FriendRequestProjection projection, Map<UUID, Boolean> newMessagesMap) {
+
+        // 1. Crear ContactUserDto del sender usando los datos de la projection
+        UserDto senderUserDto = new UserDto(
+                projection.getContactId(),
+                projection.getContactUsername()
+        );
+        ContactUserDto contactUserDto = new ContactUserDto(
+                senderUserDto,
+                newMessagesMap.getOrDefault(projection.getContactId(), false)
+        );
+
+        // 2. Crear SharedGameInfoDto solo si hay juego sugerido
+        SharedGameInfoDto gameInfo = getSharedGameInfoDto(projection);
+
+
+        // 4. Construir el DTO final
+        return new FriendRequestDto(
+                projection.getRequestId(),          //  Desde projection
+                contactUserDto,                          //  Contact User
+                projection.getRequestSource(),      //  Source
+                projection.getStatus(),             //  Status
+                gameInfo,                           //  Con ratings reales o null
+                projection.getReceivedAt()          //  Desde projection
+        );
+    }
+
+    private SharedGameInfoDto getSharedGameInfoDto(FriendRequestRepository.FriendRequestProjection projection) {
+        SharedGameInfoDto gameInfo = null;
+
+        if (FriendRequest.RequestSource.SUGGESTION.equals(projection.getRequestSource()) &&
+                projection.getGameSlug() != null) {
+
+            gameInfo = new SharedGameInfoDto(
+                    projection.getGameSlug(),
+                    projection.getGameName(),
+                    projection.getYourRating() != null ? projection.getYourRating() : 0,
+                    projection.getTheirRating() != null ? projection.getTheirRating() : 0
+            );
+        }
+        return gameInfo;
+    }
+
+    /**
+     * Convierte UserGameDetails a PreferredGameDto
+     */
+    public PreferredGameDto toPreferredGameDto(UserGameDetails gameDetails) {
+        return new PreferredGameDto(
+                gameDetails.getGame().getSlug(),
+                gameDetails.getGame().getName(),
+                gameDetails.getRating()
+        );
+    }
+
+    // ================================================
+    // MAPPERS PARA BÚSQUEDA DE USUARIOS HU-16
+    // ================================================
+
+
+    /**
+     * Crea UserSearchResultDto con query y resultados enriquecidos
+     */
+    public UserSearchResultDto toUserSearchResultDto(String query, List<SearchedUserDto> searchedUsers) {
+        return new UserSearchResultDto(query, searchedUsers);
+    }
+
+    /**
+     * Convierte User a SearchedUserDto con información de relación
+     */
+    public SearchedUserDto toSearchedUserDto(User user, Boolean isFriend, Boolean hasPendingRequest, Boolean hasRejectedRequest) {
+        if (user == null) {
+            return null;
+        }
+
+        UserDto userDto = toUserDto(user);
+
+        return new SearchedUserDto(
+                userDto,
+                isFriend != null ? isFriend : false,
+                hasPendingRequest != null ? hasPendingRequest : false,
+                hasRejectedRequest != null ? hasRejectedRequest : false
+        );
+    }
+
+    // ================================================
+    // MAPPERS PARA SOLICITUDES DE AMISTAD HU-17
+    // ================================================
+
+    /**
+     * Convierte FriendRequest entity directamente a FriendRequestDto
+     * Para respuestas de envío de solicitud con ratings
+     */
+    public FriendRequestDto toFriendRequestDto(FriendRequest friendRequest, Integer yourRating, Integer theirRating, Map<UUID, Boolean> newMessagesMap) {
+        // Para outgoing requests, el contactUser es el receiver
+        ContactUserDto contactUser = new ContactUserDto(
+                new UserDto(friendRequest.getReceiver().getId(), friendRequest.getReceiver().getUsername()),
+                newMessagesMap.getOrDefault(friendRequest.getReceiver().getId(), false)
+        );
+
+        SharedGameInfoDto sharedGameInfo = null;
+        if (friendRequest.getSharedGame() != null) {
+            sharedGameInfo = new SharedGameInfoDto(
+                    friendRequest.getSharedGame().getSlug(),
+                    friendRequest.getSharedGame().getName(),
+                    yourRating != null ? yourRating : 0,
+                    theirRating != null ? theirRating : 0
+            );
+        }
+
+        return new FriendRequestDto(
+                friendRequest.getId(),
+                contactUser,
+                friendRequest.getSource(),
+                friendRequest.getStatus(),
+                sharedGameInfo,
+                friendRequest.getCreatedAt()
+        );
+    }
+
+    /**
+     * Convierte User a ContactUserDto (para nuevo amigo tras aceptar solicitud).
+     */
+    public ContactUserDto toContactUserDto(User user, boolean newMessages) {
+        UserDto userDto = new UserDto(user.getId(), user.getUsername());
+
+        return new ContactUserDto(userDto, newMessages);
+    }
+
+    /**
+     * Convierte a DTO de respuesta para eliminación de amigo.
+     */
+    public DeleteFriendResponseDto toDeleteFriendResponseDto(User deletedFriend, boolean success) {
+        return new DeleteFriendResponseDto(
+                success,
+                deletedFriend.getUsername(),
+                deletedFriend.getId()
+        );
+    }
+
+    // ================================================
+    // MAPPERS SUGERENCIA DE USUARIOS HU-20
+    // ================================================
+    /**
+     * Convierte UserGameDetails a SuggestedUserDto para respuesta de sugerencias
+     */
+    public SuggestedUserDto toSuggestedUserDto(UserGameDetails userGameDetails, String gameSlug, int yourRating) {
+        return new SuggestedUserDto(
+                // Información básica del usuario sugerido
+                new UserDto(
+                        userGameDetails.getUser().getId(),
+                        userGameDetails.getUser().getUsername()
+                ),
+                new SharedGameInfoDto(
+                        gameSlug,                              // Slug del juego en común
+                        userGameDetails.getGame().getName(),   // Nombre del juego en común
+                        yourRating,                            // Tu rating del juego
+                        userGameDetails.getRating()            // Su rating del juego
+                )
+
+        );
+    }
+
+    // ================================================
+    // MAPPERS GENERALES
+    // ================================================
+
+    /**
+     * Convierte User entity a UserDto básico
+     */
+    public UserDto toUserDto(User user) {
+        if (user == null) {
+            return null;
+        }
+
+        return new UserDto(
+                user.getId(),
+                user.getUsername()
+        );
+    }
+
+
+
+
+
+
+
+
+}

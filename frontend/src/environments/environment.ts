@@ -22,9 +22,33 @@ const getApiUrl = () => {
   return 'http://localhost:8080/api';
 };
 
+const getWsUrl = () => {
+  const hostname = window.location.hostname;
+  
+  // Para desarrollo local
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'ws://localhost:8080/ws';
+  }
+  
+  // Para red local (tu IP)
+  if (hostname.startsWith('192.168')) {
+    return `ws://${hostname}:8080/ws`;
+  }
+  
+  // Para dev tunnels, usar el mismo host pero puerto 8080
+  if (hostname.includes('devtunnels.ms')) {
+    // Reemplazar el puerto en la URL del túnel
+    return `wss://${hostname.replace('-4200', '-8080')}/ws`;
+  }
+  
+  // Fallback
+  return 'ws://localhost:8080/ws';
+};
+
 export const environment = {
   production: false,
   apiUrl: getApiUrl(), // 👈 Se adapta automáticamente a cualquier entorno
+  wsUrl: getWsUrl(), // 👈 WebSocket URL para chat
   version: '1.0.0',
   features: {
     enableGoogleAuth: false,
