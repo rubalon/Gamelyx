@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { ChatApi, MessageDto, ConversationMessagesDto } from '@core/services/chat-api';
 import { ChatWebSocket, WebSocketMessageDto, WebSocketReadReceiptDto } from '@core/services/chat-websocket';
 import { AuthStore } from './auth-store';
@@ -34,10 +34,23 @@ export class ChatStore {
     // Configurar callbacks de WebSocket (sin auto-conectar)
     this.chatWs.onNewMessage((wsMessage) => this.handleNewMessage(wsMessage));
     this.chatWs.onReadReceipt((receipt) => this.handleReadReceipt(receipt));
+
+    // 🔄 Observar cambios de autenticación para auto-conectar/desconectar WebSocket
+    effect(() => {
+      const isAuthenticated = this.authStore.isAuthenticated();
+      
+      if (isAuthenticated) {
+        console.log('🔌 Usuario autenticado - conectando WebSocket automáticamente');
+        this.connectWebSocket();
+      } else {
+        console.log('❌ Usuario no autenticado - desconectando WebSocket automáticamente');
+        this.disconnectWebSocket();
+      }
+    });
   }
 
   /**
-   * 🔌 Conectar WebSocket (llamado desde auth-store después de login)
+   * 🔌 Conectar WebSocket (llamado automáticamente por effect cuando usuario se autentica)
    */
   connectWebSocket(): void {
     console.log('🔌 Iniciando conexión WebSocket desde ChatStore');
@@ -45,7 +58,7 @@ export class ChatStore {
   }
 
   /**
-   * 🔌 Desconectar WebSocket (llamado desde auth-store al hacer logout)
+   * 🔌 Desconectar WebSocket (llamado automáticamente por effect cuando usuario sale)
    */
   disconnectWebSocket(): void {
     console.log('❌ Desconectando WebSocket desde ChatStore');
