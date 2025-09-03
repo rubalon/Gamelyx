@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
 import { AuthStore } from '@core/stores/auth-store';
 import { MessageDto } from './chat-api';
+import { environment } from '../../../environments/environment';
 
 // DTOs para WebSocket basados en el backend
 export interface WebSocketMessageDto {
@@ -58,7 +59,7 @@ export class ChatWebSocket {
 
     // Crear cliente STOMP con WebSocket nativo
     this.client = new Client({
-      brokerURL: `ws://localhost:8080/ws?token=${token}`, // Token en query string para handshake HTTP
+      brokerURL: `${environment.wsUrl}?token=${token}`, // Token en query string para handshake HTTP
       connectHeaders: {
         Authorization: `Bearer ${token}` // Token en headers STOMP para el CONNECT command
       },

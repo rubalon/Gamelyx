@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 // DTOs que coinciden exactamente con el backend
 export interface MessageDto {
@@ -26,7 +27,7 @@ export interface ConversationMessagesDto {
 
 @Injectable({ providedIn: 'root' })
 export class ChatApi {
-  private baseUrl = 'http://localhost:8080/api/chat';
+  private baseUrl = `${environment.apiUrl}/chat`;
   private http = inject(HttpClient);
 
   /**
