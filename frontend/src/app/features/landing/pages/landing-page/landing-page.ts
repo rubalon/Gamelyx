@@ -8,6 +8,7 @@ import { AuthModal } from '@shared/components/auth-modal/auth-modal';
 import { ModalService } from '@shared/services/modal';
 import { AsyncPipe } from '@angular/common';
 import { FooterComponent } from '@shared/components/footer/footer';
+import { AuthStore } from '@core/stores/auth-store';
 
 @Component({
   selector: 'app-landing-page',
@@ -26,7 +27,8 @@ import { FooterComponent } from '@shared/components/footer/footer';
 export class LandingPage implements OnInit {
   protected modalService = inject(ModalService);
   private route = inject(ActivatedRoute);
-  
+  private authStore = inject(AuthStore);
+
   // 🆕 NUEVO: Controlar visibilidad del banner
   showVerificationBanner = false;
 
@@ -34,15 +36,21 @@ export class LandingPage implements OnInit {
     // 🆕 NUEVO: Manejar parámetros de verificación de email
     const verified = this.route.snapshot.queryParams['verified'];
     const openModal = this.route.snapshot.queryParams['openModal'];
-    
+
     if (verified === 'true') {
       this.showVerificationBanner = true;
-      
+
       // Si se solicita abrir modal en login
       if (openModal === 'login') {
         this.modalService.setAuthModalTab('login');
         this.modalService.openAuthModal();
       }
+    }
+
+    // 🆕 NUEVO: Abrir modal automáticamente si hay un error de autenticación (ej. JWT expirado)
+    if (this.authStore.error()) {
+      this.modalService.setAuthModalTab('login');
+      this.modalService.openAuthModal();
     }
   }
 }
