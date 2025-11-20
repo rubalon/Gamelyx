@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt-interceptor';
+import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { GoogleAuthService } from './core/services/google-auth'; // 🆕 NUEVO
 
 /**
@@ -51,9 +52,12 @@ export const appConfig: ApplicationConfig = {
     // 🛣️ Routing
     provideRouter(routes),
     
-    // 🌐 HTTP Client + JWT Interceptor
+    // 🌐 HTTP Client + Interceptors
     provideHttpClient(
-      withInterceptors([jwtInterceptor]) // Automáticamente añade JWT a todas las requests
+      withInterceptors([
+        jwtInterceptor,    // Añade JWT a todas las requests
+        errorInterceptor   // Maneja errores de autenticación (auto-logout en JWT expirado)
+      ])
     ),
     
     // 🗣️ Internationalization (ngx-translate)

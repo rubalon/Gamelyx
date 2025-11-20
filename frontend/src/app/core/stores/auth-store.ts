@@ -272,14 +272,15 @@ export class AuthStore {
 
   /**
    * Cierra la sesión del usuario
+   * @param errorMessage Mensaje de error opcional a mostrar (ej. "Tu sesión ha expirado")
    */
-  logout(): void {
+  logout(errorMessage?: string): void {
     this.clearAuthData();
     this.updateAuthState({
       user: null,
       isAuthenticated: false,
       isLoading: false,
-      error: null,
+      error: errorMessage || null,
       registrationPending: null
     });
     this.router.navigate(['/']);
