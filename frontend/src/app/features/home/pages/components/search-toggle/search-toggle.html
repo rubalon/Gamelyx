@@ -5,21 +5,21 @@
   <div class="flex mb-6 bg-gray-700 rounded-lg p-1 w-fit">
     <button
       (click)="searchType.set('games')"
-      [class]="searchType() === 'games' 
-        ? 'bg-purple-600 text-white shadow-lg' 
+      [class]="searchType() === 'games'
+        ? 'bg-purple-600 text-white shadow-lg'
         : 'text-gray-300 hover:text-white hover:bg-gray-600'"
       class="px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm flex items-center space-x-2">
       <span>🎮</span>
-      <span>Buscar Juegos</span>
+      <span>{{ 'searchToggle.searchGames' | translate }}</span>
     </button>
     <button
       (click)="searchType.set('users')"
-      [class]="searchType() === 'users' 
-        ? 'bg-purple-600 text-white shadow-lg' 
+      [class]="searchType() === 'users'
+        ? 'bg-purple-600 text-white shadow-lg'
         : 'text-gray-300 hover:text-white hover:bg-gray-600'"
       class="px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm flex items-center space-x-2">
       <span>👥</span>
-      <span>Buscar Personas</span>
+      <span>{{ 'searchToggle.searchUsers' | translate }}</span>
     </button>
   </div>
 

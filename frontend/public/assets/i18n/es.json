@@ -125,7 +125,7 @@
     },
     "status": {
       "friend": "Amigo",
-      "requestSent": "Solicitud enviada", 
+      "requestSent": "Solicitud enviada",
       "rejected": "Rechazado",
       "alreadyFriends": "Ya son amigos",
       "requestPending": "Solicitud enviada",
@@ -133,6 +133,245 @@
     },
     "actions": {
       "addFriend": "Añadir"
+    }
+  },
+  "friendFinder": {
+    "title": "🔍 Buscar Amigos",
+    "loading": "Cargando tus gustos...",
+    "noGames": {
+      "title": "Aún no tienes juegos valorados",
+      "subtitle": "Valora algunos juegos para encontrar amigos con gustos similares"
+    },
+    "noSuggestions": {
+      "title": "No se encontraron amigos con gustos similares",
+      "subtitle": "Hemos buscado en todos tus juegos favoritos pero no hay sugerencias disponibles en este momento. Valora más juegos para ampliar las opciones de búsqueda"
+    },
+    "exhausted": {
+      "title": "No se encontraron más amigos con gustos similares",
+      "subtitle": "Hemos buscado en todos tus juegos favoritos pero no hay más sugerencias disponibles en este momento. Valora más juegos para ampliar las opciones de búsqueda"
+    },
+    "retryButton": "🔄 Intentar de nuevo",
+    "mainButton": "Buscar amigos que compartan mis gustos",
+    "helpText": "💡 El sistema buscará usuarios que hayan valorado positivamente los mismos juegos que tú"
+  },
+  "contactUserCard": {
+    "emptyResult": {
+      "title": "Persona que le gustan los mismos juegos que a ti",
+      "subtitle": "Aquí aparecerá una sugerencia personalizada"
+    },
+    "messages": {
+      "new": "Nuevos mensajes",
+      "none": "Sin mensajes nuevos"
+    },
+    "sharedGame": {
+      "title": "Juego común",
+      "yourRating": "Tú:",
+      "theirRating": "Suyo:"
+    },
+    "foundBySearch": {
+      "title": "Localizado por búsqueda",
+      "subtitle": "Usuario encontrado mediante búsqueda manual"
+    },
+    "deleteModal": {
+      "title": "Eliminar amigo",
+      "message": "¿Estás seguro de que quieres eliminar a {{username}} de tu lista de amigos?",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar"
+    },
+    "tooltips": {
+      "openChat": "Abrir chat",
+      "deleteFriend": "Eliminar amigo",
+      "markAsNotified": "Marcar como visto",
+      "acceptRequest": "Aceptar solicitud",
+      "rejectRequest": "Rechazar solicitud",
+      "sendRequest": "Enviar solicitud",
+      "skipSuggestion": "Pasar sugerencia",
+      "collapse": "Colapsar lista",
+      "expand": "Expandir lista"
+    }
+  },
+  "friendList": {
+    "title": "👥 Amigos",
+    "empty": {
+      "title": "No tienes amigos aún",
+      "subtitle": "¡Busca personas con gustos similares!"
+    }
+  },
+  "friendRequests": {
+    "title": "📨 Solicitudes de amistad",
+    "tabs": {
+      "incoming": "Entrantes",
+      "outgoing": "Enviadas"
+    },
+    "status": {
+      "pending": "Pendientes",
+      "accepted": "Aceptadas",
+      "rejected": "Rechazadas"
+    },
+    "empty": {
+      "incoming": {
+        "title": "No tienes solicitudes pendientes",
+        "subtitle": "Las nuevas solicitudes de amistad aparecerán aquí"
+      },
+      "outgoingPending": {
+        "title": "No tienes solicitudes pendientes",
+        "subtitle": "Busca usuarios para enviar solicitudes de amistad"
+      },
+      "outgoingAccepted": {
+        "title": "No tienes solicitudes aceptadas por revisar",
+        "subtitle": "Cuando alguien acepte tu solicitud, aparecerá aquí hasta que la marques como vista"
+      },
+      "outgoingRejected": {
+        "title": "No tienes solicitudes rechazadas",
+        "subtitle": "Las solicitudes rechazadas aparecerán aquí hasta que las marques como vistas"
+      }
+    }
+  },
+  "searchToggle": {
+    "searchGames": "Buscar Juegos",
+    "searchUsers": "Buscar Personas"
+  },
+  "chat": {
+    "loading": "Cargando conversación...",
+    "typing": "escribiendo...",
+    "sendMessage": "Enviar mensaje",
+    "empty": {
+      "title": "¡Inicia la conversación!",
+      "subtitle": "Envía tu primer mensaje a {{username}}"
+    },
+    "input": {
+      "placeholder": "Escribe un mensaje...",
+      "hint": "Presiona Enter para enviar, Shift+Enter para nueva línea",
+      "characterCount": "{{count}}/500",
+      "messageCount": "{{count}}/25 mensajes"
+    },
+    "limit": {
+      "title": "⚠️ Límite de 25 mensajes alcanzado",
+      "subtitle": "Esta conversación ha llegado al máximo de mensajes permitidos"
+    }
+  },
+  "reviewModal": {
+    "title": {
+      "edit": "Editar tu review",
+      "create": "Escribir review"
+    },
+    "writingAs": "Escribiendo como",
+    "closeModal": "Cerrar modal",
+    "rating": {
+      "label": "Puntuación",
+      "giveStars": "Dar {{count}} estrella",
+      "giveStarsPlural": "Dar {{count}} estrellas",
+      "clickToRate": "Haz click en las estrellas para puntuar (opcional)",
+      "labels": {
+        "1": "Terrible",
+        "2": "Muy malo",
+        "3": "Malo",
+        "4": "Flojo",
+        "5": "Regular",
+        "6": "Decente",
+        "7": "Bueno",
+        "8": "Muy bueno",
+        "9": "Excelente",
+        "10": "Obra maestra"
+      }
+    },
+    "review": {
+      "label": "Tu experiencia con el juego",
+      "optional": "(opcional)",
+      "placeholder": "Comparte qué te gustó, qué no te gustó, y si lo recomendarías a otros jugadores...",
+      "maxLengthError": "La review no puede superar los 1000 caracteres"
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "submit": {
+        "updating": "Actualizando...",
+        "publishing": "Publicando...",
+        "update": "Actualizar review",
+        "publish": "Publicar review"
+      }
+    },
+    "errors": {
+      "noContent": "Debes escribir un comentario o dar una puntuación",
+      "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
+      "gameNotFound": "El juego no fue encontrado.",
+      "serverError": "Error del servidor. Por favor, intenta de nuevo más tarde.",
+      "genericError": "Error al enviar la review. Por favor, intenta de nuevo."
+    }
+  },
+  "gameSearch": {
+    "title": "Buscar Juegos",
+    "loading": "Buscando juegos...",
+    "error": {
+      "title": "Error al buscar juegos",
+      "retry": "Reintentar"
+    },
+    "backToHome": "Volver al inicio",
+    "resultsFor": "Resultados para:",
+    "gamesFound": "{{count}} juego encontrado",
+    "gamesFoundPlural": "{{count}} juegos encontrados",
+    "noResults": {
+      "title": "No se encontraron juegos",
+      "subtitle": "Intenta con términos más generales o verifica la ortografía",
+      "suggestions": "💡 Sugerencias: \"Minecraft\", \"GTA\", \"Zelda\", \"FIFA\""
+    },
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "previousShort": "Ant",
+      "nextShort": "Sig",
+      "pageOf": "Página {{current}} de {{total}}"
+    }
+  },
+  "gamePage": {
+    "backToResults": "Volver a resultados",
+    "description": "Descripción",
+    "readMore": "Leer más",
+    "showLess": "Mostrar menos",
+    "gameInfo": "Información del juego",
+    "screenshots": "Capturas de pantalla",
+    "platforms": "Plataformas",
+    "retry": "Reintentar",
+    "errorTitle": "¡Ups! Algo salió mal",
+    "errorMessages": {
+      "notFound": "El juego no fue encontrado",
+      "unauthorized": "Necesitas iniciar sesión para ver este juego",
+      "loadError": "Error al cargar los detalles del juego. Por favor, intenta de nuevo."
+    },
+    "officialWebsite": "Sitio Web Oficial",
+    "genres": "Géneros",
+    "communityReviews": "Reviews de la comunidad",
+    "reviewCount": "{{count}} review",
+    "reviewCountPlural": "{{count}} reviews",
+    "yourReview": "Tu review",
+    "otherReviews": "Otras Reviews",
+    "noStatus": "Sin estado",
+    "edit": "Editar",
+    "updated": "Actualizado",
+    "released": "Lanzamiento",
+    "releaseDate": "Fecha de lanzamiento",
+    "developer": "Desarrollador",
+    "publisher": "Editor",
+    "addReview": {
+      "title": "¿Ya jugaste este juego?",
+      "description": "Comparte tu experiencia con la comunidad. Tu opinión ayuda a otros jugadores a decidir.",
+      "button": "Escribir mi review"
+    },
+    "noReviews": {
+      "title": "Aún no hay reviews",
+      "subtitle": "Sé el primero en compartir tu experiencia con este juego"
+    },
+    "timeAgo": {
+      "justNow": "Ahora mismo",
+      "minutesAgo": "Hace {{count}} minuto",
+      "minutesAgoPlural": "Hace {{count}} minutos",
+      "hoursAgo": "Hace {{count}} hora",
+      "hoursAgoPlural": "Hace {{count}} horas",
+      "daysAgo": "Hace {{count}} día",
+      "daysAgoPlural": "Hace {{count}} días",
+      "monthsAgo": "Hace {{count}} mes",
+      "monthsAgoPlural": "Hace {{count}} meses",
+      "yearsAgo": "Hace {{count}} año",
+      "yearsAgoPlural": "Hace {{count}} años"
     }
   }
 }

@@ -1,20 +1,22 @@
 // src/app/features/games/pages/game-page/components/game-reviews-section/game-reviews-section.ts
 import { Component, inject, signal, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GameDetails, GameReview, GameUserStatus, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
 import { ReviewModal } from '../review-modal/review-modal';
 import { StarRating } from '@shared/components/star-rating/star-rating';
-import { AvatarComponent } from '@shared/components/avatar/avatar';  
+import { AvatarComponent } from '@shared/components/avatar/avatar';
 
 @Component({
   selector: 'app-game-reviews-section',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReviewModal, 
+    CommonModule,
+    TranslateModule,
+    ReviewModal,
     StarRating,
-    AvatarComponent  
+    AvatarComponent
   ],
   templateUrl: './game-reviews-section.html',
   styleUrl: './game-reviews-section.scss'
@@ -26,6 +28,7 @@ export class GameReviewsSection {
 
   // 🏪 Dependencies
   private authStore = inject(AuthStore);
+  private translateService = inject(TranslateService);
 
   // 🎯 Estado interno del componente con Signals
   showReviewModal = signal(false);
@@ -94,30 +97,50 @@ export class GameReviewsSection {
       const now = new Date();
       const diffInMs = now.getTime() - date.getTime();
       const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-      
+
       if (diffInDays === 0) {
         // Mismo día - mostrar horas
         const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
         if (diffInHours === 0) {
           const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-          return diffInMinutes <= 1 ? 'Ahora mismo' : `Hace ${diffInMinutes} minutos`;
+          if (diffInMinutes <= 1) {
+            return this.translateService.instant('gamePage.timeAgo.justNow');
+          }
+          return diffInMinutes === 1
+            ? this.translateService.instant('gamePage.timeAgo.minutesAgo', { count: diffInMinutes })
+            : this.translateService.instant('gamePage.timeAgo.minutesAgoPlural', { count: diffInMinutes });
         }
-        return diffInHours === 1 ? 'Hace 1 hora' : `Hace ${diffInHours} horas`;
+        return diffInHours === 1
+          ? this.translateService.instant('gamePage.timeAgo.hoursAgo', { count: diffInHours })
+          : this.translateService.instant('gamePage.timeAgo.hoursAgoPlural', { count: diffInHours });
       }
-      
-      if (diffInDays === 1) return 'Ayer';
-      if (diffInDays < 7) return `Hace ${diffInDays} días`;
+
+      if (diffInDays === 1) {
+        return this.translateService.instant('gamePage.timeAgo.daysAgo', { count: 1 });
+      }
+      if (diffInDays < 7) {
+        return this.translateService.instant('gamePage.timeAgo.daysAgoPlural', { count: diffInDays });
+      }
       if (diffInDays < 30) {
         const weeks = Math.floor(diffInDays / 7);
-        return weeks === 1 ? 'Hace 1 semana' : `Hace ${weeks} semanas`;
+        return weeks === 1
+          ? this.translateService.instant('gamePage.timeAgo.daysAgoPlural', { count: 7 })
+          : this.translateService.instant('gamePage.timeAgo.daysAgoPlural', { count: diffInDays });
       }
       if (diffInDays < 365) {
         const months = Math.floor(diffInDays / 30);
-        return months === 1 ? 'Hace 1 mes' : `Hace ${months} meses`;
+        return months === 1
+          ? this.translateService.instant('gamePage.timeAgo.monthsAgo', { count: months })
+          : this.translateService.instant('gamePage.timeAgo.monthsAgoPlural', { count: months });
       }
-      
-      return date.toLocaleDateString('es-ES', { 
-        year: 'numeric', 
+
+      const years = Math.floor(diffInDays / 365);
+      return years === 1
+        ? this.translateService.instant('gamePage.timeAgo.yearsAgo', { count: years })
+        : this.translateService.instant('gamePage.timeAgo.yearsAgoPlural', { count: years });
+
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
         month: 'short', 
         day: 'numeric' 
       });
@@ -158,17 +181,28 @@ export class GameReviewsSection {
   getStatusText(status: string | null | undefined): string {
     // ✅ SOLUCIÓN: Manejar null/undefined antes de toUpperCase()
     if (!status) {
-      return 'Sin estado';
+      return this.translateService.instant('gamePage.noStatus');
     }
 
     const statusMap: Record<string, string> = {
-      'COMPLETED': 'Completado',
-      'PLAYING': 'Jugando',
-      'WISHLIST': 'En lista de deseos',
-      'ARCHIVED': 'Archivado'
+      'COMPLETED': this.translateService.instant('games.status.completed'),
+      'PLAYING': this.translateService.instant('games.status.playing'),
+      'WISHLIST': this.translateService.instant('games.status.wishlist'),
+      'ARCHIVED': this.translateService.instant('games.status.archived')
     };
-    
+
     return statusMap[status.toUpperCase()] || status;
+  }
+
+  /**
+   * 📊 Obtener texto del contador de reviews
+   */
+  getReviewCountText(count: number): string {
+    if (count === 1) {
+      return this.translateService.instant('gamePage.reviewCount', { count });
+    } else {
+      return this.translateService.instant('gamePage.reviewCountPlural', { count });
+    }
   }
 
   /**

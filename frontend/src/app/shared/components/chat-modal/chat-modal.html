@@ -37,7 +37,7 @@
           @if (isLoading()) {
             <!-- Loading state -->
             <div class="flex justify-center items-center h-full">
-              <div class="text-gray-400">Cargando conversación...</div>
+              <div class="text-gray-400">{{ 'chat.loading' | translate }}</div>
             </div>
           } @else if (error()) {
             <!-- Error state -->
@@ -78,8 +78,8 @@
             <!-- Empty state -->
             <div class="flex flex-col items-center justify-center h-full text-center py-8">
               <div class="text-4xl mb-3">💬</div>
-              <p class="text-gray-400 mb-2">¡Inicia la conversación!</p>
-              <p class="text-gray-500 text-sm">Envía tu primer mensaje a {{ userData().username }}</p>
+              <p class="text-gray-400 mb-2">{{ 'chat.empty.title' | translate }}</p>
+              <p class="text-gray-500 text-sm">{{ getEmptySubtitle() }}</p>
             </div>
           }
           
@@ -94,7 +94,7 @@
                       <div class="w-1 h-1 bg-gray-400 rounded-full typing-dot-2"></div>
                       <div class="w-1 h-1 bg-gray-400 rounded-full typing-dot-3"></div>
                     </div>
-                    <span class="text-xs text-gray-400 ml-2">escribiendo...</span>
+                    <span class="text-xs text-gray-400 ml-2">{{ 'chat.typing' | translate }}</span>
                   </div>
                 </div>
               </div>
@@ -107,8 +107,8 @@
           @if (messageLimitReached()) {
             <!-- Mensaje de límite alcanzado -->
             <div class="text-center py-4">
-              <div class="text-red-400 font-medium text-sm mb-2">⚠️ Límite de 25 mensajes alcanzado</div>
-              <div class="text-gray-500 text-xs">Esta conversación ha llegado al máximo de mensajes permitidos</div>
+              <div class="text-red-400 font-medium text-sm mb-2">{{ 'chat.limit.title' | translate }}</div>
+              <div class="text-gray-500 text-xs">{{ 'chat.limit.subtitle' | translate }}</div>
             </div>
           } @else {
             <!-- Input normal de mensajes -->
@@ -117,7 +117,7 @@
                 <textarea
                   [(ngModel)]="messageText"
                   (keydown)="onKeyDown($event)"
-                  placeholder="Escribe un mensaje..."
+                  [placeholder]="'chat.input.placeholder' | translate"
                   rows="1"
                   class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:outline-none scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700"
                   style="max-height: 120px; min-height: 40px;"></textarea>
@@ -126,7 +126,7 @@
               <button
                 (click)="onSendMessage()"
                 [disabled]="!canSend()"
-                title="Enviar mensaje"
+                [title]="'chat.sendMessage' | translate"
                 class="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors flex-shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
@@ -137,11 +137,11 @@
             <!-- Character count / tips -->
             <div class="flex justify-between items-center mt-2 text-xs">
               <div class="flex flex-col space-y-1">
-                <span class="text-gray-500">Presiona Enter para enviar, Shift+Enter para nueva línea</span>
+                <span class="text-gray-500">{{ 'chat.input.hint' | translate }}</span>
               </div>
               <div class="flex flex-col text-right space-y-1">
-                <span class="text-gray-500">{{ messageText().length }}/500</span>
-                <span class="text-gray-500">{{ totalMessagesCount() }}/25 mensajes</span>
+                <span class="text-gray-500">{{ getCharacterCountText() }}</span>
+                <span class="text-gray-500">{{ getMessageCountText() }}</span>
               </div>
             </div>
           }

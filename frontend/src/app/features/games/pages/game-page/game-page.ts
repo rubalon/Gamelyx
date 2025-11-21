@@ -2,7 +2,7 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil, switchMap, finalize, catchError, of } from 'rxjs';
 
 import { Header } from '@shared/components/header/header';
@@ -32,6 +32,7 @@ export class GamePage implements OnInit, OnDestroy {
   private router = inject(Router);
   private gameApiService = inject(GameApiService);
   private authStore = inject(AuthStore);
+  private translateService = inject(TranslateService);
   private destroy$ = new Subject<void>();
 
   // 🎯 Estado del componente
@@ -139,15 +140,15 @@ export class GamePage implements OnInit, OnDestroy {
       .pipe(
         catchError(error => {
           console.error('Error loading game details:', error);
-          
+
           if (error.status === 404) {
-            this.error.set('El juego no fue encontrado');
+            this.error.set(this.translateService.instant('gamePage.errorMessages.notFound'));
           } else if (error.status === 401) {
-            this.error.set('Necesitas iniciar sesión para ver este juego');
+            this.error.set(this.translateService.instant('gamePage.errorMessages.unauthorized'));
           } else {
-            this.error.set('Error al cargar los detalles del juego. Por favor, intenta de nuevo.');
+            this.error.set(this.translateService.instant('gamePage.errorMessages.loadError'));
           }
-          
+
           return of(null);
         }),
         finalize(() => this.isLoading.set(false))
@@ -195,10 +196,13 @@ export class GamePage implements OnInit, OnDestroy {
   formatReleaseDate(dateString: string): string {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+      const currentLang = this.translateService.currentLang || this.translateService.defaultLang || 'es';
+      const locale = currentLang === 'en' ? 'en-US' : 'es-ES';
+
+      return date.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
     } catch {
       return dateString;

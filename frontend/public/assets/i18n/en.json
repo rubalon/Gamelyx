@@ -126,13 +126,252 @@
     "status": {
       "friend": "Friend",
       "requestSent": "Request sent",
-      "rejected": "Rejected", 
+      "rejected": "Rejected",
       "alreadyFriends": "Already friends",
       "requestPending": "Request sent",
       "notAvailable": "Not available"
     },
     "actions": {
       "addFriend": "Add"
+    }
+  },
+  "friendFinder": {
+    "title": "🔍 Find Friends",
+    "loading": "Loading your preferences...",
+    "noGames": {
+      "title": "You don't have rated games yet",
+      "subtitle": "Rate some games to find friends with similar tastes"
+    },
+    "noSuggestions": {
+      "title": "No friends with similar tastes found",
+      "subtitle": "We've searched through all your favorite games but there are no suggestions available at this time. Rate more games to expand search options"
+    },
+    "exhausted": {
+      "title": "No more friends with similar tastes found",
+      "subtitle": "We've searched through all your favorite games but there are no more suggestions available at this time. Rate more games to expand search options"
+    },
+    "retryButton": "🔄 Try again",
+    "mainButton": "Find friends who share my tastes",
+    "helpText": "💡 The system will search for users who have positively rated the same games as you"
+  },
+  "contactUserCard": {
+    "emptyResult": {
+      "title": "Person who likes the same games as you",
+      "subtitle": "A personalized suggestion will appear here"
+    },
+    "messages": {
+      "new": "New messages",
+      "none": "No new messages"
+    },
+    "sharedGame": {
+      "title": "Shared game",
+      "yourRating": "You:",
+      "theirRating": "Them:"
+    },
+    "foundBySearch": {
+      "title": "Found by search",
+      "subtitle": "User found through manual search"
+    },
+    "deleteModal": {
+      "title": "Delete friend",
+      "message": "Are you sure you want to remove {{username}} from your friends list?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "tooltips": {
+      "openChat": "Open chat",
+      "deleteFriend": "Delete friend",
+      "markAsNotified": "Mark as seen",
+      "acceptRequest": "Accept request",
+      "rejectRequest": "Reject request",
+      "sendRequest": "Send request",
+      "skipSuggestion": "Skip suggestion",
+      "collapse": "Collapse list",
+      "expand": "Expand list"
+    }
+  },
+  "friendList": {
+    "title": "👥 Friends",
+    "empty": {
+      "title": "You don't have friends yet",
+      "subtitle": "Find people with similar tastes!"
+    }
+  },
+  "friendRequests": {
+    "title": "📨 Friend requests",
+    "tabs": {
+      "incoming": "Incoming",
+      "outgoing": "Sent"
+    },
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "empty": {
+      "incoming": {
+        "title": "You have no pending requests",
+        "subtitle": "New friend requests will appear here"
+      },
+      "outgoingPending": {
+        "title": "You have no pending requests",
+        "subtitle": "Search for users to send friend requests"
+      },
+      "outgoingAccepted": {
+        "title": "You have no accepted requests to review",
+        "subtitle": "When someone accepts your request, it will appear here until you mark it as seen"
+      },
+      "outgoingRejected": {
+        "title": "You have no rejected requests",
+        "subtitle": "Rejected requests will appear here until you mark them as seen"
+      }
+    }
+  },
+  "searchToggle": {
+    "searchGames": "Search Games",
+    "searchUsers": "Search Users"
+  },
+  "chat": {
+    "loading": "Loading conversation...",
+    "typing": "typing...",
+    "sendMessage": "Send message",
+    "empty": {
+      "title": "Start the conversation!",
+      "subtitle": "Send your first message to {{username}}"
+    },
+    "input": {
+      "placeholder": "Type a message...",
+      "hint": "Press Enter to send, Shift+Enter for new line",
+      "characterCount": "{{count}}/500",
+      "messageCount": "{{count}}/25 messages"
+    },
+    "limit": {
+      "title": "⚠️ 25 message limit reached",
+      "subtitle": "This conversation has reached the maximum number of allowed messages"
+    }
+  },
+  "reviewModal": {
+    "title": {
+      "edit": "Edit your review",
+      "create": "Write review"
+    },
+    "writingAs": "Writing as",
+    "closeModal": "Close modal",
+    "rating": {
+      "label": "Rating",
+      "giveStars": "Give {{count}} star",
+      "giveStarsPlural": "Give {{count}} stars",
+      "clickToRate": "Click on the stars to rate (optional)",
+      "labels": {
+        "1": "Terrible",
+        "2": "Very bad",
+        "3": "Bad",
+        "4": "Poor",
+        "5": "Average",
+        "6": "Decent",
+        "7": "Good",
+        "8": "Very good",
+        "9": "Excellent",
+        "10": "Masterpiece"
+      }
+    },
+    "review": {
+      "label": "Your experience with the game",
+      "optional": "(optional)",
+      "placeholder": "Share what you liked, what you didn't like, and if you would recommend it to other players...",
+      "maxLengthError": "The review cannot exceed 1000 characters"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "submit": {
+        "updating": "Updating...",
+        "publishing": "Publishing...",
+        "update": "Update review",
+        "publish": "Publish review"
+      }
+    },
+    "errors": {
+      "noContent": "You must write a comment or give a rating",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "gameNotFound": "The game was not found.",
+      "serverError": "Server error. Please try again later.",
+      "genericError": "Error submitting the review. Please try again."
+    }
+  },
+  "gameSearch": {
+    "title": "Search Games",
+    "loading": "Searching games...",
+    "error": {
+      "title": "Error searching games",
+      "retry": "Retry"
+    },
+    "backToHome": "Back to home",
+    "resultsFor": "Results for:",
+    "gamesFound": "{{count}} game found",
+    "gamesFoundPlural": "{{count}} games found",
+    "noResults": {
+      "title": "No games found",
+      "subtitle": "Try more general terms or check spelling",
+      "suggestions": "💡 Suggestions: \"Minecraft\", \"GTA\", \"Zelda\", \"FIFA\""
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "previousShort": "Prev",
+      "nextShort": "Next",
+      "pageOf": "Page {{current}} of {{total}}"
+    }
+  },
+  "gamePage": {
+    "backToResults": "Back to results",
+    "description": "Description",
+    "readMore": "Read more",
+    "showLess": "Show less",
+    "gameInfo": "Game Information",
+    "screenshots": "Screenshots",
+    "platforms": "Platforms",
+    "retry": "Retry",
+    "errorTitle": "Oops! Something went wrong",
+    "errorMessages": {
+      "notFound": "The game was not found",
+      "unauthorized": "You need to sign in to view this game",
+      "loadError": "Error loading game details. Please try again."
+    },
+    "officialWebsite": "Official Website",
+    "genres": "Genres",
+    "communityReviews": "Community Reviews",
+    "reviewCount": "{{count}} review",
+    "reviewCountPlural": "{{count}} reviews",
+    "yourReview": "Your review",
+    "otherReviews": "Other Reviews",
+    "noStatus": "No status",
+    "edit": "Edit",
+    "updated": "Updated",
+    "released": "Released",
+    "releaseDate": "Release Date",
+    "developer": "Developer",
+    "publisher": "Publisher",
+    "addReview": {
+      "title": "Have you played this game?",
+      "description": "Share your experience with the community. Your opinion helps other players decide.",
+      "button": "Write my review"
+    },
+    "noReviews": {
+      "title": "No reviews yet",
+      "subtitle": "Be the first to share your experience with this game"
+    },
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} minute ago",
+      "minutesAgoPlural": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hour ago",
+      "hoursAgoPlural": "{{count}} hours ago",
+      "daysAgo": "{{count}} day ago",
+      "daysAgoPlural": "{{count}} days ago",
+      "monthsAgo": "{{count}} month ago",
+      "monthsAgoPlural": "{{count}} months ago",
+      "yearsAgo": "{{count}} year ago",
+      "yearsAgoPlural": "{{count}} years ago"
     }
   }
 }

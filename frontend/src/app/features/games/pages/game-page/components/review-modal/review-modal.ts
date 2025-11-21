@@ -2,6 +2,7 @@
 import { Component, inject, signal, computed, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GameApiService, GameUserStatus, UpdateReviewRequest, UpdateReviewResponse } from '@core/services/game-api';
 import { AuthStore } from '@core/stores/auth-store';
 import { finalize, catchError, of } from 'rxjs';
@@ -9,7 +10,7 @@ import { finalize, catchError, of } from 'rxjs';
 @Component({
   selector: 'app-review-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './review-modal.html',
   styleUrl: './review-modal.scss'
 })
@@ -25,6 +26,7 @@ export class ReviewModal {
   private fb = inject(FormBuilder);
   private gameApiService = inject(GameApiService);
   private authStore = inject(AuthStore);
+  private translateService = inject(TranslateService);
 
   // 🎯 Component state
   reviewForm!: FormGroup;
@@ -36,8 +38,8 @@ export class ReviewModal {
   // 💫 Computed values
   currentUser = computed(() => this.authStore.user());
   isEditMode = computed(() => this.existingReview() !== null);
-  modalTitle = computed(() => 
-    this.isEditMode() ? 'Editar tu review' : 'Escribir review'
+  modalTitle = computed(() =>
+    this.translateService.instant(this.isEditMode() ? 'reviewModal.title.edit' : 'reviewModal.title.create')
   );
 
   // ✅ SOLUCIÓN: Effect como propiedad de clase
@@ -153,7 +155,7 @@ export class ReviewModal {
     
     // Validar que al menos hay texto o rating
     if (!formValue.reviewText?.trim() && !formValue.rating) {
-      this.submitError.set('Debes escribir un comentario o dar una puntuación');
+      this.submitError.set(this.translateService.instant('reviewModal.errors.noContent'));
       return;
     }
 
@@ -170,17 +172,17 @@ export class ReviewModal {
       .pipe(
         catchError(error => {
           console.error('Error submitting review:', error);
-          
+
           if (error.status === 401) {
-            this.submitError.set('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+            this.submitError.set(this.translateService.instant('reviewModal.errors.sessionExpired'));
           } else if (error.status === 404) {
-            this.submitError.set('El juego no fue encontrado.');
+            this.submitError.set(this.translateService.instant('reviewModal.errors.gameNotFound'));
           } else if (error.status >= 500) {
-            this.submitError.set('Error del servidor. Por favor, intenta de nuevo más tarde.');
+            this.submitError.set(this.translateService.instant('reviewModal.errors.serverError'));
           } else {
-            this.submitError.set('Error al enviar la review. Por favor, intenta de nuevo.');
+            this.submitError.set(this.translateService.instant('reviewModal.errors.genericError'));
           }
-          
+
           return of(null);
         }),
         finalize(() => this.isSubmitting.set(false))
@@ -254,20 +256,8 @@ export class ReviewModal {
    * 🎯 Obtener mensaje descriptivo del rating
    */
   getRatingLabel(rating: number): string {
-    const labels: Record<number, string> = {
-      1: 'Terrible',
-      2: 'Muy malo',
-      3: 'Malo', 
-      4: 'Flojo',
-      5: 'Regular',
-      6: 'Decente',
-      7: 'Bueno',
-      8: 'Muy bueno',
-      9: 'Excelente',
-      10: 'Obra maestra'
-    };
-    
-    return labels[rating] || '';
+    if (rating < 1 || rating > 10) return '';
+    return this.translateService.instant(`reviewModal.rating.labels.${rating}`);
   }
 
   /**

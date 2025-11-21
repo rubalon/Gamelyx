@@ -1,5 +1,6 @@
 import { Component, input, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { StarRating } from '@shared/components/star-rating/star-rating';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal';
@@ -36,6 +37,7 @@ export interface ContactUserData {
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     AvatarComponent,
     StarRating,
     ConfirmationModalComponent,
@@ -47,6 +49,7 @@ export interface ContactUserData {
 export class ContactUserCard {
   private socialStore = inject(SocialStore);
   private chatStore = inject(ChatStore);
+  private translateService = inject(TranslateService);
   
   // 📥 Inputs modernos
   userData = input<ContactUserData | null>(null);  // Opcional para 'empty-result'
@@ -268,7 +271,15 @@ export class ContactUserCard {
     /****************************************************************************
    * MÉTODOS COMUNES
    * ****************************************************************************/
-  
+
+  /**
+   * 🗑️ Obtener mensaje de eliminación traducido
+   */
+  getDeleteMessage(): string {
+    const friend = this.friendToDelete();
+    if (!friend) return '';
+    return this.translateService.instant('contactUserCard.deleteModal.message', { username: friend.username });
+  }
 
   /**
    * 📅 Formatear fecha relativa
@@ -282,13 +293,19 @@ export class ContactUserCard {
     const diffMinutes = Math.floor(diffTime / (1000 * 60));
 
     if (diffDays > 0) {
-      return `hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+      return diffDays === 1
+        ? this.translateService.instant('gamePage.timeAgo.daysAgo', { count: diffDays })
+        : this.translateService.instant('gamePage.timeAgo.daysAgoPlural', { count: diffDays });
     } else if (diffHours > 0) {
-      return `hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+      return diffHours === 1
+        ? this.translateService.instant('gamePage.timeAgo.hoursAgo', { count: diffHours })
+        : this.translateService.instant('gamePage.timeAgo.hoursAgoPlural', { count: diffHours });
     } else if (diffMinutes > 0) {
-      return `hace ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
+      return diffMinutes === 1
+        ? this.translateService.instant('gamePage.timeAgo.minutesAgo', { count: diffMinutes })
+        : this.translateService.instant('gamePage.timeAgo.minutesAgoPlural', { count: diffMinutes });
     } else {
-      return 'ahora';
+      return this.translateService.instant('gamePage.timeAgo.justNow');
     }
   }
 }

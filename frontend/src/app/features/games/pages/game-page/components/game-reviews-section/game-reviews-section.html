@@ -1,9 +1,9 @@
 <!-- src/app/features/games/pages/game-page/components/game-reviews-section/game-reviews-section.html -->
 <section class="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
-    <h2 class="text-xl sm:text-2xl font-bold text-white">Reviews de la comunidad</h2>
+    <h2 class="text-xl sm:text-2xl font-bold text-white">{{ 'gamePage.communityReviews' | translate }}</h2>
     <div class="text-gray-400 text-sm">
-      {{ gameDetails().totalCommunityReviews }} review{{ gameDetails().totalCommunityReviews !== 1 ? 's' : '' }}
+      {{ getReviewCountText(gameDetails().totalCommunityReviews) }}
     </div>
   </div>
 
@@ -17,22 +17,22 @@
         <!-- Badge "Tu Review" -->
         <div class="absolute -top-2 left-3 sm:left-4">
           <span class="bg-purple-600 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full font-medium">
-            Tu review
+            {{ 'gamePage.yourReview' | translate }}
           </span>
         </div>
         
         <!-- 🆕 Botón Editar - Arriba a la derecha -->
         <div class="absolute top-3 sm:top-4 right-3 sm:right-4">
-          <button 
+          <button
             (click)="onEditMyReview()"
             class="text-purple-400 hover:text-purple-300 hover:bg-purple-900/30 transition-all duration-200 p-1.5 sm:p-2 rounded-lg flex items-center text-xs sm:text-sm"
-            title="Editar mi review"
+            [title]="'gamePage.edit' | translate"
           >
             <svg class="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
-            <span class="ml-1 hidden sm:inline">Editar</span>
+            <span class="ml-1 hidden sm:inline">{{ 'gamePage.edit' | translate }}</span>
           </button>
         </div>
         
@@ -67,7 +67,7 @@
           <!-- Fecha de última actualización -->
           @if (myReview()?.reviewUpdatedAt) {
             <div class="text-gray-500 text-xs">
-              Actualizado {{ formatReviewDate(myReview()?.reviewUpdatedAt) }}
+              {{ 'gamePage.updated' | translate }} {{ formatReviewDate(myReview()?.reviewUpdatedAt) }}
             </div>
           }
         </div>
@@ -89,19 +89,19 @@
         
         <!-- Texto principal -->
         <h3 class="text-white font-medium mb-2 group-hover:text-purple-300 transition-colors text-sm sm:text-base">
-          ¿Ya jugaste este juego?
+          {{ 'gamePage.addReview.title' | translate }}
         </h3>
         <p class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 group-hover:text-gray-300 transition-colors">
-          Comparte tu experiencia con la comunidad. Tu opinión ayuda a otros jugadores a decidir.
+          {{ 'gamePage.addReview.description' | translate }}
         </p>
-        
+
         <!-- Call to action -->
         <div class="inline-flex items-center text-purple-400 font-medium group-hover:text-purple-300 transition-colors text-xs sm:text-sm">
           <svg class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
           </svg>
-          Escribir mi review
+          {{ 'gamePage.addReview.button' | translate }}
         </div>
       </div>
     }
@@ -109,7 +109,7 @@
     <!-- Reviews de otros usuarios -->
     @if (otherReviews().length > 0) {
       <div class="space-y-3">
-        <h3 class="text-base sm:text-lg font-semibold text-white mt-4 sm:mt-6 mb-3 sm:mb-4">Otras reviews</h3>
+        <h3 class="text-base sm:text-lg font-semibold text-white mt-4 sm:mt-6 mb-3 sm:mb-4">{{ 'gamePage.otherReviews' | translate }}</h3>
         
         @for (review of otherReviews(); track review.username) {
           <div class="bg-gray-700/50 rounded-lg p-3 sm:p-4 hover:bg-gray-700/70 transition-colors">
@@ -163,13 +163,13 @@
       <div class="text-center py-6 sm:py-8">
         <div class="mb-3 sm:mb-4">
           <svg class="h-10 w-10 sm:h-12 sm:w-12 text-gray-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.001 8.001 0 01-7.003-4.07L2 16l2.014-5.31C5.001 6.238 8.172 3 12 3s7 3.238 7 9z"/>
           </svg>
         </div>
-        <h3 class="text-gray-400 font-medium mb-2 text-sm sm:text-base">Aún no hay reviews</h3>
+        <h3 class="text-gray-400 font-medium mb-2 text-sm sm:text-base">{{ 'gamePage.noReviews.title' | translate }}</h3>
         <p class="text-gray-500 text-xs sm:text-sm">
-          Sé el primero en compartir tu experiencia con este juego
+          {{ 'gamePage.noReviews.subtitle' | translate }}
         </p>
       </div>
     }

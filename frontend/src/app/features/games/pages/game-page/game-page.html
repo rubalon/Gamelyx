@@ -35,14 +35,14 @@
                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
-          <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">¡Ups! Algo salió mal</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">{{ 'gamePage.errorTitle' | translate }}</h2>
           <p class="text-gray-400 mb-6 text-sm sm:text-base">{{ error() }}</p>
           <div class="flex flex-col sm:flex-row gap-4 sm:space-x-4 sm:justify-center">
-            <button 
+            <button
               (click)="retryLoad()"
               class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-colors"
             >
-              Reintentar
+              {{ 'gamePage.retry' | translate }}
             </button>
             <button 
               (click)="goBack()"
@@ -102,7 +102,7 @@
                     <svg class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
-                    Volver a resultados
+                    {{ 'gamePage.backToResults' | translate }}
                   </button>
                   
                   <!-- Game Title - Responsive Text -->
@@ -180,22 +180,22 @@
               <!-- Description Section -->
               @if (gameDetails()!.descriptionRaw) {
                 <section class="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
-                  <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Descripción</h2>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">{{ 'gamePage.description' | translate }}</h2>
                   <div class="text-gray-300 leading-relaxed text-sm sm:text-base">
                     <div class="whitespace-pre-line">{{ getDisplayDescriptionText() }}</div>
                     
                     @if (shouldShowToggleButton()) {
-                      <button 
-                        (click)="toggleDescription()" 
+                      <button
+                        (click)="toggleDescription()"
                         class="text-purple-400 hover:text-purple-300 font-medium mt-3 flex items-center transition-colors text-sm"
                       >
                         @if (showFullDescription()) {
-                          Mostrar menos
+                          {{ 'gamePage.showLess' | translate }}
                           <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
                           </svg>
                         } @else {
-                          Leer más
+                          {{ 'gamePage.readMore' | translate }}
                           <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                           </svg>
@@ -209,7 +209,7 @@
               <!-- Screenshots Section TODO-->
               @if (gameDetails()!.screenshots && gameDetails()!.screenshots.length > 0) {
                 <section class="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
-                  <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Capturas de pantalla</h2>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">{{ 'gamePage.screenshots' | translate }}</h2>
                   
                   <!-- Main Screenshot -->
                   <div class="mb-4">
@@ -253,13 +253,13 @@
               
               <!-- Game Stats -->
               <div class="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
-                <h3 class="text-lg sm:text-xl font-bold text-white mb-4">Información del juego</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-4">{{ 'gamePage.gameInfo' | translate }}</h3>
                 <div class="space-y-3 sm:space-y-4 text-sm sm:text-base">
                   
                   <!-- Platforms - Show on mobile here -->
                   @if (gameDetails()!.platforms && gameDetails()!.platforms.length > 0) {
                     <div class="sm:hidden">
-                      <span class="text-gray-400 text-sm block mb-2">Plataformas</span>
+                      <span class="text-gray-400 text-sm block mb-2">{{ 'gamePage.platforms' | translate }}</span>
                       <div class="flex flex-wrap gap-1">
                         @for (platform of gameDetails()!.platforms.slice(0, 4); track platform) {
                           <span class="bg-blue-600/20 text-blue-300 text-xs px-2 py-1 rounded border border-blue-600/30">
@@ -278,23 +278,23 @@
                   <!-- Release Date - Show on mobile here -->
                   @if (gameDetails()!.released) {
                     <div class="sm:hidden">
-                      <span class="text-gray-400 text-sm block mb-1">Fecha de lanzamiento</span>
+                      <span class="text-gray-400 text-sm block mb-1">{{ 'gamePage.releaseDate' | translate }}</span>
                       <span class="text-white text-sm">{{ formatReleaseDate(gameDetails()!.released) }}</span>
                     </div>
                   }
-                  
+
                   <!-- Developers -->
                   @if (gameDetails()!.developers && gameDetails()!.developers.length > 0) {
                     <div>
-                      <span class="text-gray-400 text-sm block mb-1">Desarrollador</span>
+                      <span class="text-gray-400 text-sm block mb-1">{{ 'gamePage.developer' | translate }}</span>
                       <span class="text-white">{{ gameDetails()!.developers.join(', ') }}</span>
                     </div>
                   }
-                  
+
                   <!-- Publishers -->
                   @if (gameDetails()!.publishers && gameDetails()!.publishers.length > 0) {
                     <div>
-                      <span class="text-gray-400 text-sm block mb-1">Editor</span>
+                      <span class="text-gray-400 text-sm block mb-1">{{ 'gamePage.publisher' | translate }}</span>
                       <span class="text-white">{{ gameDetails()!.publishers.join(', ') }}</span>
                     </div>
                   }
@@ -307,10 +307,10 @@
                         class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 sm:py-3 px-4 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base"
                       >
                         <svg class="h-4 w-4 sm:h-5 sm:w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                         </svg>
-                        Sitio web oficial
+                        {{ 'gamePage.officialWebsite' | translate }}
                       </button>
                     </div>
                   }
@@ -320,7 +320,7 @@
               <!-- Genres -->
               @if (gameDetails()!.genres && gameDetails()!.genres.length > 0) {
                 <div class="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
-                  <h3 class="text-lg sm:text-xl font-bold text-white mb-4">Géneros</h3>
+                  <h3 class="text-lg sm:text-xl font-bold text-white mb-4">{{ 'gamePage.genres' | translate }}</h3>
                   <div class="flex flex-wrap gap-2">
                     @for (genre of gameDetails()!.genres; track genre) {
                       <span class="bg-purple-600/20 text-purple-300 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 rounded-lg border border-purple-600/30">

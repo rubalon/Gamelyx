@@ -1,6 +1,7 @@
 import { Component, input, output, signal, computed, inject, effect, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AvatarComponent } from '@shared/components/avatar/avatar';
 import { ChatStore } from '@core/stores/chat-store';
 
@@ -15,6 +16,7 @@ export interface ChatModalData {
   imports: [
     CommonModule,
     FormsModule,
+    TranslateModule,
     AvatarComponent
   ],
   templateUrl: './chat-modal.html',
@@ -22,7 +24,8 @@ export interface ChatModalData {
 })
 export class ChatModalComponent implements AfterViewInit {
   private chatStore = inject(ChatStore);
-  
+  private translateService = inject(TranslateService);
+
   // 📜 ViewChild para el contenedor de mensajes
   @ViewChild('messagesContainer') messagesContainer!: ElementRef<HTMLDivElement>;
   
@@ -139,13 +142,34 @@ export class ChatModalComponent implements AfterViewInit {
   }
   
   /**
+   * 💬 Obtener subtítulo vacío traducido
+   */
+  getEmptySubtitle(): string {
+    return this.translateService.instant('chat.empty.subtitle', { username: this.userData().username });
+  }
+
+  /**
+   * 🔢 Obtener texto de contador de caracteres traducido
+   */
+  getCharacterCountText(): string {
+    return this.translateService.instant('chat.input.characterCount', { count: this.messageText().length });
+  }
+
+  /**
+   * 📊 Obtener texto de contador de mensajes traducido
+   */
+  getMessageCountText(): string {
+    return this.translateService.instant('chat.input.messageCount', { count: this.totalMessagesCount() });
+  }
+
+  /**
    * 🕐 Formatear timestamp
    */
   formatTime(timestamp: string): string {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('es-ES', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
   
