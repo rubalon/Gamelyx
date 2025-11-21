@@ -182,6 +182,8 @@ export class AuthModal implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error en login:', error);
+          // 🆕 Desactivar loading en caso de error
+          this.isTraditionalLoading = false;
         },
         complete: () => {
           // 🆕 Desactivar loading al completar
@@ -215,6 +217,8 @@ export class AuthModal implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error en registro:', error);
+          // 🆕 Desactivar loading en caso de error
+          this.isTraditionalLoading = false;
         },
         complete: () => {
           // 🆕 Desactivar loading al completar
