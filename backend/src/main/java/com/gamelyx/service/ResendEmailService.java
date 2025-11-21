@@ -4,7 +4,6 @@ import com.gamelyx.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.util.Map;
  * Resend: 3,000 emails gratis al mes
  */
 @Service
-@Primary // Esta implementación tendrá prioridad sobre EmailService
 public class ResendEmailService {
 
     private static final Logger log = LoggerFactory.getLogger(ResendEmailService.class);
