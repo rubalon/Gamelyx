@@ -31,18 +31,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final EmailService emailService;
+    private final ResendEmailService resendEmailService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtUtil jwtUtil,
                        AuthenticationManager authenticationManager,
-                       EmailService emailService) {
+                       ResendEmailService resendEmailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
-        this.emailService = emailService;
+        this.resendEmailService = resendEmailService;
     }
 
     /**
@@ -245,10 +245,11 @@ public class AuthService {
 
         // Enviar email de verificación
         try {
-            emailService.sendVerificationEmail(savedUser, savedUser.getEmailVerificationToken());
+            resendEmailService.sendVerificationEmail(savedUser, savedUser.getEmailVerificationToken());
             System.out.println("Email de verificación enviado a: " + savedUser.getEmail());
         } catch (Exception e) {
             System.err.println("Error enviando email de verificación: " + e.getMessage());
+            throw new RuntimeException("No se pudo enviar el email de verificación. Por favor, intenta registrarte nuevamente.", e);
         }
 
         // Devolver RegisterResponse sin tokens JWT
