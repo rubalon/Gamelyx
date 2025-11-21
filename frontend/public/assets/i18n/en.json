@@ -6,16 +6,15 @@
     "welcome": "Welcome,"
   },
   "footer": {
-      "description": "Your ultimate platform to discover, explore and connect with the world of video games. Find your next favorite game.",
-      "author": "Created by [Your Name]",
-      "developer": "Full-Stack Developer", 
-      "hire_me": "Hire Me!",
-      "available": "Available for projects",
-      "linkedin_aria": "Visit LinkedIn profile for collaboration opportunities",
+      "tfg_title": "University of Jaén Final Project 2025",
+      "by": "By",
+      "author_name": "Rubén Alonso Cruz",
+      "built_with": "Built with",
       "powered_by": "Data powered by",
-      "rights": "All rights reserved.",
-      "built_with": "Made with",
-      "in": "in"
+      "rawg_database": "RAWG Video Games Database",
+      "copyright": "Gamelyx. All rights reserved.",
+      "contact_me": "Contact me!",
+      "view_profile": "View profile"
     },
   "hero": {
     "subtitle": "Your gaming experience elevated to the next level",

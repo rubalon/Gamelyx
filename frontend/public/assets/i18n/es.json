@@ -6,16 +6,15 @@
     "welcome": "Bienvenido,"
   },
   "footer": {
-      "description": "Tu plataforma definitiva para descubrir, explorar y conectar con el mundo de los videojuegos. Encuentra tu próximo juego favorito.",
-      "author": "Creado por [Tu Nombre]",
-      "developer": "Desarrollador Full-Stack",
-      "hire_me": "¡Contrátame!",
-      "available": "Disponible para proyectos",
-      "linkedin_aria": "Visitar perfil de LinkedIn para oportunidades de colaboración",
+      "tfg_title": "TFG Universidad de Jaén 2025",
+      "by": "Por",
+      "author_name": "Rubén Alonso Cruz",
+      "built_with": "Construido con",
       "powered_by": "Datos proporcionados por",
-      "rights": "Todos los derechos reservados.",
-      "built_with": "Hecho con",
-      "in": "en"
+      "rawg_database": "RAWG Video Games Database",
+      "copyright": "Gamelyx. Todos los derechos reservados.",
+      "contact_me": "¡Contáctame!",
+      "view_profile": "Ver perfil"
     },
   "hero": {
     "subtitle": "Tu experiencia gaming elevada al siguiente nivel",
