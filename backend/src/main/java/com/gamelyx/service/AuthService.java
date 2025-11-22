@@ -31,18 +31,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final ResendEmailService resendEmailService;
+    private final IEmailService emailService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtUtil jwtUtil,
                        AuthenticationManager authenticationManager,
-                       ResendEmailService resendEmailService) {
+                       IEmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
-        this.resendEmailService = resendEmailService;
+        this.emailService = emailService;
     }
 
     /**
@@ -245,7 +245,7 @@ public class AuthService {
 
         // Enviar email de verificación
         try {
-            resendEmailService.sendVerificationEmail(savedUser, savedUser.getEmailVerificationToken());
+            emailService.sendVerificationEmail(savedUser, savedUser.getEmailVerificationToken());
             System.out.println("Email de verificación enviado a: " + savedUser.getEmail());
         } catch (Exception e) {
             System.err.println("Error enviando email de verificación: " + e.getMessage());

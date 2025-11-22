@@ -4,6 +4,7 @@ import com.gamelyx.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,11 @@ import java.util.Map;
 /**
  * Servicio de email usando Resend API (funciona sobre HTTPS, no requiere puertos SMTP)
  * Resend: 3,000 emails gratis al mes
+ * Se usa SOLO en producción (cuando está activo el profile "production")
  */
 @Service
-public class ResendEmailService {
+@Profile("production")
+public class ResendEmailService implements IEmailService {
 
     private static final Logger log = LoggerFactory.getLogger(ResendEmailService.class);
     private static final String RESEND_API_URL = "https://api.resend.com/emails";
@@ -55,6 +58,7 @@ public class ResendEmailService {
     /**
      * Envía email de verificación a un usuario recién registrado
      */
+    @Override
     public void sendVerificationEmail(User user, String token) {
         log.info("=== INICIO: Enviando email de verificación via Resend ===");
         log.info("Usuario: {} (ID: {}), Email: {}", user.getUsername(), user.getId(), user.getEmail());
@@ -130,6 +134,7 @@ public class ResendEmailService {
     /**
      * Envía email de bienvenida tras verificación exitosa
      */
+    @Override
     public void sendWelcomeEmail(User user) {
         log.info("=== INICIO: Enviando email de bienvenida via Resend ===");
         log.info("Usuario: {} (ID: {}), Email: {}", user.getUsername(), user.getId(), user.getEmail());
@@ -173,6 +178,7 @@ public class ResendEmailService {
     /**
      * Método para testing - envía email de prueba
      */
+    @Override
     public void sendTestEmail(String to) {
         log.info("=== INICIO: Enviando email de PRUEBA via Resend ===");
         log.info("Destinatario: {}", to);

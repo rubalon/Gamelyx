@@ -8,7 +8,7 @@ import com.gamelyx.dto.AuthDtos.VerifyEmailRequest;
 import com.gamelyx.dto.AuthDtos.GoogleAuthRequest;
 import com.gamelyx.dto.AuthDtos.RefreshTokenRequest;
 import com.gamelyx.service.AuthService;
-import com.gamelyx.service.ResendEmailService;
+import com.gamelyx.service.IEmailService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +23,11 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final ResendEmailService resendEmailService;
+    private final IEmailService emailService;
 
-    public AuthController(AuthService authService, ResendEmailService resendEmailService) {
+    public AuthController(AuthService authService, IEmailService emailService) {
         this.authService = authService;
-        this.resendEmailService = resendEmailService;
+        this.emailService = emailService;
     }
 
     /**
@@ -173,7 +173,7 @@ public class AuthController {
                         .body(createErrorResponse("Email inválido"));
             }
 
-            resendEmailService.sendTestEmail(email);
+            emailService.sendTestEmail(email);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

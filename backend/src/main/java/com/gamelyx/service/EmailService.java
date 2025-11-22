@@ -6,6 +6,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,13 @@ import org.thymeleaf.context.Context;
 
 import java.util.Locale;
 
+/**
+ * Servicio de email usando Gmail SMTP
+ * Se usa SOLO en desarrollo local (cuando NO está el profile "production")
+ */
 @Service
-public class EmailService {
+@Profile("!production")
+public class EmailService implements IEmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
@@ -42,6 +48,7 @@ public class EmailService {
     /**
      * Envía email de verificación a un usuario recién registrado
      */
+    @Override
     public void sendVerificationEmail(User user, String token) {
         log.info("=== INICIO: Enviando email de verificación ===");
         log.info("Usuario: {} (ID: {}), Email: {}", user.getUsername(), user.getId(), user.getEmail());
@@ -113,6 +120,7 @@ public class EmailService {
     /**
      * Envía email de bienvenida tras verificación exitosa
      */
+    @Override
     public void sendWelcomeEmail(User user) {
         log.info("=== INICIO: Enviando email de bienvenida ===");
         log.info("Usuario: {} (ID: {}), Email: {}", user.getUsername(), user.getId(), user.getEmail());
@@ -277,6 +285,7 @@ public class EmailService {
     /**
      * Método para testing - envía email de prueba
      */
+    @Override
     public void sendTestEmail(String to) {
         log.info("=== INICIO: Enviando email de PRUEBA ===");
         log.info("Destinatario: {}", to);
