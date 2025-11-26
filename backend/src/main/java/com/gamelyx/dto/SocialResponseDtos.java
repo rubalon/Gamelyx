@@ -71,18 +71,9 @@ public class SocialResponseDtos {
     // ================================================
 
     /**
-     * Response de aceptar/rechazar solicitud
-     */
-    public record FriendRequestResponseDto(
-            boolean success,
-            ContactUserDto newFriend
-    ) {}
-
-    /**
      * Response para eliminar amigo
      */
     public record DeleteFriendResponseDto(
-            boolean success,
             String deletedFriendUsername,
             UUID deletedFriendId
     ) {}

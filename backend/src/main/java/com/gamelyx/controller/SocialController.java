@@ -72,12 +72,12 @@ public class SocialController {
      * PUT /api/social/friend-requests/{requestId}/respond
      */
     @PutMapping("/friend-requests/{requestId}/respond")
-    public ResponseEntity<FriendRequestResponseDto> respondToFriendRequest(
+    public ResponseEntity<ContactUserDto> respondToFriendRequest(
             @AuthenticationPrincipal String username,
             @PathVariable String requestId,
             @RequestParam FriendRequestAction action) {
 
-        FriendRequestResponseDto response = socialService.respondToFriendRequest(
+        ContactUserDto response = socialService.respondToFriendRequest(
                 username,
                 requestId,
                 action
@@ -118,11 +118,7 @@ public class SocialController {
                 friendId
         );
 
-        if (response.success()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
-        }
+        return ResponseEntity.ok(response);
     }
 
     // ================================================

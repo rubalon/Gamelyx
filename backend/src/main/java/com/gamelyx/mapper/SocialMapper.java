@@ -187,9 +187,8 @@ public class SocialMapper {
     /**
      * Convierte a DTO de respuesta para eliminación de amigo.
      */
-    public DeleteFriendResponseDto toDeleteFriendResponseDto(User deletedFriend, boolean success) {
+    public DeleteFriendResponseDto toDeleteFriendResponseDto(User deletedFriend) {
         return new DeleteFriendResponseDto(
-                success,
                 deletedFriend.getUsername(),
                 deletedFriend.getId()
         );

@@ -188,8 +188,9 @@ public class SocialService {
     /**
      * Responde a una solicitud de amistad (acepta o rechaza).
      * IMPLEMENTACIÓN REAL: Usa validator y mapper para lógica limpia.
+     * @return ContactUserDto del nuevo amigo si se aceptó, null si se rechazó
      */
-    public FriendRequestResponseDto respondToFriendRequest(
+    public ContactUserDto respondToFriendRequest(
             String currentUsername,
             String requestId,
             FriendRequestAction action) {
@@ -217,18 +218,17 @@ public class SocialService {
 
             // Retornar nuevo amigo con estado real de newMessages
             boolean hasNewMessages = hasUnreadMessagesFrom(
-                friendRequest.getReceiver().getId(), 
+                friendRequest.getReceiver().getId(),
                 friendRequest.getSender().getId()
             );
-            ContactUserDto newFriend = socialMapper.toContactUserDto(friendRequest.getSender(), hasNewMessages);
-            return new FriendRequestResponseDto(true, newFriend);
+            return socialMapper.toContactUserDto(friendRequest.getSender(), hasNewMessages);
 
         } else {
             // Rechazar: cambiar status solamente
             friendRequest.reject();
             friendRequestRepository.save(friendRequest);
 
-            return new FriendRequestResponseDto(true, null);
+            return null;
         }
     }
 
@@ -364,7 +364,7 @@ public class SocialService {
         cleanupRelatedFriendRequests(validation.getCallerUser().getId(), friendId);
 
         // 4. Convertir a DTO usando el mapper
-        return socialMapper.toDeleteFriendResponseDto(validation.getTargetUser(), true);
+        return socialMapper.toDeleteFriendResponseDto(validation.getTargetUser());
     }
 
     /**

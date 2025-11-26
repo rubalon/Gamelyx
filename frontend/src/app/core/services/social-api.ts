@@ -86,13 +86,7 @@ export interface SuggestedUserDto {
   };
 }
 
-export interface FriendRequestResponseDto {
-  success: boolean;
-  newFriend: ContactUserDto;
-}
-
 export interface DeleteFriendResponseDto {
-  success: boolean;
   deletedFriendUsername: string;
   deletedFriendId: string; // UUID como string
 }
@@ -142,10 +136,11 @@ export class SocialApiService {
    * ✅❌ Responder a solicitud de amistad
    * PUT /api/social/friend-requests/{requestId}/respond?action=ACCEPT|REJECT
    * Requiere autenticación JWT
+   * Devuelve ContactUserDto solo si action=ACCEPT, null si action=REJECT
    */
-  respondToFriendRequest(requestId: string, action: 'ACCEPT' | 'REJECT'): Observable<FriendRequestResponseDto> {
+  respondToFriendRequest(requestId: string, action: 'ACCEPT' | 'REJECT'): Observable<ContactUserDto | null> {
     const params = new HttpParams().set('action', action);
-    return this.http.put<FriendRequestResponseDto>(`${this.API_URL}/friend-requests/${requestId}/respond`, null, { params });
+    return this.http.put<ContactUserDto | null>(`${this.API_URL}/friend-requests/${requestId}/respond`, null, { params });
   }
 
   /**

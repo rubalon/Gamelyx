@@ -3,8 +3,8 @@ import { Injectable, inject, signal, computed, Signal } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
-import { 
-  SocialApiService, 
+import {
+  SocialApiService,
   HomeSocialDataDto,
   ContactUserDto,
   FriendRequestDto,
@@ -13,7 +13,6 @@ import {
   UserSearchResultDto,
   SuggestedUserDto,
   DeleteFriendResponseDto,
-  FriendRequestResponseDto,
   RequestSource,
   FriendRequestStatus
 } from '@core/services/social-api';
@@ -224,31 +223,31 @@ export class SocialStore {
    * ✅❌ Responder a solicitud de amistad
    * 🔧 OPTIMIZADO: Maneja ACCEPT/REJECT localmente sin refetch
    */
-  respondToFriendRequest(requestId: string, action: 'ACCEPT' | 'REJECT'): Observable<FriendRequestResponseDto> {
-    this.updateSocialState({ 
-      isLoadingRespondRequest: true, 
-      error: null 
+  respondToFriendRequest(requestId: string, action: 'ACCEPT' | 'REJECT'): Observable<ContactUserDto | null> {
+    this.updateSocialState({
+      isLoadingRespondRequest: true,
+      error: null
     });
 
     return this.socialApi.respondToFriendRequest(requestId, action)
       .pipe(
-        tap(response => {
-          console.log(`✅ Friend request ${action.toLowerCase()}ed:`, response);
-          
+        tap(newFriend => {
+          console.log(`✅ Friend request ${action.toLowerCase()}ed:`, newFriend);
+
           const currentState = this._socialState();
-          
+
           // 🗑️ Eliminar la incomingRequest en ambos casos (ACCEPT/REJECT)
           const updatedIncoming = currentState.incomingRequests.filter(
             request => request.requestId !== requestId
           );
-          
+
           let updatedFriends = currentState.friends;
-          
+
           // ➕ Si es ACCEPT, agregar nuevo amigo a la lista
-          if (action === 'ACCEPT' && response.newFriend) {
-            updatedFriends = [...currentState.friends, response.newFriend];
+          if (action === 'ACCEPT' && newFriend) {
+            updatedFriends = [...currentState.friends, newFriend];
           }
-          
+
           // 📊 Actualizar estado local
           this.updateSocialState({
             incomingRequests: updatedIncoming,
