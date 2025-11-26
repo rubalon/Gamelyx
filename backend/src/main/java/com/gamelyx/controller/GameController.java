@@ -79,20 +79,13 @@ public class GameController {
         try {
             GameResponseDtos.GamePageDto gamePageDto;
 
-            if (username != null) {
-                // Usuario autenticado → incluir mi estado personal
-                // GameService busca User entity por username si lo necesita
-                gamePageDto = gameService.getGamePageWithUserData(identifier, username)
-                        .block();
 
-                logger.debug("Game page loaded with user data: '{}'", gamePageDto.getName());
-            } else {
-                // Usuario no autenticado → solo datos públicos
-                gamePageDto = gameService.getGamePagePublic(identifier)
-                        .block();
+            // Usuario autenticado → incluir mi estado personal
+            // GameService busca User entity por username si lo necesita
+            gamePageDto = gameService.getGamePageWithUserData(identifier, username)
+                    .block();
+            logger.debug("Game page loaded with user data: '{}'", gamePageDto.getName());
 
-                logger.debug("Game page loaded (public): '{}'", gamePageDto.getName());
-            }
 
             return ResponseEntity.ok(gamePageDto);
 

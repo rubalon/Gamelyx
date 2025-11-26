@@ -65,8 +65,8 @@ public class GameService {
     // ===== FUNCIONALIDAD 1: BÚSQUEDA =====
 
     /**
-     * 🎯 Para: GET /search
-     * SIN CAMBIOS: No requiere autenticación
+     * Para: GET /search
+     * No requiere autenticación
      */
     public Mono<GameResponseDtos.GameSearchResultsDto> searchGamesForResults(String query, int page, int size) {
         logger.info("🔍 SEARCH SERVICE: query='{}', page={}, size={}", query, page, size);
@@ -98,9 +98,9 @@ public class GameService {
     // ===== FUNCIONALIDAD 2: PÁGINA DEL JUEGO =====
 
     /**
-     * 🎯 Para: GET /game/{identifier} (usuario autenticado)
+     * Para: GET /game/{identifier} (usuario autenticado)
      *
-     * 🔧 REFACTORIZADO: Recibe username y busca User entity
+     * Recibe username y busca User entity
      */
     public Mono<GameResponseDtos.GamePageDto> getGamePageWithUserData(String identifier, String username) {
         logger.info("🎮 GAME PAGE WITH USER: identifier='{}', user={}", identifier, username);
@@ -129,36 +129,13 @@ public class GameService {
                 });
     }
 
-    /**
-     * 🎯 Para: GET /game/{identifier} (usuario NO autenticado)
-     *
-     * LÓGICA DE NEGOCIO:
-     * - Resolver identifier → Game
-     * - Obtener reviews públicas
-     * - Usar GameMapper para conversiones
-     */
-    public Mono<GameResponseDtos.GamePageDto> getGamePagePublic(String identifier) {
-        logger.info("🎮 GAME PAGE PUBLIC: identifier='{}'", identifier);
-
-        return resolveGameFromIdentifier(identifier)
-                .map(game -> {
-                    GameResponseDtos.GamePageDto gamePageDto = gameMapper.gameToPageDto(game);
-
-                    // LÓGICA DE NEGOCIO: Obtener reviews públicas
-                    List<UserGameDetails> recentReviews = getPublicReviews(game.getId(), 3);
-                    gamePageDto.setRecentReviews(gameMapper.userGameDetailsListToOtherReviews(recentReviews));
-
-                    logger.debug("Game page built: '{}' (public)", game.getName());
-                    return gamePageDto;
-                });
-    }
 
     // ===== FUNCIONALIDAD 3: ACTUALIZAR MI REVIEW =====
 
     /**
      * 🎯 Para: PUT /game/{identifier}/my-game-details
      *
-     * 🔧 REFACTORIZADO: Recibe username y busca User entity
+     * Recibe username y busca User entity
      */
     public Mono<GameResponseDtos.UpdatedGameStatusDto> updateMyGameReview(
             String identifier, String username, UpdateMyGameRequest request) {
@@ -252,15 +229,15 @@ public class GameService {
         );
     }
 
-    // ===== 🆕 NUEVO MÉTODO: BÚSQUEDA DE USER =====
+    // =====  BÚSQUEDA DE USER =====
 
     /**
-     * 🆕 NUEVO: Buscar User entity por username
+     *   Buscar User entity por username
      *
      * RESPONSABILIDAD DEL SERVICE:
      * - GameService es responsable de buscar User cuando lo necesita
      * - JwtAuthenticationFilter se mantiene stateless
-     * - Separación clara de responsabilidades
+     *
      */
     private User findUserByUsername(String username) {
         logger.debug("🔍 Searching user by username: {}", username);
