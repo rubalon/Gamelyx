@@ -9,7 +9,8 @@
     "ng": "ng",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "start": "ng serve"
   },
   "prettier": {
     "overrides": [
