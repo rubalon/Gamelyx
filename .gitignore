@@ -9,6 +9,12 @@
 *.swo
 *~
 
+# Configuraciones de ejecución (contienen variables de entorno)
+.run/
+*.run.xml
+backend/.run/
+frontend/.run/
+
 #################################################
 # Sistema Operativo
 #################################################
@@ -56,7 +62,7 @@ backend/*.class
 backend/.idea/
 
 #################################################
-# Android/Mobile Build Artifacts (NUEVO)
+# Android/Mobile Build Artifacts
 #################################################
 *.aab
 *.apk
@@ -85,13 +91,16 @@ private_key.pem
 *.db-journal
 
 #################################################
-# Variables de entorno
+# Variables de entorno y secretos (CRÍTICO)
 #################################################
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+*.env
+!.env.example
+application-local.properties
+application-local.yml
+**/secrets/
+**/credentials/
 
 #################################################
 # Archivos temporales
@@ -101,13 +110,11 @@ private_key.pem
 .cache/
 
 #################################################
-# Claude Code (para el futuro)
+# Claude Code
 #################################################
 .claude-code/
 
 #################################################
 # Archivos específicos del proyecto
 #################################################
-# Mantener el workspace pero ignorar configs personales
-.vscode/settings.json
 !Gamelyx.code-workspace
