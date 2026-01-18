@@ -29,11 +29,11 @@ export class LandingPage implements OnInit {
   private route = inject(ActivatedRoute);
   private authStore = inject(AuthStore);
 
-  // 🆕 NUEVO: Controlar visibilidad del banner
+  // Controlar visibilidad del banner
   showVerificationBanner = false;
 
   ngOnInit(): void {
-    // 🆕 NUEVO: Manejar parámetros de verificación de email
+    // Manejar parámetros de verificación de email
     const verified = this.route.snapshot.queryParams['verified'];
     const openModal = this.route.snapshot.queryParams['openModal'];
 
@@ -47,7 +47,7 @@ export class LandingPage implements OnInit {
       }
     }
 
-    // 🆕 NUEVO: Abrir modal automáticamente si hay un error de autenticación (ej. JWT expirado)
+    //  Abrir modal automáticamente si hay un error de autenticación (ej. JWT expirado)
     if (this.authStore.error()) {
       this.modalService.setAuthModalTab('login');
       this.modalService.openAuthModal();

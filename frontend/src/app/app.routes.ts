@@ -12,13 +12,13 @@ export const routes: Routes = [
     path: 'landing',
     loadComponent: () => import('./features/landing/pages/landing-page/landing-page')
       .then(m => m.LandingPage),
-    canActivate: [canActivateGuest] // 👈 Solo si NO está logueado
+    canActivate: [canActivateGuest] //  Solo si NO está logueado
   },
   {
     path: 'home',
     loadComponent: () => import('./features/home/pages/home-page/home-page')
       .then(m => m.HomePage),
-    canActivate: [canActivateAuth] // 👈 Solo si está logueado
+    canActivate: [canActivateAuth] //  Solo si está logueado
   },
   
   // 🎮 Games Feature Routes - Solo para usuarios autenticados

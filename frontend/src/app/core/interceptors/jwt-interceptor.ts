@@ -4,8 +4,6 @@ import { inject } from '@angular/core';
 import { AuthStore } from '../stores/auth-store';
 
 /**
- * 🛡️ JWT Interceptor (Functional - Angular 20)
- * 
  * Automáticamente añade el token JWT a todas las peticiones HTTP
  * que vayan dirigidas a nuestro backend API
  */

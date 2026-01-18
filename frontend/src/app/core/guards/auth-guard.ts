@@ -18,7 +18,7 @@ export const canActivateAuth: CanActivateFn = (route, state) => {
   return false;
 };
 
-// 👈 BONUS: Guard para prevenir acceso a landing si ya está logueado
+// Guard para prevenir acceso a landing si ya está logueado
 export const canActivateGuest: CanActivateFn = (route, state) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
