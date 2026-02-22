@@ -59,7 +59,8 @@
       "recent": "Recent searches:",
       "noResults": "No games found",
       "searching": "Searching...",
-      "error": "Error searching games"
+      "error": "Error searching games",
+      "hint": "Try searching for games like \"Minecraft\", \"GTA\", \"Zelda\"..."
     }
   },
   "games": {
