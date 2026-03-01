@@ -201,7 +201,7 @@
   "friendRequests": {
     "title": "📨 Solicitudes de amistad",
     "tabs": {
-      "incoming": "Entrantes",
+      "incoming": "Recibidas",
       "outgoing": "Enviadas"
     },
     "status": {
